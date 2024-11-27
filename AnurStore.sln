@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35514.174
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{0DC8CB73-D941-4DB1-A3D1-889FD770B887}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AnurStore.Domain", "AnurStore.Domain", "{862FA187-5ABD-4125-9576-DC78903ADC56}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AnurStore.Application", "AnurStore.Application", "{D7F001EC-7927-4E00-8955-9DF7B01A551B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnurStore.Application", "AnurStore.Application\AnurStore.Application.csproj", "{6CC84519-E522-41A8-9625-FD688B64195E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnurStore.Domain", "AnurStore.Domain\AnurStore.Domain.csproj", "{0121F76E-1C1D-4996-B761-4576B23411D4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CC84519-E522-41A8-9625-FD688B64195E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC84519-E522-41A8-9625-FD688B64195E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC84519-E522-41A8-9625-FD688B64195E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC84519-E522-41A8-9625-FD688B64195E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0121F76E-1C1D-4996-B761-4576B23411D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0121F76E-1C1D-4996-B761-4576B23411D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0121F76E-1C1D-4996-B761-4576B23411D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0121F76E-1C1D-4996-B761-4576B23411D4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{862FA187-5ABD-4125-9576-DC78903ADC56} = {0DC8CB73-D941-4DB1-A3D1-889FD770B887}
+		{D7F001EC-7927-4E00-8955-9DF7B01A551B} = {0DC8CB73-D941-4DB1-A3D1-889FD770B887}
+		{6CC84519-E522-41A8-9625-FD688B64195E} = {D7F001EC-7927-4E00-8955-9DF7B01A551B}
+		{0121F76E-1C1D-4996-B761-4576B23411D4} = {862FA187-5ABD-4125-9576-DC78903ADC56}
+	EndGlobalSection
+EndGlobal
