@@ -11,7 +11,7 @@ public class ProductSale : BaseEntity
     public string? CustomerName { get; set; }
     [Column(TypeName = "decimal(18,2)")]
     public decimal Discount { get; set; }
-    public string ReceiptNumber { get; set; } = default!;
+    public string? ReceiptNumber { get; set; } 
     public PaymentMethod PaymentMethod { get; set; }
     public string InvoiceId { get; set; } = default!;
     public string UserId { get; set; } = default!;

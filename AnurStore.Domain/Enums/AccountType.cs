@@ -2,10 +2,10 @@
 {
     public enum AccountType
     {
-        Asset = 1,  // e.g., Cash, Inventory
-        Liability = 2,  // e.g., Accounts Payable
-        Income = 3,  // e.g., Sales Revenue
-        Expense = 4   // e.g., Rent, Salaries
+        Asset = 1,  
+        Liability = 2,  
+        Income = 3, 
+        Expense = 4  
     }
 
 }

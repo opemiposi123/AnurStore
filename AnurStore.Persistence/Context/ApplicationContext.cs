@@ -1,4 +1,6 @@
 ﻿using AnurStore.Domain.Entities;
+using AnurStore.Domain.Enums;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
@@ -15,6 +17,83 @@ namespace AnurStore.Persistence.Context
         {
             base.OnModelCreating(builder);
             builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            var adminRoleId = Guid.NewGuid().ToString();
+            var adminUserId = Guid.NewGuid().ToString();
+            var cashierRoleId = Guid.NewGuid().ToString(); 
+            var cashierUserId = Guid.NewGuid().ToString();
+
+            builder.Entity<IdentityRole>().HasData(
+                new IdentityRole
+                {
+                    Id = adminRoleId,
+                    Name = "Admin",
+                    NormalizedName = "ADMIN"
+                }
+            );
+
+            builder.Entity<IdentityRole>().HasData(
+                new IdentityRole
+                {
+                    Id = cashierRoleId,
+                    Name = "Cashier",
+                    NormalizedName = "CASHIER"
+                }
+            );
+
+            var hasher = new PasswordHasher<User>();
+
+            builder.Entity<User>().HasData(
+                new User
+                {
+                    Id = adminUserId,
+                    UserName = "Admin",
+                    NormalizedUserName = "ADMIN",
+                    Email = "admin@gmail.com",
+                    NormalizedEmail = "ADMIN@GMAIL.COM",
+                    Address = "No 4 Unity Str Aboru",
+                    EmailConfirmed = true,
+                    PasswordHash = hasher.HashPassword(null, "Admin@123"),
+                    SecurityStamp = string.Empty,
+                    Role = Role.Admin,
+                    FirstName = "Admin",
+                    LastName = "AnurStore"
+                }
+            );
+
+            builder.Entity<User>().HasData(
+                new User
+                {
+                    Id = cashierUserId,
+                    UserName = "Cashier",
+                    NormalizedUserName = "CASHIER",
+                    Email = "cashier@gmail.com",
+                    NormalizedEmail = "CASHIER@GMAIL.COM",
+                    Address = "No 5 Manchester Liberty Estate ",
+                    EmailConfirmed = true,
+                    PasswordHash = hasher.HashPassword(null, "Cashier@123"),
+                    SecurityStamp = string.Empty,
+                    Role = Role.Cahier,
+                    FirstName = "Cashier",
+                    LastName = "Ameerah"
+                }
+            );
+
+            builder.Entity<IdentityUserRole<string>>().HasData(
+                new IdentityUserRole<string>
+                {
+                    RoleId = adminRoleId,
+                    UserId = adminUserId
+                }
+            );
+
+            builder.Entity<IdentityUserRole<string>>().HasData(
+                new IdentityUserRole<string>
+                {
+                    RoleId = cashierRoleId,
+                    UserId = cashierUserId
+                }
+            );
         }
 
         public DbSet<Account> Accounts { get; set; }
@@ -35,6 +114,4 @@ namespace AnurStore.Persistence.Context
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
     }
-
 }
-

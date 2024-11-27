@@ -23,4 +23,8 @@
 	  <ProjectReference Include="..\AnurStore.Domain\AnurStore.Domain.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Repositories\" />
+	</ItemGroup>
+
 </Project>

@@ -18,6 +18,6 @@ public class ProductPurchase : BaseEntity
     public User User { get; set; } = default!;
     public ICollection<ProductPurchaseItem> PurchaseItems { get; set; } = [];
     public string InventoryId { get; set; } = default!;
-    public Inventory Inventory { get; set; }
+    public Inventory? Inventory { get; set; }
 }
 
