@@ -1,4 +1,5 @@
 ﻿using AnurStore.Domain.Common.Contracts;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnurStore.Domain.Entities
 {
@@ -7,8 +8,11 @@ namespace AnurStore.Domain.Entities
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
         public string? BarCode { get;set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal CostPrice { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal PricePerPack { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
         public decimal UnitPrice { get; set; }   
         public DateTime MFTDate { get; set; }
         public DateTime ExpiryDate { get; set; }
