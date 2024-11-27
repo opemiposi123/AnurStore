@@ -3,8 +3,9 @@
     public enum PaymentMethod
     {
         Cash = 1,
-        Transfer,
+        BankTransfer,
         POS,
-        Cheque
+        Cheque,
+        CreditCard
     }
 }

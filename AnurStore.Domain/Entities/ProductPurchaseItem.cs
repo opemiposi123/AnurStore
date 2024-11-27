@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnurStore.Domain.Entities;
 
-public class PurchaseItem : BaseEntity
+public class ProductPurchaseItem : BaseEntity
 {
     public string ProductId { get; set; } = default!;
     public Product Product { get; set; } = default!;

@@ -18,5 +18,7 @@ public class ProductSale : BaseEntity
     public User? User { get; set; }
     public Invoice Invoice { get; set; } = default!;
     public ICollection<ProductSaleItem> ProductSaleItems { get; set; } = [];
+    public string InventoryId { get; set; } = default!;
+    public Inventory? Inventory { get; set; }
 }
 

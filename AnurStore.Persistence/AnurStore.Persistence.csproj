@@ -19,4 +19,8 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\AnurStore.Domain\AnurStore.Domain.csproj" />
+	</ItemGroup>
+
 </Project>
