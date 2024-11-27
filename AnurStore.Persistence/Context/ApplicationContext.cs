@@ -22,6 +22,7 @@ namespace AnurStore.Persistence.Context
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
+        public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductPurchase> ProductPurchases { get; set; }
