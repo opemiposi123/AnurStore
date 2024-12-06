@@ -13,8 +13,9 @@ namespace AnurStore.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal PricePerPack { get; set; }
         [Column(TypeName = "decimal(18,2)")]
-        public decimal UnitPrice { get; set; }   
-        public DateTime MFTDate { get; set; }
+        public decimal UnitPrice { get; set; }
+        public string? ProductImageUrl { get; set; }
+        public DateTime MFTDate { get; set; } 
         public DateTime ExpiryDate { get; set; }
         public int TotalItemInPack { get; set; }
         public string CategoryId { get; set; } = default!;

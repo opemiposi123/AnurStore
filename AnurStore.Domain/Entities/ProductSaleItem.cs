@@ -1,9 +1,10 @@
-﻿using AnurStore.Domain.Enums;
+﻿using AnurStore.Domain.Common.Contracts;
+using AnurStore.Domain.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnurStore.Domain.Entities;
 
-public class ProductSaleItem
+public class ProductSaleItem : BaseEntity
 {
     public string ProductId { get; set; } = default!;
     public Product? Product { get; set; }

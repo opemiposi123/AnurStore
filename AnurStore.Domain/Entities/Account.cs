@@ -1,4 +1,5 @@
-﻿using AnurStore.Domain.Enums;
+﻿using AnurStore.Domain.Common.Contracts;
+using AnurStore.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AnurStore.Domain.Entities
 {
-    public class Account
+    public class Account : BaseEntity
     {
         public string Name { get; set; } = default!;
         public string? Description { get; set; }

@@ -1,15 +1,15 @@
 ﻿using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace AnurStore.Persistence.Context
 {
-    public class ApplicationContext : DbContext
+    public class ApplicationContext : IdentityDbContext<User>
     {
-        public ApplicationContext(DbContextOptions<ApplicationContext> options)
-            : base(options)
+        public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
         }
 
@@ -20,7 +20,7 @@ namespace AnurStore.Persistence.Context
 
             var adminRoleId = Guid.NewGuid().ToString();
             var adminUserId = Guid.NewGuid().ToString();
-            var cashierRoleId = Guid.NewGuid().ToString(); 
+            var cashierRoleId = Guid.NewGuid().ToString();
             var cashierUserId = Guid.NewGuid().ToString();
 
             builder.Entity<IdentityRole>().HasData(
@@ -95,6 +95,7 @@ namespace AnurStore.Persistence.Context
                 }
             );
         }
+
 
         public DbSet<Account> Accounts { get; set; }
         public DbSet<AccountEntry> AccountEntries { get; set; }

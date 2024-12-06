@@ -15,6 +15,7 @@ namespace AnurStore.Domain.Entities
         [Column(TypeName = "decimal(18,2)")]
         public decimal NetAmount { get; set; } 
         public string? CustomerName { get; set; } 
+        public string? CustomerCare { get; set; }  
         public string? Notes { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
     }
