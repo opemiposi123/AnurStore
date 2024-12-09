@@ -23,6 +23,7 @@ builder.Services.AddIdentity<User, IdentityRole>(opt =>
 })
 .AddEntityFrameworkStores<ApplicationContext>()
 .AddDefaultTokenProviders();
+builder.Services.AddHttpContextAccessor();
 
 
 var app = builder.Build();
