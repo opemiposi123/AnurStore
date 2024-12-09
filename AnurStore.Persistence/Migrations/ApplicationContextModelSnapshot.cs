@@ -252,6 +252,9 @@ namespace AnurStore.Persistence.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("CustomerCare")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CustomerName")
                         .HasColumnType("nvarchar(max)");
 
@@ -295,6 +298,57 @@ namespace AnurStore.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("AnurStore.Domain.Entities.InvoiceItem", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedBy")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InvoiceId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("UnitPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvoiceId");
+
+                    b.ToTable("InvoiceItem");
                 });
 
             modelBuilder.Entity("AnurStore.Domain.Entities.Payment", b =>
@@ -996,10 +1050,10 @@ namespace AnurStore.Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a1d0fb9c-6efc-4003-9844-77f2a5ea8b69",
+                            Id = "959e663c-2ae9-4ba5-ba4b-1cff321e2563",
                             AccessFailedCount = 0,
                             Address = "No 4 Unity Str Aboru",
-                            ConcurrencyStamp = "b1dfa863-5941-48d6-b85c-49d48852e245",
+                            ConcurrencyStamp = "a9cff666-d070-434f-9fb2-d6787512c066",
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Admin",
@@ -1008,7 +1062,7 @@ namespace AnurStore.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEgK+H8XMExiMcGEm8punz7/6hWCcV4MfIHWfmw3a8nyEWo2z8QsXyLreNFQePcUfg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJwkr/Vy0CkBriOsBALo3MsvfmUwAQ4N3ZHBPRRGkylB7VMgCQves9vMJ7kSfheyPA==",
                             PhoneNumberConfirmed = false,
                             Role = 1,
                             SecurityStamp = "",
@@ -1017,10 +1071,10 @@ namespace AnurStore.Persistence.Migrations
                         },
                         new
                         {
-                            Id = "ae7c27f1-4bbe-4aea-b3a5-38de3702171b",
+                            Id = "c47eb573-95f1-4d90-8dd9-dceebba7c90d",
                             AccessFailedCount = 0,
                             Address = "No 5 Manchester Liberty Estate ",
-                            ConcurrencyStamp = "fe32676c-35c5-4ac1-b775-7414f2238f30",
+                            ConcurrencyStamp = "8de71a42-bb4f-4129-99cf-307165c402c1",
                             Email = "cashier@gmail.com",
                             EmailConfirmed = true,
                             FirstName = "Cashier",
@@ -1029,7 +1083,7 @@ namespace AnurStore.Persistence.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "CASHIER@GMAIL.COM",
                             NormalizedUserName = "CASHIER",
-                            PasswordHash = "AQAAAAIAAYagAAAAEOhGZDiry7VrKdr28LQdCewZOg7JUhRXdZUNXtjzl207bE9rRWAo7perr9o2nron/Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAENZWqXwGJ0ao6fCaGGj+8CqQcMF2oB7QdIFedcjQZp1oxsH3O7G7L6SxUco6Sm6gNw==",
                             PhoneNumberConfirmed = false,
                             Role = 2,
                             SecurityStamp = "",
@@ -1067,13 +1121,13 @@ namespace AnurStore.Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1c85fcd0-5d75-4c17-a7e5-7bf83024901d",
+                            Id = "fc60e126-819f-49c2-95f2-0c1cb053c05d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "b34b60c5-2622-429d-88be-50d450438ebf",
+                            Id = "ee776064-3bde-42f6-80b0-c3fbab9a3d5f",
                             Name = "Cashier",
                             NormalizedName = "CASHIER"
                         });
@@ -1168,13 +1222,13 @@ namespace AnurStore.Persistence.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "a1d0fb9c-6efc-4003-9844-77f2a5ea8b69",
-                            RoleId = "1c85fcd0-5d75-4c17-a7e5-7bf83024901d"
+                            UserId = "959e663c-2ae9-4ba5-ba4b-1cff321e2563",
+                            RoleId = "fc60e126-819f-49c2-95f2-0c1cb053c05d"
                         },
                         new
                         {
-                            UserId = "ae7c27f1-4bbe-4aea-b3a5-38de3702171b",
-                            RoleId = "b34b60c5-2622-429d-88be-50d450438ebf"
+                            UserId = "c47eb573-95f1-4d90-8dd9-dceebba7c90d",
+                            RoleId = "ee776064-3bde-42f6-80b0-c3fbab9a3d5f"
                         });
                 });
 
@@ -1225,6 +1279,17 @@ namespace AnurStore.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("AnurStore.Domain.Entities.InvoiceItem", b =>
+                {
+                    b.HasOne("AnurStore.Domain.Entities.Invoice", "Invoice")
+                        .WithMany("InvoiceItems")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Invoice");
                 });
 
             modelBuilder.Entity("AnurStore.Domain.Entities.Payment", b =>
@@ -1428,6 +1493,11 @@ namespace AnurStore.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("AnurStore.Domain.Entities.Invoice", b =>
+                {
+                    b.Navigation("InvoiceItems");
                 });
 
             modelBuilder.Entity("AnurStore.Domain.Entities.Product", b =>

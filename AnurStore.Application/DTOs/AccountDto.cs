@@ -1,12 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AnurStore.Domain.Enums;
+using MassTransit;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnurStore.Application.DTOs
 {
-    internal class AccountDto
+    public class AccountDto
     {
+        public string Name { get; set; } = default!;
+        public string? Description { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Balance { get; set; }
+        public AccountType AccountType { get; set; }
+        public string Id { get; set; } = NewId.Next().ToSequentialGuid().ToString();
+        public string CreatedBy { get; set; } = default!;
+        public DateTime CreatedOn { get; set; }
+        public string? LastModifiedBy { get; set; }
+        public DateTime? LastModifiedOn { get; set; }
+        public DateTime? DeletedOn { get; set; }
+        public string? DeletedBy { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

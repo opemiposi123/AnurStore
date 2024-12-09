@@ -21,11 +21,8 @@
 	</ItemGroup>
   
 	<ItemGroup>
+	  <ProjectReference Include="..\AnurStore.Application\AnurStore.Application.csproj" />
 	  <ProjectReference Include="..\AnurStore.Domain\AnurStore.Domain.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Repositories\" />
 	</ItemGroup>
 
 </Project>
