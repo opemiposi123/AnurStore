@@ -1,5 +1,7 @@
 ﻿using AnurStore.Application.Abstractions.Services;
+using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
+using AnurStore.Application.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -18,8 +20,12 @@ namespace AnurStore.WebUI.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var result = await _brandService.GetAllBrand();
-            return View(result);
+            var response = await _brandService.GetAllBrand();
+            if (response.Status)
+            {
+                return View(response.Data);
+            }
+            return View(Enumerable.Empty<BrandDto>());
         }
 
         public async Task<IActionResult> ViewBrandDetail(string id)
@@ -31,12 +37,12 @@ namespace AnurStore.WebUI.Controllers
                        : View(brand);
         }
 
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         public IActionResult CreateBrand() =>
           View();
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+      //  [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBrand(CreateBrandRequest model, [FromServices] IValidator<CreateBrandRequest> validator)
         {
             var validationResult = await validator.ValidateAsync(model);
@@ -53,7 +59,8 @@ namespace AnurStore.WebUI.Controllers
             return RedirectToAction("Index", "Brand");
         }
 
-        [Authorize(Roles = "Admin")]
+        // [Authorize(Roles = "Admin")]
+        [HttpGet]
         public async Task<IActionResult> DeleteBrand([FromRoute] string id)
         {
             var response = await _brandService.DeleteBrand(id);
@@ -63,16 +70,16 @@ namespace AnurStore.WebUI.Controllers
 
         public async Task<IActionResult> EditBrand(string id)
         {
-            var instance = await _brandService.GetBrand(id);
-            if (instance == null)
+            var result = await _brandService.GetBrand(id);
+            if (result == null)
             {
                 return NotFound();
             }
-            return View(instance);
+            return View(result.Data);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditBrand([FromRoute] string id, [FromForm] UpdateBrandRequest model, [FromServices] IValidator<UpdateBrandRequest> validator)
         {
             var validationResult = await validator.ValidateAsync(model);

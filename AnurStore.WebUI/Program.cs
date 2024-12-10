@@ -2,6 +2,7 @@ using AnurStore.Application.Abstractions.Repositories;
 using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
+using AnurStore.Application.Validators.Brand;
 using AnurStore.Application.Validators.Category;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
@@ -30,6 +31,9 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();
+builder.Services.AddScoped<IValidator<CreateBrandRequest>, CreateBrandValidator>();
+builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryValidator>();
+builder.Services.AddScoped<IValidator<UpdateBrandRequest>, UpdateBrandValidator>();
 
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {
@@ -45,9 +49,9 @@ builder.Services.AddIdentity<User, IdentityRole>(opt =>
 
 builder.Services.AddNotyf(config =>
 {
-    config.DurationInSeconds = 10;
+    config.DurationInSeconds = 5;
     config.IsDismissable = true;
-    config.Position = NotyfPosition.BottomRight;
+    config.Position = NotyfPosition.TopRight;
 }
 );
 builder.Services.AddHttpContextAccessor();

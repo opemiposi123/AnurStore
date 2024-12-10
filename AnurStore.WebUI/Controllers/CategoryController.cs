@@ -20,19 +20,12 @@ namespace AnurStore.WebUI.Controllers
         public async Task<IActionResult> Index()
         {
             var response = await _categoryService.GetAllCategory();
-
             if (response.Status)
             {
-                return View(response.Data); // Pass only the data (IEnumerable<CategoryDto>) to the view
+                return View(response.Data);
             }
-            else
-            {
-                // Handle the error case
-                ViewBag.ErrorMessage = response.Message;
-                return View(Enumerable.Empty<CategoryDto>()); // Pass an empty list to avoid null issues in the view
-            }
+            return View(Enumerable.Empty<CategoryDto>());
         }
-
 
         public async Task<IActionResult> ViewCategoryDetail(string id)
         {
@@ -43,12 +36,10 @@ namespace AnurStore.WebUI.Controllers
                        : View(category);
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult CreateCategory() =>
           View();
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCategory(CreateCategoryRequest model, [FromServices] IValidator<CreateCategoryRequest> validator)
         {
             var validationResult = await validator.ValidateAsync(model);
@@ -64,8 +55,8 @@ namespace AnurStore.WebUI.Controllers
             _notyf.Success("Category Created Succesfully");
             return RedirectToAction("Index", "Category");
         }
-
-        [Authorize(Roles = "Admin")]
+        
+        [HttpGet]
         public async Task<IActionResult> DeleteCategory([FromRoute] string id)
         {
             var response = await _categoryService.DeleteCategory(id);
@@ -75,16 +66,15 @@ namespace AnurStore.WebUI.Controllers
 
         public async Task<IActionResult> EditCategory(string id)
         {
-            var instance = await _categoryService.GetCategory(id);
-            if (instance == null)
+            var response = await _categoryService.GetCategory(id);
+            if (response == null)
             {
                 return NotFound();
             }
-            return View(instance);
+            return View(response.Data);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")] 
         public async Task<IActionResult> EditCategory([FromRoute] string id, [FromForm] UpdateCategoryRequest model, [FromServices] IValidator<UpdateCategoryRequest> validator)
         {
             var validationResult = await validator.ValidateAsync(model);

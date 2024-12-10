@@ -5,7 +5,7 @@
             <img src="~/assets/images/logo.png"
                  class="img-fluid rounded-normal light-logo"
                  alt="logo" />
-            <h5 class="logo-title light-logo ml-3">POSDash</h5>
+            <h5 class="logo-title light-logo ml-3">AnurStore</h5>
         </a>
         <div class="iq-menu-bt-sidebar ml-0">
             <i class="las la-bars wrapper-menu"></i>
@@ -15,7 +15,7 @@
         <nav class="iq-sidebar-menu">
             <ul id="iq-sidebar-toggle" class="iq-menu">
                 <li class="active">
-                    <a href="~/backend/index.html" class="svg-icon">
+                    <a href="@Url.Action("Index","Home")" class="svg-icon">
                         <svg class="svg-icon"
                              id="p-dash1"
                              width="20"
@@ -134,6 +134,60 @@
                         <li class="">
                             <a href="@Url.Action("CreateCategory","Category")">
                                 <i class="las la-minus"></i><span>Add Category</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class=" ">
+                    <a href="#brand"
+                       class="collapsed"
+                       data-toggle="collapse"
+                       aria-expanded="false">
+                        <svg class="svg-icon"
+                             id="p-dash3"
+                             width="20"
+                             height="20"
+                             xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <rect x="9"
+                                  y="9"
+                                  width="13"
+                                  height="13"
+                                  rx="2"
+                                  ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                        <span class="ml-4">Brands</span>
+                        <svg class="svg-icon iq-arrow-right arrow-active"
+                             width="20"
+                             height="20"
+                             xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <polyline points="10 15 15 20 20 15"></polyline>
+                            <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
+                        </svg>
+                    </a>
+                    <ul id="brand"
+                        class="iq-submenu collapse"
+                        data-parent="#iq-sidebar-toggle">
+                        <li class="">
+                            <a href="@Url.Action("Index","Brand")">
+                                <i class="las la-minus"></i><span>List Brand</span>
+                            </a>
+                        </li>
+                        <li class="">
+                            <a href="@Url.Action("CreateBrand","Brand")">
+                                <i class="las la-minus"></i><span>Add Brand</span>
                             </a>
                         </li>
                     </ul>
