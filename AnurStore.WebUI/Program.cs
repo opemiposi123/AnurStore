@@ -1,5 +1,13 @@
+using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.Abstractions.Services;
+using AnurStore.Application.RequestModel;
+using AnurStore.Application.Services;
+using AnurStore.Application.Validators.Category;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
+using AnurStore.Persistence.Repositories;
+using AspNetCoreHero.ToastNotification;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,9 +16,20 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//Database
 var connectionString = builder.Configuration.GetConnectionString("AnurStore");
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
 
+//Repositories
+builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+//Services
+builder.Services.AddScoped<IBrandService, BrandService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+//Validators
+builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();
 
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {
@@ -23,6 +42,14 @@ builder.Services.AddIdentity<User, IdentityRole>(opt =>
 })
 .AddEntityFrameworkStores<ApplicationContext>()
 .AddDefaultTokenProviders();
+
+builder.Services.AddNotyf(config =>
+{
+    config.DurationInSeconds = 10;
+    config.IsDismissable = true;
+    config.Position = NotyfPosition.BottomRight;
+}
+);
 builder.Services.AddHttpContextAccessor();
 
 

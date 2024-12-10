@@ -31,7 +31,7 @@
                             <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
                             <line x1="12" y1="22.08" x2="12" y2="12"></line>
                         </svg>
-                        <span class="ml-4">Dashboards</span>
+                        <span class="ml-4">Dashboard</span>
                     </a>
                 </li>
                 <li class=" ">
@@ -127,12 +127,12 @@
                         class="iq-submenu collapse"
                         data-parent="#iq-sidebar-toggle">
                         <li class="">
-                            <a href="~/backend/page-list-category.html">
+                            <a href="@Url.Action("Index","Category")">
                                 <i class="las la-minus"></i><span>List Category</span>
                             </a>
                         </li>
                         <li class="">
-                            <a href="~/backend/page-add-category.html">
+                            <a href="@Url.Action("CreateCategory","Category")">
                                 <i class="las la-minus"></i><span>Add Category</span>
                             </a>
                         </li>

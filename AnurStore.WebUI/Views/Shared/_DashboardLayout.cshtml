@@ -31,6 +31,7 @@
 
 		@RenderBody()
 	</div>
+	<script src="~/js/site.js" asp-append-version="true"></script>
 	<partial name="_DashboardFooter" />
 	<!-- Wrapper Start -->
 	<script src="~/assets/js/backend-bundle.min.js"></script>
@@ -48,5 +49,7 @@
 	<script src="~/assets/js/app.js"></script>
 	@RenderSection("Scripts", required: false)
 	<ejs-scripts></ejs-scripts>
+	@await Component.InvokeAsync("Notyf")
+	@RenderSection("Scripts", required: false)
 </body>
 </html>
