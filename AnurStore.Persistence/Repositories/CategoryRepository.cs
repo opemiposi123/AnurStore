@@ -24,8 +24,8 @@ namespace AnurStore.Persistence.Repositories
 
         public async Task<bool> Exist(string categoryName)
         {
-            var brand = await _context.Categories.AnyAsync(r => r.Name == categoryName);
-            return brand;
+            var category = await _context.Categories.AnyAsync(r => r.Name == categoryName);
+            return category;
         }
 
         public List<Category> GetAllCategory()

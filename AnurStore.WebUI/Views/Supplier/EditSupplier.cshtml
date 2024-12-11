@@ -1,0 +1,65 @@
+﻿@model AnurStore.Application.DTOs.SupplierDto
+@{
+    ViewData["Title"] = "Edit Supplier";
+    Layout = "_DashboardLayout";
+}
+<div class="content-page">
+    <div class="container-fluid add-form-list">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Edit Supplier</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="EditSupplier" data-toggle="validator">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label">Supplier Name *</label>
+                                        <input asp-for="Name" class="form-control" value="@Model.Name" placeholder="Enter Supplier Name" required />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label">Supplier Name *</label>
+                                        <input asp-for="Email" class="form-control" value="@Model.Email" placeholder="Enter Supplier Name" required />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="PhoneNumber" class="control-label">Supplier PhoneNumber *</label>
+                                        <input asp-for="PhoneNumber" class="form-control" value="@Model.PhoneNumber" placeholder="Enter Supplier PhoneNumber" required />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Location" class="control-label">Supplier Location *</label>
+                                        <input asp-for="Location" class="form-control" value="@Model.Location" placeholder="Enter Supplier Location" required />
+                                        <span asp-validation-for="Location" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary mr-2">Edit Supplier</button>
+                                    <button type="reset" class="btn btn-danger">Reset</button>
+                                    <a class="btn btn-primary" asp-action="Index">Return to Supplier List</a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

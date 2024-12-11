@@ -7,9 +7,9 @@ namespace AnurStore.Application.Abstractions.Services
     public interface IBrandService
     {
         Task<BaseResponse<string>> CreateBrand(CreateBrandRequest request);
-        Task<BaseResponse<bool>> UpdateBrand(string BrandId, UpdateBrandRequest request);
-        Task<BaseResponse<BrandDto>> GetBrand(string BrandId); 
+        Task<BaseResponse<bool>> UpdateBrand(string brandId, UpdateBrandRequest request);
+        Task<BaseResponse<BrandDto>> GetBrand(string brandId); 
         Task<BaseResponse<IEnumerable<BrandDto>>> GetAllBrand();
-        Task<BaseResponse<bool>> DeleteBrand(string BrandId);
+        Task<BaseResponse<bool>> DeleteBrand(string brandId);
     }
 }

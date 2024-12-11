@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AnurStore.Domain.Entities;
 
 namespace AnurStore.Application.Abstractions.Repositories
 {
-    internal class ISupplierRepository
+    public interface ISupplierRepository
     {
+        Task<Supplier> CreateSupplier(Supplier supplier);
+        Task<IList<Supplier>> GetAllSuppliers(); 
+        Task<Supplier> GetSupplierById(string id); 
+        Task<bool> UpdateSupplier(Supplier supplier);
+        Task<bool> Exist(string supplierName);
+        List<Supplier> GetAllSupplier();
     }
 }

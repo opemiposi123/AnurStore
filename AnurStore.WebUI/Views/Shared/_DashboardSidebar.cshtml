@@ -1,5 +1,6 @@
 ﻿
 <div class="iq-sidebar sidebar-default">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <div class="iq-sidebar-logo d-flex align-items-center justify-content-between">
         <a href="~/backend/index.html" class="header-logo">
             <img src="~/assets/images/logo.png"
@@ -386,16 +387,6 @@
                         class="iq-submenu collapse"
                         data-parent="#iq-sidebar-toggle">
                         <li class="">
-                            <a href="~/backend/page-list-customers.html">
-                                <i class="las la-minus"></i><span>Customers</span>
-                            </a>
-                        </li>
-                        <li class="">
-                            <a href="~/backend/page-add-customers.html">
-                                <i class="las la-minus"></i><span>Add Customers</span>
-                            </a>
-                        </li>
-                        <li class="">
                             <a href="~/backend/page-list-users.html">
                                 <i class="las la-minus"></i><span>Users</span>
                             </a>
@@ -406,12 +397,12 @@
                             </a>
                         </li>
                         <li class="">
-                            <a href="~/backend/page-list-suppliers.html">
+                            <a href="@Url.Action("Index","Supplier")">
                                 <i class="las la-minus"></i><span>Suppliers</span>
                             </a>
                         </li>
                         <li class="">
-                            <a href="~/backend/page-add-supplier.html">
+                            <a href="@Url.Action("CreateSupplier","Supplier")">
                                 <i class="las la-minus"></i><span>Add Suppliers</span>
                             </a>
                         </li>

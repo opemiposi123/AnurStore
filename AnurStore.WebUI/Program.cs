@@ -4,6 +4,7 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;
 using AnurStore.Application.Validators.Category;
+using AnurStore.Application.Validators.Supplier;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
 using AnurStore.Persistence.Repositories;
@@ -24,17 +25,23 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServe
 //Repositories
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 
 //Services
 builder.Services.AddScoped<IUserAuthService,UserAuthService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();
 builder.Services.AddScoped<IValidator<CreateBrandRequest>, CreateBrandValidator>();
+builder.Services.AddScoped<IValidator<CreateSupplierRequest>, CreateSupplierValidator>();
+
+
 builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryValidator>();
 builder.Services.AddScoped<IValidator<UpdateBrandRequest>, UpdateBrandValidator>();
+builder.Services.AddScoped<IValidator<UpdateSupplierRequest>, UpdateSupplierValidator>();
 
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {
