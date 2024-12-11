@@ -36,7 +36,6 @@ namespace AnurStore.Application.Services
                         Status = false,
                     };
                 }
-
                 _logger.LogInformation("Checking if category with name {CategoryName} exists.", request.Name);
                 var reportExists = await _categoryRepository.Exist(request.Name);
 
