@@ -8,11 +8,11 @@ namespace AnurStore.Domain.Entities
     {
         public string InvoiceNumber { get; set; } = default!;
         public DateTime InvoiceDate { get; set; } = DateTime.Now;
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "money")]
         public decimal TotalAmount { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
-        public decimal Discount { get; set; } 
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "money")]
+        public decimal Discount { get; set; }
+        [Column(TypeName = "money")]
         public decimal NetAmount { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerCare { get; set; } 

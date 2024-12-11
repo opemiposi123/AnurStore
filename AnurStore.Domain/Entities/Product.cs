@@ -8,11 +8,11 @@ namespace AnurStore.Domain.Entities
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
         public string? BarCode { get;set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "money")]
         public decimal CostPrice { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "money")]
         public decimal PricePerPack { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "money")]
         public decimal UnitPrice { get; set; }
         public string? ProductImageUrl { get; set; }
         public DateTime MFTDate { get; set; } 

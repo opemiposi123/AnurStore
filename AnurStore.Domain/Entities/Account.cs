@@ -8,7 +8,7 @@ namespace AnurStore.Domain.Entities
     {
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
-        [Column(TypeName = "decimal(18,2)")]
+        [Column(TypeName = "money")]
         public decimal Balance { get; set; } 
         public AccountType AccountType { get; set; }  
     }
