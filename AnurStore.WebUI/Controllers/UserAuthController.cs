@@ -43,10 +43,8 @@ namespace AnurStore.WebUI.Controllers
 
         public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordRequestModel changePasswordModelDto, string username)
         {
-
             var result = await _userAuthService.ChangePasswordAsync(changePasswordModelDto, username);
             return RedirectToAction(nameof(Login));
-
         }
     }
 }

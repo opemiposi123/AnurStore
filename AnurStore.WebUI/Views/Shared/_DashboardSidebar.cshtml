@@ -387,7 +387,7 @@
                         class="iq-submenu collapse"
                         data-parent="#iq-sidebar-toggle">
                         <li class="">
-                            <a href="~/backend/page-list-users.html">
+                            <a href="@Url.Action("Index","User")">
                                 <i class="las la-minus"></i><span>Users</span>
                             </a>
                         </li>
@@ -408,7 +408,7 @@
                         </li>
                     </ul>
                 </li>
-                <li class="">
+                <li class=" ">
                     <a href="~/backend/page-report.html" class="">
                         <svg class="svg-icon"
                              id="p-dash7"
@@ -433,7 +433,102 @@
                         class="iq-submenu collapse"
                         data-parent="#iq-sidebar-toggle"></ul>
                 </li>
-               
+                <li class=" ">
+                    <a href="#otherpage"
+                       class="collapsed"
+                       data-toggle="collapse"
+                       aria-expanded="false">
+                        <svg class="svg-icon"
+                             id="p-dash9"
+                             width="20"
+                             height="20"
+                             xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <rect x="3"
+                                  y="3"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                  ry="2"></rect>
+                            <rect x="7" y="7" width="3" height="9"></rect>
+                            <rect x="14" y="7" width="3" height="5"></rect>
+                        </svg>
+                        <span class="ml-4">Product Setup</span>
+                        <svg class="svg-icon iq-arrow-right arrow-active"
+                             width="20"
+                             height="20"
+                             xmlns="http://www.w3.org/2000/svg"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+                            <polyline points="10 15 15 20 20 15"></polyline>
+                            <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
+                        </svg>
+                    </a>
+                    <ul id="otherpage"
+                        class="iq-submenu collapse"
+                        data-parent="#iq-sidebar-toggle">
+                        <li class=" ">
+                            <a href="#productunit"
+                               class="collapsed"
+                               data-toggle="collapse"
+                               aria-expanded="false">
+                                <svg class="svg-icon"
+                                     id="p-dash10"
+                                     width="20"
+                                     height="20"
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <polyline points="17 11 19 13 23 9"></polyline>
+                                </svg>
+                                <span class="ml-4">Product Unit</span>
+                                <svg class="svg-icon iq-arrow-right arrow-active"
+                                     width="20"
+                                     height="20"
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="2"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+                                    <polyline points="10 15 15 20 20 15"></polyline>
+                                    <path d="M4 4h7a4 4 0 0 1 4 4v12"></path>
+                                </svg>
+                            </a>
+                            <ul id="productunit"
+                                class="iq-submenu collapse"
+                                data-parent="#otherpage">
+                                <li class="">
+                                    <a href="@Url.Action("Index","ProductUnit")">
+                                        <i class="las la-minus"></i><span>Unit List</span>
+                                    </a>
+                                </li>
+                                <li class="">
+                                    <a href="@Url.Action("CreateProductUnit","ProductUnit")">
+                                        <i class="las la-minus"></i><span>Create Unit</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
             </ul>
         </nav>
         <div class="p-3"></div>

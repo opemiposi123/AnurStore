@@ -3,7 +3,6 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AnurStore.WebUI.Controllers

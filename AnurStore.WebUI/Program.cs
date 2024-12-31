@@ -4,7 +4,9 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;
 using AnurStore.Application.Validators.Category;
+using AnurStore.Application.Validators.ProductUnit;
 using AnurStore.Application.Validators.Supplier;
+using AnurStore.Application.Validators.User;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
 using AnurStore.Persistence.Repositories;
@@ -14,7 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddHttpContextAccessor();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -26,22 +28,30 @@ builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServe
 builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
+builder.Services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 //Services
 builder.Services.AddScoped<IUserAuthService,UserAuthService>();
 builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();
 builder.Services.AddScoped<IValidator<CreateBrandRequest>, CreateBrandValidator>();
 builder.Services.AddScoped<IValidator<CreateSupplierRequest>, CreateSupplierValidator>();
+builder.Services.AddScoped<IValidator<CreateProductUnitRequest>, CreateProductUnitValidator>();
+builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserValidator>();
 
 
 builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryValidator>();
 builder.Services.AddScoped<IValidator<UpdateBrandRequest>, UpdateBrandValidator>();
 builder.Services.AddScoped<IValidator<UpdateSupplierRequest>, UpdateSupplierValidator>();
+builder.Services.AddScoped<IValidator<UpdateProductUnitRequest>, UpdateProductUnitValidator>();
+builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserValidator>();
 
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {

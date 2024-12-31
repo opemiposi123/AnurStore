@@ -21,7 +21,9 @@ namespace AnurStore.Persistence.Repositories
 
         public async Task<IList<User>> GetAllAsync()
         {
-            return await _context.Users.ToListAsync();
+            var users = await _context.Users
+              .ToListAsync();
+            return users;
         }
 
         public async Task<bool> UpdateAsync(User user)
@@ -48,7 +50,11 @@ namespace AnurStore.Persistence.Repositories
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
-    }
 
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await _context.SaveChangesAsync();
+        }
+    }
 }
 

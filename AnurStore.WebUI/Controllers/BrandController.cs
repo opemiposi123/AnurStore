@@ -1,7 +1,6 @@
 ﻿using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
-using AnurStore.Application.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -17,7 +16,7 @@ namespace AnurStore.WebUI.Controllers
         {
             _notyf = notyf;
             _brandService = brandService;
-        }
+        } 
         public async Task<IActionResult> Index()
         {
             var response = await _brandService.GetAllBrand();
@@ -36,13 +35,13 @@ namespace AnurStore.WebUI.Controllers
                        ? (IActionResult)NotFound()
                        : View(brand);
         }
-
-       // [Authorize(Roles = "Admin")]
+         
+       [Authorize(Roles = "Admin")]
         public IActionResult CreateBrand() =>
           View();
 
         [HttpPost]
-      //  [Authorize(Roles = "Admin")]
+       [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBrand(CreateBrandRequest model, [FromServices] IValidator<CreateBrandRequest> validator)
         {
             var validationResult = await validator.ValidateAsync(model);

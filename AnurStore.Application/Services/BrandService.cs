@@ -137,7 +137,7 @@ namespace AnurStore.Application.Services
             try 
             { 
                 var result = await _brandRepository.GetAllBrands();
-                var brandDtos = result.Where(x => !x.IsDeleted).Select(r => new BrandDto
+                var brandDtos = result.Select(r => new BrandDto
                 {
                     Id = r.Id,
                     Name = r.Name,

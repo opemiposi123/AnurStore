@@ -1,0 +1,51 @@
+﻿@model AnurStore.Application.DTOs.ProductUnitDto
+@{
+    ViewData["Title"] = "Edit Unit";
+    Layout = "_DashboardLayout";
+}
+<div class="content-page">
+    <div class="container-fluid add-form-list">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Edit Unit</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="EditProductUnit" data-toggle="validator">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label">ProductUnit Name *</label>
+                                        <input asp-for="Name" class="form-control" value="@Model.Name" placeholder="Enter Unit" required />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Description" class="control-label">Description</label>
+                                        <input asp-for="Description" class="form-control" value="@Model.Description" placeholder="Enter Description" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary mr-2">Edit Unit</button>
+                                    <button type="reset" class="btn btn-danger">Reset</button>
+                                    <a class="btn btn-primary" asp-action="Index">Return to ProductUnit List</a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

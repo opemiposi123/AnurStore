@@ -36,6 +36,7 @@ namespace AnurStore.Persistence.Repositories
         public async Task<IList<Brand>> GetAllBrands()
         {
             var brands = await _context.Brands
+                .Where(x => x.IsDeleted == false)
                 .ToListAsync();
             return brands;
         }

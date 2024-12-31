@@ -1,0 +1,96 @@
+﻿ @model AnurStore.Application.RequestModel.CreateUserRequest
+@{
+    ViewData["Title"] = "Create User";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid add-form-list">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Add User</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="AddUser" data-toggle="validator">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Username" class="control-label">User Name *</label>
+                                        <input asp-for="Username" class="form-control" placeholder="Enter User Name" required />
+                                        <span asp-validation-for="Username" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"> 
+                                    <div class="form-group">
+                                        <label asp-for="Email" class="control-label">Email *</label>
+                                        <input asp-for="Email" class="form-control" placeholder="Enter Email" />
+                                        <span asp-validation-for="Email" class="text-danger"></span>
+                                    </div>  
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group"> 
+                                        <label asp-for="FirstName" class="control-label">FirstName *</label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Enter FirstName" />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                 <div class="col-md-6"> 
+                                    <div class="form-group"> 
+                                        <label asp-for="LastName" class="control-label">LastName</label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Enter LastName" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Password" class="control-label">Password * </label>
+                                        <input asp-for="Password" class="form-control" placeholder="Enter Password" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ConfirmPassword" class="control-label">ConfirmPassword</label>
+                                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Enter ConfirmPassword" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Password" class="control-label">Password * </label>
+                                        <input asp-for="Password" class="form-control" placeholder="Enter Password" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ConfirmPassword" class="control-label">ConfirmPassword</label>
+                                        <input asp-for="ConfirmPassword" class="form-control" placeholder="Enter ConfirmPassword" />
+                                        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary mr-2">Add User</button>
+                                    <button type="reset" class="btn btn-danger">Reset</button>
+                                    <a class="btn btn-primary" asp-action="Index">Return to User List</a>
+                                </div>
+                            </div>
+                        </form>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

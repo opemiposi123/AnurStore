@@ -9,7 +9,8 @@ namespace AnurStore.Application.Abstractions.Services
         Task<BaseResponse<string>> CreateCategory(CreateCategoryRequest request);
         Task<BaseResponse<bool>> UpdateCategory(string CategoryId, UpdateCategoryRequest request);
         Task<BaseResponse<CategoryDto>> GetCategory(string CategoryId);
-        Task<BaseResponse<IEnumerable<CategoryDto>>> GetAllCategory(); 
+        Task<BaseResponse<IEnumerable<CategoryDto>>> GetAllCategory();
         Task<BaseResponse<bool>> DeleteCategory(string categoryId);
     }
 }
+ 

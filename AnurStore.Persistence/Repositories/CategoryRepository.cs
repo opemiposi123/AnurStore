@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AnurStore.Persistence.Repositories
 {
-    public  class CategoryRepository : ICategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
         private readonly ApplicationContext _context;
 
@@ -32,7 +32,7 @@ namespace AnurStore.Persistence.Repositories
         {
             return _context.Categories.ToList();
         }
-         
+
         public async Task<IList<Category>> GetAllCategories()
         {
             var categories = await _context.Categories

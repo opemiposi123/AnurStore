@@ -57,7 +57,8 @@ namespace AnurStore.Persistence.Context
                     SecurityStamp = string.Empty,
                     Role = Role.Admin,
                     FirstName = "Admin",
-                    LastName = "AnurStore"
+                    LastName = "AnurStore",
+                    Gender = Gender.Female,
                 }
             );
 
@@ -75,7 +76,8 @@ namespace AnurStore.Persistence.Context
                     SecurityStamp = string.Empty,
                     Role = Role.Cahier,
                     FirstName = "Cashier",
-                    LastName = "Ameerah"
+                    LastName = "Ameerah",
+                    Gender = Gender.Female,
                 }
             );
 

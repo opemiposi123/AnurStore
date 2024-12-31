@@ -52,7 +52,10 @@ namespace AnurStore.Application.Services
 
                     var authClaims = new List<Claim>
                     {
-                         new Claim(ClaimTypes.Name, user.UserName)
+                         new Claim(ClaimTypes.Name, user.UserName),
+                         new Claim(ClaimTypes.GivenName, user.FirstName),
+                         new Claim(ClaimTypes.Email, user.Email),
+                         new Claim("RegistrationDate", user.CreatedOn.ToString())
                     };
 
                     foreach (var userRole in userRoles)
