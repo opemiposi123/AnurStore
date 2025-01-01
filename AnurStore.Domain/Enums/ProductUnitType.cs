@@ -3,6 +3,6 @@
     public enum ProductUnitType
     {
         Pack = 1,
-        Piece
+        SingleUnit
     }
 }
