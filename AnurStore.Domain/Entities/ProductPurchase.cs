@@ -12,7 +12,7 @@ public class ProductPurchase : BaseEntity
     [Column(TypeName = "money")]
     public decimal? Discount { get; set; }
 
-    public PaymentMethod? PaymentMethod { get; set; }
+    public PaymentMethod PaymentMethod { get; set; }
 
     public string SupplierId { get; set; } = default!;
 
