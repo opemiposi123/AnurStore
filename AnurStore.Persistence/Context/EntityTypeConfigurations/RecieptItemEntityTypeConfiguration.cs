@@ -13,7 +13,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
     {
         public void Configure(EntityTypeBuilder<RecieptItem> builder)
         {
-            builder.ToTable("InvoiceItems");
+            builder.ToTable("RecieptItems");
 
             builder.HasKey(ii => ii.Id);
 

@@ -1,5 +1,6 @@
 ﻿using AnurStore.Domain.Common.Contracts;
 using AnurStore.Domain.Enums;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnurStore.Domain.Entities
@@ -23,6 +24,8 @@ namespace AnurStore.Domain.Entities
         public string? Notes { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }
+        public string ProductSaleId { get; set; } = default!;
+        public ProductSale? ProductSale { get; set; }
         public ICollection<RecieptItem> RecieptItems { get; set; } = [];
     }
 }

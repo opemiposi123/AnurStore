@@ -9,6 +9,7 @@ using AnurStore.Application.Validators.Supplier;
 using AnurStore.Application.Validators.User;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
+using AnurStore.Persistence.Context.Seeder;
 using AnurStore.Persistence.Repositories;
 using AspNetCoreHero.ToastNotification;
 using FluentValidation;
@@ -85,7 +86,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
+await app.SeedToDatabaseAsync();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
