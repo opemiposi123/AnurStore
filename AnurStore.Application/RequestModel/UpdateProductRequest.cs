@@ -1,14 +1,12 @@
-﻿using AnurStore.Domain.Common.Contracts;
-
-namespace AnurStore.Domain.Entities
+﻿namespace AnurStore.Application.RequestModel
 {
-    public class Product : BaseEntity
+    public class UpdateProductRequest
     {
         public string Name { get; set; } = default!;
 
         public string? Description { get; set; }
 
-        public string? BarCode { get;set; } // 5800 * 3.5/100
+        public string? BarCode { get; set; } // 5800 * 3.5/100
 
         public decimal PricePerPack { get; set; }
 
@@ -21,17 +19,11 @@ namespace AnurStore.Domain.Entities
         public string? ProductImageUrl { get; set; }
 
         public int TotalItemInPack { get; set; }
+        public double ProductSize { get; set; }
 
         public string CategoryId { get; set; } = default!;
 
-        public Category Category { get; set; } = default!;
-
         public string? BrandId { get; set; }
-
-        public Brand Brand { get; set; } = default!;
-        
-        public ProductSize ProductSize { get; set; } = default!;
-
-        public Inventory Inventory { get; set; } = default!;
+        public string? UnitId { get; set; }
     }
 }

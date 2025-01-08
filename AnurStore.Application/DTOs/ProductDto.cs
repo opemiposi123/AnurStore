@@ -1,10 +1,8 @@
-﻿
-using MassTransit;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using MassTransit;
 
 namespace AnurStore.Application.DTOs;
 
-public  class ProductDto
+public  class ProductDto 
 {
     public string Name { get; set; } = default!;
 
