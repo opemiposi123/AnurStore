@@ -1,8 +1,6 @@
 ﻿using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using System.Net;
 
 namespace AnurStore.Persistence.Context.Seeder
 {
@@ -12,7 +10,7 @@ namespace AnurStore.Persistence.Context.Seeder
         {
             //Seed Roles
             await roleManager.CreateAsync(new IdentityRole(Role.Admin.ToString()));
-            await roleManager.CreateAsync(new IdentityRole(Role.Cahier.ToString()));
+            await roleManager.CreateAsync(new IdentityRole(Role.Cashier.ToString()));
         }
         public static async Task SeedAdminAsync(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
@@ -36,7 +34,7 @@ namespace AnurStore.Persistence.Context.Seeder
             if (user == null)
             {
                 await userManager.CreateAsync(defaultUser, "Admin@123");
-                await userManager.AddToRoleAsync(defaultUser, Role.Cahier.ToString());
+                await userManager.AddToRoleAsync(defaultUser, Role.Cashier.ToString());
                 await userManager.AddToRoleAsync(defaultUser, Role.Admin.ToString());
             }
         }
@@ -61,7 +59,7 @@ namespace AnurStore.Persistence.Context.Seeder
             if (user == null)
             {
                 await userManager.CreateAsync(defaultUser, "Cashier@123");
-                await userManager.AddToRoleAsync(defaultUser, Role.Cahier.ToString());
+                await userManager.AddToRoleAsync(defaultUser, Role.Cashier.ToString());
             }
 
         }

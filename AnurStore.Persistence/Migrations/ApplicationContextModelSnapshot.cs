@@ -479,7 +479,7 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePerPack")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ProductImageUrl")
                         .HasColumnType("nvarchar(max)");
@@ -488,7 +488,7 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPriceMarkup")
                         .HasColumnType("decimal(18,2)");

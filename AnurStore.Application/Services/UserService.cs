@@ -71,7 +71,7 @@ namespace AnurStore.Application.Services
                     };
                 }
 
-                await _userManager.AddToRoleAsync(user, Role.Cahier.ToString());
+                await _userManager.AddToRoleAsync(user, Role.Cashier.ToString());
                 await _userRepository.SaveChangesAsync();
 
                 _logger.LogInformation("User created a new account with password.");

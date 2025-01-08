@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AnurStore.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Updated_migs : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -387,9 +387,9 @@ namespace AnurStore.Persistence.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BarCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PricePerPack = table.Column<decimal>(type: "money", nullable: false),
+                    PricePerPack = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PackPriceMarkup = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "money", nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     UnitPriceMarkup = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ProductImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalItemInPack = table.Column<int>(type: "int", nullable: false),

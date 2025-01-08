@@ -1,4 +1,4 @@
-using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.Abstractions.Repositories; 
 using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
@@ -54,6 +54,7 @@ builder.Services.AddScoped<IValidator<UpdateSupplierRequest>, UpdateSupplierVali
 builder.Services.AddScoped<IValidator<UpdateProductUnitRequest>, UpdateProductUnitValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserValidator>();
 
+//Identity
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {
     opt.Password.RequiredLength = 5;
@@ -66,6 +67,7 @@ builder.Services.AddIdentity<User, IdentityRole>(opt =>
 .AddEntityFrameworkStores<ApplicationContext>()
 .AddDefaultTokenProviders();
 
+//Notyf
 builder.Services.AddNotyf(config =>
 {
     config.DurationInSeconds = 5;
@@ -73,11 +75,10 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopRight;
 }
 );
+
 builder.Services.AddHttpContextAccessor();
 
-
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -86,6 +87,7 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 await app.SeedToDatabaseAsync();
 app.UseHttpsRedirection();
 app.UseStaticFiles();

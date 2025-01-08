@@ -1,5 +1,4 @@
 ﻿using AnurStore.Domain.Common.Contracts;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AnurStore.Domain.Entities
 {
@@ -11,12 +10,10 @@ namespace AnurStore.Domain.Entities
 
         public string? BarCode { get;set; } // 5800 * 3.5/100
 
-        [Column(TypeName = "money")]
         public decimal PricePerPack { get; set; }
 
         public decimal PackPriceMarkup { get; set; }
 
-        [Column(TypeName = "money")]
         public decimal UnitPrice { get; set; }
 
         public decimal UnitPriceMarkup { get; set; }

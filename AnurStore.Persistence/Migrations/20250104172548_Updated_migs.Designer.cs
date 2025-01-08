@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnurStore.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250104132436_Initial")]
-    partial class Initial
+    [Migration("20250104172548_Updated_migs")]
+    partial class Updated_migs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -482,7 +482,7 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("PricePerPack")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ProductImageUrl")
                         .HasColumnType("nvarchar(max)");
@@ -491,7 +491,7 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("UnitPriceMarkup")
                         .HasColumnType("decimal(18,2)");

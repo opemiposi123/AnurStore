@@ -27,7 +27,8 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 
             builder.Property(p => p.PackPriceMarkup)
                 .IsRequired()
-                .HasColumnType("decimal(18,2)");
+                .HasPrecision(18, 2)
+                .HasColumnType("decimal(18,2");
 
             builder.Property(p => p.UnitPrice)
                 .IsRequired()
@@ -35,7 +36,8 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 
             builder.Property(p => p.UnitPriceMarkup)
                 .IsRequired()
-                .HasColumnType("decimal(18,2)"); 
+                .HasPrecision(18, 2)
+                .HasColumnType("decimal(18,2");
 
             builder.Property(p => p.ProductImageUrl)
                 .HasMaxLength(200);
@@ -48,12 +50,11 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 
             builder.Property(p => p.BrandId)
                 .IsRequired(false); 
-
             
             builder.HasOne(p => p.Inventory)
                 .WithOne(i => i.Product) 
                 .HasForeignKey<Inventory>(i => i.ProductId)
-                .OnDelete(DeleteBehavior.Cascade); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(p => p.ProductSize)
                 .IsRequired(); 
