@@ -8,5 +8,6 @@ namespace AnurStore.IOC.ServiceCollection
 {
     internal class ServiceCollection
     {
+
     }
 }

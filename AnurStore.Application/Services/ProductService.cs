@@ -110,6 +110,7 @@ namespace AnurStore.Application.Services
                 };
             }
         }
+
         public async Task<string> SaveFileAsync(IFormFile file)
         {
             var uploads = Path.Combine("wwwroot", "images");

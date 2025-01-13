@@ -39,9 +39,9 @@ namespace AnurStore.Application.Services
                 }
 
                 _logger.LogInformation("Checking if Brand with name {BrandName} exists.", request.Name);
-                var reportExists = await _brandRepository.Exist(request.Name);
+                var brandExists = await _brandRepository.Exist(request.Name);
 
-                if (reportExists)
+                if (brandExists)
                 {
                     _logger.LogWarning("Brand with name {BrandName} already exists.", request.Name);
                     return new BaseResponse<string>

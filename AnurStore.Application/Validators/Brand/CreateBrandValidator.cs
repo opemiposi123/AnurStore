@@ -9,7 +9,7 @@ namespace AnurStore.Application.Validators.Brand
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Name is required.")
-                .MaximumLength(50).WithMessage("Name must not exceed 50 characters.");
+                .MaximumLength(25).WithMessage("Name must not exceed 25 characters.");
 
             RuleFor(x => x.Description)
                 .MaximumLength(100).WithMessage("Description must not exceed 100 characters.");
