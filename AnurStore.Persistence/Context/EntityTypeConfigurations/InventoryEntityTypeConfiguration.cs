@@ -26,7 +26,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
             builder.HasOne(i => i.Product)
                    .WithOne(up => up.Inventory)
                    .HasForeignKey<Inventory>(x => x.ProductId)
-                   .OnDelete(DeleteBehavior.NoAction); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             builder.Property(i => i.StockDate)
                    .HasColumnType("datetime");

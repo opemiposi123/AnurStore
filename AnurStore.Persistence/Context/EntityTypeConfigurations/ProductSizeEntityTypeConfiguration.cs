@@ -9,12 +9,19 @@ internal sealed class ProductSizeEntityTypeConfiguration : IEntityTypeConfigurat
     public void Configure(EntityTypeBuilder<ProductSize> builder)
     {
         builder.ToTable("ProductSizes");
+
         builder.HasKey(x => x.Id);
+
         builder.Property(x => x.Size);
 
-        builder.HasOne(u => u.Product)
-               .WithOne(up => up.ProductSize)
-               .HasForeignKey<ProductSize>(x => x.ProductId)
-               .OnDelete(DeleteBehavior.NoAction);
+        builder.HasOne(ps => ps.Product)
+            .WithOne(p => p.ProductSize)
+            .HasForeignKey<ProductSize>(ps => ps.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(ps => ps.ProductUnit)
+            .WithMany()
+            .HasForeignKey(ps => ps.ProductUnitId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

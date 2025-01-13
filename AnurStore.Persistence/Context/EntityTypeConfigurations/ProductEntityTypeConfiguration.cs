@@ -14,12 +14,13 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 
             builder.Property(p => p.Name)
                 .IsRequired()
-                .HasMaxLength(50); 
+                .HasMaxLength(50);
+
             builder.Property(p => p.Description)
-                .HasMaxLength(100); 
+                .HasMaxLength(100);
 
             builder.Property(p => p.BarCode)
-                .HasMaxLength(50); 
+                .HasMaxLength(50);
 
             builder.Property(p => p.PricePerPack)
                 .IsRequired()
@@ -28,7 +29,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
             builder.Property(p => p.PackPriceMarkup)
                 .IsRequired()
                 .HasPrecision(18, 2)
-                .HasColumnType("decimal(18,2");
+                .HasColumnType("decimal(18,2)");
 
             builder.Property(p => p.UnitPrice)
                 .IsRequired()
@@ -37,7 +38,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
             builder.Property(p => p.UnitPriceMarkup)
                 .IsRequired()
                 .HasPrecision(18, 2)
-                .HasColumnType("decimal(18,2");
+                .HasColumnType("decimal(18,2)");
 
             builder.Property(p => p.ProductImageUrl)
                 .HasMaxLength(200);
@@ -49,15 +50,20 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
                 .IsRequired();
 
             builder.Property(p => p.BrandId)
-                .IsRequired(false); 
-            
+                .IsRequired(false);
+
             builder.HasOne(p => p.Inventory)
-                .WithOne(i => i.Product) 
+                .WithOne(i => i.Product)
                 .HasForeignKey<Inventory>(i => i.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasOne(p => p.ProductSize)
+                .WithOne(ps => ps.Product)
+                .HasForeignKey<ProductSize>(ps => ps.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.Property(p => p.ProductSize)
-                .IsRequired(); 
+                .IsRequired();
         }
     }
 }

@@ -10,5 +10,6 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<bool> UpdateProduct(Product product);
         Task<bool> Exist(string productName);
         List<Product> SelectProduct();
+       Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize);
     } 
 }

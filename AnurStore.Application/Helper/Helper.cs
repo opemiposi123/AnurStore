@@ -28,5 +28,14 @@
         {
             return DateTime.Now.Year;
         }
+
+        public decimal RoundToNearestTen(decimal number)
+        {
+            decimal remainder = number % 10;
+            decimal value = (remainder >= 5) ? number - remainder + 10 : number - remainder;
+
+            return value;
+        }
+
     }
 }

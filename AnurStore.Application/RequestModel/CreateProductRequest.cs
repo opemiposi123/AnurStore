@@ -1,4 +1,6 @@
-﻿namespace AnurStore.Application.RequestModel
+﻿using Microsoft.AspNetCore.Http;
+
+namespace AnurStore.Application.RequestModel
 {
     public class CreateProductRequest
     {
@@ -16,7 +18,9 @@
 
         public decimal UnitPriceMarkup { get; set; }
 
-        public string? ProductImageUrl { get; set; }
+        public IFormFile? ProductImage { get; set; } 
+
+        //public IFormFile? CoverImageFile { get; set; }
 
         public int TotalItemInPack { get; set; }
         public double ProductSize { get; set; }
@@ -25,6 +29,6 @@
     
         public string? BrandId { get; set; }
 
-        public string? UnitId { get; set; }
+        public string UnitId { get; set; } = default!;
     }
 }

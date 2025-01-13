@@ -26,9 +26,13 @@ namespace AnurStore.Persistence.Repositories
             return product;
         }
 
-        public async Task<IList<Product>> GetAllProduct()
+        public async Task<IList<Product>> GetAllProduct() 
         {
             var produtcs = await _context.Products
+                  .Include(r  => r.ProductSize)
+                     .ThenInclude(r => r.ProductUnit)   
+                  .Include(r => r.Category)
+                  .Include(r => r.Brand)
                   .ToListAsync();
             return produtcs;
         }
@@ -48,5 +52,35 @@ namespace AnurStore.Persistence.Repositories
             var result = _context.Products.Update(product);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                _context.Products.Add(product);
+                await _context.SaveChangesAsync();
+
+                if (productSize != null)
+                {
+                    productSize.ProductId = product.Id; 
+                    _context.ProductSizes.Add(productSize);
+                    await _context.SaveChangesAsync();
+                }
+
+                // Commit the transaction
+                await transaction.CommitAsync();
+
+                return product.Id; 
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
+
     }
 }

@@ -17,6 +17,7 @@ public  class ProductDto
     public decimal UnitPrice { get; set; }
 
     public decimal UnitPriceMarkup { get; set; }
+
     public string? ProductImageUrl { get; set; }
 
     public int TotalItemInPack { get; set; }
