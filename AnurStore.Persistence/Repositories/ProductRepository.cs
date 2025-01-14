@@ -81,6 +81,16 @@ namespace AnurStore.Persistence.Repositories
             }
         }
 
+        public async Task<ProductSize?> GetProductSizeByProductIdAsync(string productId)
+        {
+            if (string.IsNullOrWhiteSpace(productId))
+                throw new ArgumentException("ProductId cannot be null or empty.", nameof(productId));
+
+            return await _context.ProductSizes
+                .AsNoTracking() // Improves performance if no modifications are needed
+                .FirstOrDefaultAsync(ps => ps.ProductId == productId);
+        }
+
 
     }
 }

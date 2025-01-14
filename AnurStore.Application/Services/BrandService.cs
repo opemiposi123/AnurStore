@@ -5,6 +5,7 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace AnurStore.Application.Services
@@ -254,5 +255,21 @@ namespace AnurStore.Application.Services
                 };
             }
         }
+
+        public async Task<IEnumerable<SelectListItem>> GetBrandSelectList()
+        {
+            var brandsResponse = await GetAllBrand();
+            if (brandsResponse.Status && brandsResponse.Data != null)
+            {
+                var brandList = brandsResponse.Data.Select(d => new SelectListItem
+                {
+                    Value = d.Id.ToString(),
+                    Text = d.Name 
+                });
+                return brandList;
+            }
+            return Enumerable.Empty<SelectListItem>();
+        }
+
     }
 }

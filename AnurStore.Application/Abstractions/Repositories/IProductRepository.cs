@@ -2,7 +2,7 @@
 
 namespace AnurStore.Application.Abstractions.Repositories
 {
-    public interface  IProductRepository
+    public interface IProductRepository
     {
         Task<Product> CreateProduct(Product product);
         Task<IList<Product>> GetAllProduct();
@@ -10,6 +10,7 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<bool> UpdateProduct(Product product);
         Task<bool> Exist(string productName);
         List<Product> SelectProduct();
-       Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize);
-    } 
+        Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize);
+        Task<ProductSize?> GetProductSizeByProductIdAsync(string productId);
+    }
 }

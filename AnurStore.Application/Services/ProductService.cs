@@ -5,7 +5,7 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace AnurStore.Application.Services
@@ -25,7 +25,6 @@ namespace AnurStore.Application.Services
             _logger = logger; 
             _httpContextAccessor = httpContextAccessor;
         }
-
 
         public async Task<BaseResponse<string>> CreateProductAsync(CreateProductRequest request)
         {
@@ -139,6 +138,7 @@ namespace AnurStore.Application.Services
                     CategoryName = r.Category.Name,
                     BrandName = r.Brand.Name,
                     UnitPrice = r.UnitPrice,
+                    PricePerPack = r.PricePerPack,
                     TotalItemInPack = r.TotalItemInPack,
                     ProductImageUrl = r.ProductImageUrl,
                     Size = r.ProductSize.Size,
@@ -214,14 +214,183 @@ namespace AnurStore.Application.Services
             }
         }
 
-        public Task<BaseResponse<bool>> UpdateProduct(string productId, UpdateProductRequest request)
+        public async Task<BaseResponse<bool>> UpdateProduct(string productId, UpdateProductRequest request)
         {
-            throw new NotImplementedException();
+            var userName = _httpContextAccessor.HttpContext?.User.Identity?.Name ?? "System";
+            _logger.LogInformation("Starting UpdateProduct method for ProductId: {ProductId}.", productId);
+
+            try
+            {
+                if (string.IsNullOrWhiteSpace(productId))
+                {
+                    _logger.LogWarning("ProductId is null or empty.");
+                    return new BaseResponse<bool>
+                    {
+                        Status = false,
+                        Message = "ProductId cannot be null or empty",
+                    };
+                }
+
+                if (request == null)
+                {
+                    _logger.LogWarning("UpdateProduct request is null.");
+                    return new BaseResponse<bool>
+                    {
+                        Status = false,
+                        Message = "Request cannot be null",
+                    };
+                }
+
+                // Retrieve the existing product
+                var product = await _productRepository.GetProductById(productId);
+                if (product == null)
+                {
+                    _logger.LogWarning("Product with Id {ProductId} not found.", productId);
+                    return new BaseResponse<bool>
+                    {
+                        Status = false,
+                        Message = "Product not found",
+                    };
+                }
+
+                // Update product properties
+                product.Name = request.Name ?? product.Name;
+                product.Description = request.Description ?? product.Description;
+                product.BarCode = request.BarCode ?? product.BarCode;
+                product.BrandId = request.BrandId ?? product.BrandId;
+                product.CategoryId = request.CategoryId ?? product.CategoryId;
+                product.UnitPrice = request.UnitPrice;
+                product.PricePerPack = request.PricePerPack;
+                product.UnitPriceMarkup = request.UnitPriceMarkup;
+                product.PackPriceMarkup = request.PackPriceMarkup;
+                product.TotalItemInPack = request.TotalItemInPack;
+                product.LastModifiedBy = userName;
+                product.LastModifiedOn = DateTime.Now;
+
+                // Update product image if a new one is provided
+                if (request.ProductImage != null && request.ProductImage.Length > 0)
+                {
+                    var newImageUrl = await SaveFileAsync(request.ProductImage);
+                    product.ProductImageUrl = newImageUrl;
+                }
+
+                // Update product size if provided
+                if (request.ProductSize != null)
+                {
+                    var existingSize = await _productRepository.GetProductSizeByProductIdAsync(productId);
+                    if (existingSize != null)
+                    {
+                        existingSize.Size = request.ProductSize;
+                        existingSize.ProductUnitId = request.UnitId;
+                        existingSize.LastModifiedBy = userName;
+                        existingSize.LastModifiedOn = DateTime.Now;
+
+                        await _productSizeRepository.UpdateProductSize(existingSize);
+                    }
+                    else
+                    {
+                        var newSize = new ProductSize
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            ProductId = product.Id,
+                            ProductUnitId = request.UnitId,
+                            Size = request.ProductSize,
+                            CreatedBy = userName,
+                            CreatedOn = DateTime.Now
+                        };
+
+                        await _productSizeRepository.CreateProductSize(newSize);
+                    }
+                }
+
+                // Update the product
+                await _productRepository.UpdateProduct(product);
+
+                _logger.LogInformation("Product with Id {ProductId} updated successfully.", productId);
+                return new BaseResponse<bool>
+                {
+                    Status = true,
+                    Message = "Product updated successfully",
+                    Data = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while updating Product with Id {ProductId}.", productId);
+                return new BaseResponse<bool>
+                {
+                    Status = false,
+                    Message = $"Failed to update Product: {ex.Message}",
+                };
+            }
         }
 
-        public Task<BaseResponse<ProductDto>> GetProduct(string productId)
+        public async Task<BaseResponse<ProductDto>> GetProductDetails(string productId)
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("Starting GetProduct method for Id {ProductId}.", productId);
+            try
+            {
+                var reportType = await _productRepository.GetProductById(productId);
+                if (reportType == null)
+                {
+                    _logger.LogWarning("Product with Id {ProductId} not found.", productId);
+                    return new BaseResponse<ProductDto>
+                    {
+                        Message = "Product not found",
+                        Status = false
+                    };
+                }
+                var ProductDto = new ProductDto
+                {
+                    Id = productId,
+                    Name = reportType.Name,
+                    Description = reportType.Description,
+                    CategoryName = reportType.Category.Name,
+                    BrandName = reportType.Brand.Name,
+                    UnitPrice = reportType.UnitPrice,
+                    PricePerPack = reportType.PricePerPack,
+                    TotalItemInPack = reportType.TotalItemInPack,
+                    ProductImageUrl = reportType.ProductImageUrl,
+                    Size = reportType.ProductSize.Size,
+                    UnitName = reportType.ProductSize.ProductUnit.Name,
+                    CreatedBy = reportType.CreatedBy,
+                    CreatedOn = reportType.CreatedOn,
+
+                };
+
+                _logger.LogInformation("Successfully retrieved Product with Id {ProductId}.", productId);
+                return new BaseResponse<ProductDto>
+                {
+                    Data = ProductDto,
+                    Status = true
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving Product with Id {ProductId}.", productId);
+                return new BaseResponse<ProductDto>
+                {
+                    Message = $"Failed to retrieve Product: {ex.Message}",
+                    Status = false
+                };
+            }
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetProductSelectList()
+        {
+            var productsResponse = await GetAllProduct();
+
+            if (productsResponse.Status && productsResponse.Data != null)
+            {
+                var productList = productsResponse.Data.Select(d => new SelectListItem
+                {
+                    Value = d.Id.ToString(), 
+                    Text = d.Name 
+                });
+
+                return productList;
+            }
+            return Enumerable.Empty<SelectListItem>();
         }
     }
 }

@@ -20,8 +20,6 @@ namespace AnurStore.Application.RequestModel
 
         public IFormFile? ProductImage { get; set; } 
 
-        //public IFormFile? CoverImageFile { get; set; }
-
         public int TotalItemInPack { get; set; }
         public double ProductSize { get; set; }
 

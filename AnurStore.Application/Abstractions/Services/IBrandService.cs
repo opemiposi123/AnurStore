@@ -1,6 +1,7 @@
 ﻿using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AnurStore.Application.Abstractions.Services
 {
@@ -11,5 +12,6 @@ namespace AnurStore.Application.Abstractions.Services
         Task<BaseResponse<BrandDto>> GetBrand(string brandId); 
         Task<BaseResponse<IEnumerable<BrandDto>>> GetAllBrand();
         Task<BaseResponse<bool>> DeleteBrand(string brandId);
+        Task<IEnumerable<SelectListItem>> GetBrandSelectList();
     }
 }
