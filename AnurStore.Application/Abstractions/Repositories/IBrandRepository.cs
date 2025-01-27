@@ -10,5 +10,6 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<bool> UpdateBrand(Brand Brand);
         Task<bool> Exist(string brandName); 
         List<Brand> GetAllBrand();
+        Task<Brand?> GetBrandByNameAsync(string brandName);
     }
 }

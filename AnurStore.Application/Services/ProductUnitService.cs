@@ -255,7 +255,7 @@ namespace AnurStore.Application.Services
             }
         }
 
-        public async Task<IEnumerable<SelectListItem>> GetProductUnitList()
+        public async Task<IEnumerable<SelectListItem>> GetProductUnitSelectList()
         {
             var productUnitResponse = await GetAllProductUnit();
             if (productUnitResponse.Status && productUnitResponse.Data != null)

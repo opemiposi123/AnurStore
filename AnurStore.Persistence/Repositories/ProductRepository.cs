@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AnurStore.Persistence.Repositories
 {
     public class ProductRepository : IProductRepository
-    {
+    { 
         private readonly ApplicationContext _context;
 
         public ProductRepository(ApplicationContext context)
@@ -91,6 +91,7 @@ namespace AnurStore.Persistence.Repositories
                 .FirstOrDefaultAsync(ps => ps.ProductId == productId);
         }
 
+       
 
     }
 }

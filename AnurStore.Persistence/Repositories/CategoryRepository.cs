@@ -50,5 +50,13 @@ namespace AnurStore.Persistence.Repositories
             var result = _context.Categories.Update(category);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Category> GetCategoryByNameAsync(string categoryName)
+        {
+            return await _context.Categories
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
+        }
+
+
     }
 }

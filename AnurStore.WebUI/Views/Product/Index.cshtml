@@ -1,0 +1,134 @@
+﻿@model IEnumerable<AnurStore.Application.DTOs.ProductDto>
+@{
+    ViewData["Title"] = "Product List";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                    <h4 class="mb-3">Product List</h4>
+                    <a href="@Url.Action("CreateProduct", "Product")" class="btn btn-primary add-list">
+                        <i class="las la-plus mr-3"></i>Add Product
+                    </a>
+                    <div class="d-flex flex-column text-right">
+                        <a href="@Url.Action("DownloadProductTemplate", "Product")" class="btn btn-secondary mb-2">
+                            Download Excel Template
+                        </a>
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">
+                            Upload Products
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="table-responsive rounded mb-3">
+                    <table class="data-tables table mb-0 tbl-server-info">
+                        <thead class="bg-white text-uppercase">
+                            <tr class="ligth ligth-data">
+                                <th>
+                                    <div class="checkbox d-inline-block">
+                                        <input type="checkbox" class="checkbox-input" id="checkbox1">
+                                        <label for="checkbox1" class="mb-0"></label>
+                                    </div>
+                                </th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Brand Name</th>
+                                <th>UnitPrice</th>
+                                <th>PackPrice</th>
+                                <th>Size</th>
+                                <th>TotalItemInPack</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="ligth-body">
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="checkbox d-inline-block">
+                                            <input type="checkbox" class="checkbox-input" id="checkbox2">
+                                            <label for="checkbox2" class="mb-0"></label>
+                                        </div>
+                                    </td>
+                                    <td>@item.Name</td>
+                                    <td>@item.CategoryName</td>
+                                    <td>@item.BrandName</td>
+                                    <td>₦@item.UnitPrice</td>
+                                    <td>₦@item.PricePerPack</td>
+                                    <td>@item.SizeWithUnit</td>
+                                    <td>@item.TotalItemInPack</td>
+                                    <td>
+                                        <div class="d-flex align-items-center list-action">
+                                            <a asp-action="ViewProductDetail" asp-route-id="@item.Id" class="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="View">
+                                                <i class="ri-eye-line mr-0"></i>
+                                            </a>
+                                            <a asp-action="EditProduct" asp-route-id="@item.Id" class="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="Edit">
+                                                <i class="ri-pencil-line mr-0"></i>
+                                            </a>
+                                            <a asp-action="DeleteProduct" asp-route-id="@item.Id" class="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="Delete">
+                                                <i class="ri-delete-bin-line mr-0"></i>
+                                            </a>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #uploadModal .custom-file-input {
+        width: 100%;
+    }
+
+    #uploadModal .custom-file-label {
+        font-size: 0.875rem; 
+        padding: 0.375rem 0.75rem; 
+    }
+
+    #uploadModal .custom-file {
+        width: auto; /* Keep the file input and label compact */
+        max-width: 300px; /* Prevent it from stretching too far */
+    }
+</style>
+
+<!-- Modal -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload Products from Excel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form asp-action="UploadProductsFromExcel" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="excelFile">Select Excel File</label>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="excelFile" name="excelFile" required />
+                            <label class="custom-file-label" for="excelFile">Choose File</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+

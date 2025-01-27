@@ -50,4 +50,14 @@ public class BrandRepository : IBrandRepository
         var result = _context.Brands.Update(brand);
         return await _context.SaveChangesAsync() > 0;
     }
+
+    public async Task<Brand?> GetBrandByNameAsync(string brandName)
+    {
+        if (string.IsNullOrEmpty(brandName))
+            return null; 
+
+        return await _context.Brands
+            .FirstOrDefaultAsync(b => b.Name.Equals(brandName, StringComparison.OrdinalIgnoreCase));
+    }
+
 }

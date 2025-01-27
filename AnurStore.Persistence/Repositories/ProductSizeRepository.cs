@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AnurStore.Persistence.Repositories
 {
-    public class ProductSizeSizeRepository : IProductSizeRepository
+    public class ProductSizeRepository : IProductSizeRepository
     {
         private readonly ApplicationContext _context;
 
-        public ProductSizeSizeRepository(ApplicationContext context) 
+        public ProductSizeRepository(ApplicationContext context) 
         {
             _context = context;
         }

@@ -12,7 +12,7 @@ namespace AnurStore.Application.Abstractions.Services
         Task<BaseResponse<ProductUnitDto>> GetProductUnit(string productUnitId);
         Task<BaseResponse<IEnumerable<ProductUnitDto>>> GetAllProductUnit();
         Task<BaseResponse<bool>> DeleteProductUnit(string productUnitId);
-        Task<IEnumerable<SelectListItem>> GetProductUnitList();
+        Task<IEnumerable<SelectListItem>> GetProductUnitSelectList();
     }
 }
  

@@ -74,12 +74,12 @@
                         class="iq-submenu collapse"
                         data-parent="#iq-sidebar-toggle">
                         <li class="">
-                            <a href="~/backend/page-list-product.html">
+                            <a href="@Url.Action("Index","Product")">
                                 <i class="las la-minus"></i><span>List Product</span>
                             </a>
                         </li>
-                        <li class="">
-                            <a href="~/backend/page-add-product.html">
+                        <li class=""> 
+                            <a href="@Url.Action("CreateProduct","Product")">
                                 <i class="las la-minus"></i><span>Add Product</span>
                             </a>
                         </li>

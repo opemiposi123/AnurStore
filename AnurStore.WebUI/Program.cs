@@ -4,6 +4,7 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;
 using AnurStore.Application.Validators.Category;
+using AnurStore.Application.Validators.Product;
 using AnurStore.Application.Validators.ProductUnit;
 using AnurStore.Application.Validators.Supplier;
 using AnurStore.Application.Validators.User;
@@ -30,7 +31,9 @@ builder.Services.AddScoped<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
 
 //Services
 builder.Services.AddScoped<IUserAuthService,UserAuthService>();
@@ -38,6 +41,7 @@ builder.Services.AddScoped<IBrandService, BrandService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 
 //Validators
@@ -45,6 +49,7 @@ builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryVali
 builder.Services.AddScoped<IValidator<CreateBrandRequest>, CreateBrandValidator>();
 builder.Services.AddScoped<IValidator<CreateSupplierRequest>, CreateSupplierValidator>();
 builder.Services.AddScoped<IValidator<CreateProductUnitRequest>, CreateProductUnitValidator>();
+builder.Services.AddScoped<IValidator<CreateProductRequest>, CreateProductValidator>();
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserValidator>();
 
 
@@ -52,6 +57,7 @@ builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryVali
 builder.Services.AddScoped<IValidator<UpdateBrandRequest>, UpdateBrandValidator>();
 builder.Services.AddScoped<IValidator<UpdateSupplierRequest>, UpdateSupplierValidator>();
 builder.Services.AddScoped<IValidator<UpdateProductUnitRequest>, UpdateProductUnitValidator>();
+builder.Services.AddScoped<IValidator<UpdateProductRequest>, UpdateProductValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserValidator>();
 
 //Identity

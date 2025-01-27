@@ -10,4 +10,5 @@ public interface ICategoryRepository
     Task<bool> UpdateCategory(Category Category);
     Task<bool> Exist(string CategoryName);
     List<Category> GetAllCategory();
+    Task<Category?> GetCategoryByNameAsync(string categoryName);
 }

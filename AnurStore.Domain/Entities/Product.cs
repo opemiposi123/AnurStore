@@ -8,15 +8,13 @@ namespace AnurStore.Domain.Entities
 
         public string? Description { get; set; }
 
-        public string? BarCode { get;set; } // 5800 * 3.5/100
+        public string? BarCode { get;set; } 
 
-        public decimal PricePerPack { get; set; }
+        public decimal? PricePerPack { get; set; } // Rate * PackPriceMarkup / 100 = 203
 
-        public decimal PackPriceMarkup { get; set; }
+        public decimal PackPriceMarkup { get; set; } //3.5
 
-        public decimal UnitPrice { get; set; }
-
-        public decimal UnitPriceMarkup { get; set; }
+        public decimal? UnitPrice { get; set; } 
 
         public string? ProductImageUrl { get; set; }
 

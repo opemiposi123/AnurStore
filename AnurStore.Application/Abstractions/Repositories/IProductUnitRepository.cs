@@ -10,5 +10,6 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<bool> UpdateProductUnit(ProductUnit productUnit);
         Task<bool> Exist(string productUnitName);
         List<ProductUnit> SelectProductUnit();
+        Task<ProductUnit?> GetProductUnitByNameAsync(string unitName);
     }
 }  

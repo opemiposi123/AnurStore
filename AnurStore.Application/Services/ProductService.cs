@@ -5,8 +5,11 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
+using System.Runtime.CompilerServices;
 
 namespace AnurStore.Application.Services
 {
@@ -15,15 +18,37 @@ namespace AnurStore.Application.Services
 
         private readonly IProductRepository _productRepository;
         private readonly IProductSizeRepository _productSizeRepository;
-        private readonly ILogger<CategoryService> _logger;
+        private readonly ICategoryRepository _categoryRepository; 
+        private readonly IBrandRepository _brandRepository; 
+        private readonly IProductUnitRepository _productUnitRepository;  
+        private readonly ILogger<ProductService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICategoryService _categoryService;
+        private readonly IBrandService _brandService; 
+        private readonly IProductUnitService _productUnitService;
 
-        public ProductService(IProductRepository productRepository, IProductSizeRepository productSizeRepository,ILogger<CategoryService> logger, IHttpContextAccessor httpContextAccessor)
+        public ProductService(IProductRepository productRepository,
+            ICategoryService categoryService,
+            IProductSizeRepository productSizeRepository,
+            ILogger<ProductService> logger, 
+            IProductUnitService productUnitService,
+            IBrandService brandService,
+            ICategoryRepository categoryRepository,
+            IBrandRepository brandRepository,
+            IProductUnitRepository productUnitRepository,
+            IHttpContextAccessor httpContextAccessor)
         {
             _productRepository = productRepository;
             _productSizeRepository = productSizeRepository;
             _logger = logger; 
             _httpContextAccessor = httpContextAccessor;
+            _categoryService = categoryService;
+            _brandService = brandService;
+            _productUnitService = productUnitService;
+            _categoryRepository = categoryRepository;
+            _brandRepository = brandRepository;
+            _logger = logger;
+            _productUnitRepository = productUnitRepository;
         }
 
         public async Task<BaseResponse<string>> CreateProductAsync(CreateProductRequest request)
@@ -70,7 +95,6 @@ namespace AnurStore.Application.Services
                     CategoryId = request.CategoryId,
                     UnitPrice = request.UnitPrice,
                     PricePerPack = request.PricePerPack,
-                    UnitPriceMarkup = request.UnitPriceMarkup,
                     PackPriceMarkup = request.PackPriceMarkup,
                     TotalItemInPack = request.TotalItemInPack,
                     ProductImageUrl = productImageUrl,
@@ -141,12 +165,11 @@ namespace AnurStore.Application.Services
                     PricePerPack = r.PricePerPack,
                     TotalItemInPack = r.TotalItemInPack,
                     ProductImageUrl = r.ProductImageUrl,
-                    Size = r.ProductSize.Size,
-                    UnitName = r.ProductSize.ProductUnit.Name,
-                    Description = r.Description
+                    Description = r.Description,
+                    SizeWithUnit = $"{r.ProductSize.Size}{r.ProductSize.ProductUnit.Name}"
                 }).ToList();
 
-                _logger.LogInformation("Successfully retrieved categories.");
+                _logger.LogInformation("Successfully retrieved products.");
                 return new BaseResponse<IEnumerable<ProductDto>>
                 {
                     Message = "Record Found Successfully",
@@ -156,7 +179,7 @@ namespace AnurStore.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while retrieving categories.");
+                _logger.LogError(ex, "Error occurred while retrieving products.");
                 return new BaseResponse<IEnumerable<ProductDto>>
                 {
                     Status = false,
@@ -261,7 +284,6 @@ namespace AnurStore.Application.Services
                 product.CategoryId = request.CategoryId ?? product.CategoryId;
                 product.UnitPrice = request.UnitPrice;
                 product.PricePerPack = request.PricePerPack;
-                product.UnitPriceMarkup = request.UnitPriceMarkup;
                 product.PackPriceMarkup = request.PackPriceMarkup;
                 product.TotalItemInPack = request.TotalItemInPack;
                 product.LastModifiedBy = userName;
@@ -340,7 +362,7 @@ namespace AnurStore.Application.Services
                         Status = false
                     };
                 }
-                var ProductDto = new ProductDto
+                var productDto = new ProductDto
                 {
                     Id = productId,
                     Name = reportType.Name,
@@ -361,7 +383,7 @@ namespace AnurStore.Application.Services
                 _logger.LogInformation("Successfully retrieved Product with Id {ProductId}.", productId);
                 return new BaseResponse<ProductDto>
                 {
-                    Data = ProductDto,
+                    Data = productDto,
                     Status = true
                 };
             }
@@ -392,5 +414,151 @@ namespace AnurStore.Application.Services
             }
             return Enumerable.Empty<SelectListItem>();
         }
+
+        public async Task<FileResult> DownloadProductTemplateAsync()
+        {
+            var categories = await _categoryService.GetCategorySelectList();
+            var brands = await _brandService.GetBrandSelectList();
+            var productUnits = await _productUnitService.GetProductUnitSelectList();
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Product Template");
+
+            worksheet.Cells[1, 1].Value = "Name";
+            worksheet.Cells[1, 2].Value = "Description";
+            worksheet.Cells[1, 3].Value = "BarCode";
+            worksheet.Cells[1, 4].Value = "Unit Price";
+            worksheet.Cells[1, 5].Value = "Price Per Pack";
+            worksheet.Cells[1, 6].Value = "Pack Price Markup";
+            worksheet.Cells[1, 7].Value = "Total Item in Pack";
+            worksheet.Cells[1, 8].Value = "Product Size";
+            worksheet.Cells[1, 9].Value = "Category Name";
+            worksheet.Cells[1, 10].Value = "Brand Name";
+            worksheet.Cells[1, 11].Value = "Product Unit";
+            worksheet.Cells[1, 12].Value = "Product Image URL";
+
+            var categoryRangeName = "CategoryList";
+            var brandRangeName = "BrandList";
+            var productUnitRangeName = "ProductUnitList";
+
+            PopulateDropdownList(worksheet, categories.Select(c => c.Text), categoryRangeName, 16);
+            PopulateDropdownList(worksheet, brands.Select(b => b.Text), brandRangeName, 17);
+            PopulateDropdownList(worksheet, productUnits.Select(u => u.Text), productUnitRangeName, 18);
+
+            AddDropdownValidation(worksheet, categoryRangeName, 9);
+            AddDropdownValidation(worksheet, brandRangeName, 10);
+            AddDropdownValidation(worksheet, productUnitRangeName, 11);
+
+            worksheet.Column(16).Hidden = true;
+            worksheet.Column(17).Hidden = true;
+            worksheet.Column(18).Hidden = true;
+
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+            {
+                FileDownloadName = "ProductTemplate.xlsx"
+            };
+        }
+  
+        private void PopulateDropdownList(ExcelWorksheet worksheet, IEnumerable<string> items, string rangeName, int columnIndex)
+        {
+            var rowIndex = 2;
+            foreach (var item in items)
+            {
+                worksheet.Cells[rowIndex++, columnIndex].Value = item;
+            }
+            worksheet.Names.Add(rangeName, worksheet.Cells[2, columnIndex, items.Count() + 1, columnIndex]);
+        }
+
+        private void AddDropdownValidation(ExcelWorksheet worksheet, string rangeName, int columnIndex)
+        {
+            var validation = worksheet.DataValidations.AddListValidation(worksheet.Cells[2, columnIndex, 100, columnIndex].Address);
+            validation.ShowErrorMessage = true;
+            validation.ErrorTitle = "Invalid selection";
+            validation.Error = "Please select a valid value from the list.";
+            validation.Formula.ExcelFormula = $"={rangeName}";
+        }
+
+        public async Task UploadProductsFromExcelAsync(Stream excelStream)
+        {
+            try
+            {
+                // Set the license context for EPPlus (required for versions 5 and above)
+                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+                using var package = new ExcelPackage(excelStream);
+                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+                if (worksheet == null)
+                {
+                    throw new ArgumentException("The Excel file is empty.");
+                }
+
+                var productList = new List<CreateProductRequest>();
+                for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                {
+                    var name = worksheet.Cells[row, 1]?.Value?.ToString()?.Trim();
+                    var description = worksheet.Cells[row, 2]?.Value?.ToString()?.Trim();
+                    var barCode = worksheet.Cells[row, 3]?.Value?.ToString()?.Trim();
+                    var unitPrice = decimal.TryParse(worksheet.Cells[row, 4]?.Value?.ToString(), out var unitPriceValue) ? unitPriceValue : 0;
+                    var pricePerPack = decimal.TryParse(worksheet.Cells[row, 5]?.Value?.ToString(), out var pricePerPackValue) ? pricePerPackValue : 0;
+                    var packPriceMarkup = decimal.TryParse(worksheet.Cells[row, 6]?.Value?.ToString(), out var packPriceMarkupValue) ? packPriceMarkupValue : 0;
+                    var totalItemInPack = int.TryParse(worksheet.Cells[row, 7]?.Value?.ToString(), out var totalItemValue) ? totalItemValue : 0;
+                    var productSize = double.TryParse(worksheet.Cells[row, 8]?.Value?.ToString(), out var productSizeValue) ? productSizeValue : 0;
+                    var categoryName = worksheet.Cells[row, 9]?.Value?.ToString()?.Trim();
+                    var brandName = worksheet.Cells[row, 10]?.Value?.ToString()?.Trim();
+                    var unitName = worksheet.Cells[row, 11]?.Value?.ToString()?.Trim();
+                    var productImage = worksheet.Cells[row, 12]?.Value?.ToString()?.Trim();
+
+                    if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(categoryName) || string.IsNullOrEmpty(unitName))
+                    {
+                        continue;
+                    }
+
+                    var category = await _categoryRepository.GetCategoryByNameAsync(categoryName);
+                    var brand = string.IsNullOrEmpty(brandName) ? null : await _brandRepository.GetBrandByNameAsync(brandName);
+                    var productUnit = await _productUnitRepository.GetProductUnitByNameAsync(unitName);
+
+                    if (category == null || productUnit == null)
+                    {
+                        continue;
+                    }
+
+                    var productRequest = new CreateProductRequest
+                    {
+                        Name = name,
+                        Description = description,
+                        BarCode = barCode,
+                        UnitPrice = unitPrice,
+                        PricePerPack = pricePerPack,
+                        PackPriceMarkup = packPriceMarkup,
+                        TotalItemInPack = totalItemInPack,
+                        ProductSize = productSize,
+                        CategoryId = category.Id,
+                        BrandId = brand?.Id,
+                        UnitId = productUnit.Id,
+                        ProductImageUrl = productImage // Replace with proper image logic if necessary
+                    };
+
+                    productList.Add(productRequest);
+                }
+
+                foreach (var productRequest in productList)
+                {
+                    await CreateProductAsync(productRequest);
+                }
+            }
+            catch (ArgumentException ex)
+            {
+                throw new ApplicationException("There was an issue with the Excel file format. Please ensure it is correctly structured.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("An error occurred while processing the Excel file. Please try again later.", ex);
+            }
+        }
+
     }
 }

@@ -2,6 +2,7 @@
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace AnurStore.Application.Abstractions.Services
@@ -15,5 +16,7 @@ namespace AnurStore.Application.Abstractions.Services
         Task<BaseResponse<bool>> DeleteProduct(string productId);
         Task<string> SaveFileAsync(IFormFile file);
         Task<IEnumerable<SelectListItem>> GetProductSelectList();
+        Task UploadProductsFromExcelAsync(Stream excelStream);
+        Task<FileResult> DownloadProductTemplateAsync();
     }
 }

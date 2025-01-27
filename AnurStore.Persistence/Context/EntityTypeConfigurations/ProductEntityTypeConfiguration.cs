@@ -23,22 +23,17 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
                 .HasMaxLength(50);
 
             builder.Property(p => p.PricePerPack)
-                .IsRequired()
+                .IsRequired(false)
                 .HasColumnType("money");
 
-            builder.Property(p => p.PackPriceMarkup)
+            builder.Property(p => p.PackPriceMarkup) 
                 .IsRequired()
                 .HasPrecision(18, 2)
                 .HasColumnType("decimal(18,2)");
 
             builder.Property(p => p.UnitPrice)
-                .IsRequired()
+                .IsRequired(false)
                 .HasColumnType("money");
-
-            builder.Property(p => p.UnitPriceMarkup)
-                .IsRequired()
-                .HasPrecision(18, 2)
-                .HasColumnType("decimal(18,2)");
 
             builder.Property(p => p.ProductImageUrl)
                 .HasMaxLength(200);

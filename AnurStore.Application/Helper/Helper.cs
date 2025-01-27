@@ -37,5 +37,32 @@
             return value;
         }
 
+        public  decimal CalculateCostUnitPrice(decimal costPrice, int totalUnit)
+        {
+            return costPrice / totalUnit;
+        }
+
+        public  decimal RoundToNearestHundred(decimal number)
+        {
+            return Math.Ceiling(number / 100) * 100;
+        }
+
+
+        //public  decimal RoundToNearestTen(decimal number)
+        //{
+        //    // Find the remainder when divided by 10
+        //    decimal remainder = number % 10;
+
+        //    // Determine if we should round up or down
+        //    if (remainder >= 5)
+        //    {
+        //        return number - remainder + 10; // Round up
+        //    }
+        //    else
+        //    {
+        //        return number - remainder; // Round down
+        //    }
+        //}
+
     }
 }
