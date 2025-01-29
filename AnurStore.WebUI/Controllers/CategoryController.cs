@@ -32,7 +32,7 @@ namespace AnurStore.WebUI.Controllers
 
             return category == null
                        ? (IActionResult)NotFound()
-                       : View(category);
+                       : View(category.Data);
         }
 
         public IActionResult CreateCategory() =>

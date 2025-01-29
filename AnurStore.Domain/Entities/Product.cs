@@ -26,7 +26,7 @@ namespace AnurStore.Domain.Entities
 
         public Category Category { get; set; } = default!;
 
-        public Brand Brand { get; set; } = default!;
+        public Brand? Brand { get; set; } 
         
         public ProductSize ProductSize { get; set; } = default!;
 

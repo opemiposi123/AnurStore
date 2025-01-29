@@ -51,13 +51,19 @@ public class BrandRepository : IBrandRepository
         return await _context.SaveChangesAsync() > 0;
     }
 
-    public async Task<Brand?> GetBrandByNameAsync(string brandName)
-    {
-        if (string.IsNullOrEmpty(brandName))
-            return null; 
+    //public async Task<Brand?> GetBrandByNameAsync(string brandName)
+    //{
+    //    if (string.IsNullOrEmpty(brandName))
+    //        return null; 
 
+    //    return await _context.Brands
+    //        .FirstOrDefaultAsync(b => b.Name.Equals(brandName, StringComparison.OrdinalIgnoreCase));
+    //}
+
+    public async Task<Brand> GetBrandByNameAsync(string brandName)
+    {
         return await _context.Brands
-            .FirstOrDefaultAsync(b => b.Name.Equals(brandName, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefaultAsync(c => c.Name.ToLower() == brandName.ToLower());
     }
 
 }

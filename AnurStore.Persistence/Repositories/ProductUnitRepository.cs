@@ -50,13 +50,19 @@ namespace AnurStore.Persistence.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<ProductUnit?> GetProductUnitByNameAsync(string unitName)
-        {
-            if (string.IsNullOrEmpty(unitName))
-                throw new ArgumentException("Product unit name cannot be null or empty.", nameof(unitName));
+        //public async Task<ProductUnit?> GetProductUnitByNameAsync(string unitName)
+        //{
+        //    if (string.IsNullOrEmpty(unitName))
+        //        throw new ArgumentException("Product unit name cannot be null or empty.", nameof(unitName));
 
+        //    return await _context.ProductUnits
+        //        .FirstOrDefaultAsync(u => u.Name.Equals(unitName, StringComparison.OrdinalIgnoreCase));
+        //}
+
+        public async Task<ProductUnit> GetProductUnitByNameAsync(string unitName)
+        {
             return await _context.ProductUnits
-                .FirstOrDefaultAsync(u => u.Name.Equals(unitName, StringComparison.OrdinalIgnoreCase));
+                .FirstOrDefaultAsync(c => c.Name.ToLower() == unitName.ToLower());
         }
     }
 }

@@ -486,7 +486,6 @@ namespace AnurStore.Application.Services
         {
             try
             {
-                // Set the license context for EPPlus (required for versions 5 and above)
                 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
                 using var package = new ExcelPackage(excelStream);
@@ -518,7 +517,7 @@ namespace AnurStore.Application.Services
                     }
 
                     var category = await _categoryRepository.GetCategoryByNameAsync(categoryName);
-                    var brand = string.IsNullOrEmpty(brandName) ? null : await _brandRepository.GetBrandByNameAsync(brandName);
+                    var brand = await _brandRepository.GetBrandByNameAsync(brandName);
                     var productUnit = await _productUnitRepository.GetProductUnitByNameAsync(unitName);
 
                     if (category == null || productUnit == null)
@@ -539,7 +538,7 @@ namespace AnurStore.Application.Services
                         CategoryId = category.Id,
                         BrandId = brand?.Id,
                         UnitId = productUnit.Id,
-                        ProductImageUrl = productImage // Replace with proper image logic if necessary
+                        ProductImageUrl = productImage 
                     };
 
                     productList.Add(productRequest);

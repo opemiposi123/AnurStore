@@ -22,6 +22,7 @@ namespace AnurStore.Application.Services
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
         }
+
         public async Task<BaseResponse<string>> CreateCategory(CreateCategoryRequest request)
         {
             var userName = _httpContextAccessor.HttpContext?.User.Identity?.Name ?? "System";
@@ -167,8 +168,8 @@ namespace AnurStore.Application.Services
             _logger.LogInformation("Starting GetCategory method for Id {CategoryId}.", categoryId);
             try
             {
-                var reportType = await _categoryRepository.GetCategoryById(categoryId);
-                if (reportType == null)
+                var category = await _categoryRepository.GetCategoryById(categoryId);
+                if (category == null)
                 {
                     _logger.LogWarning("Category with Id {CategoryId} not found.", categoryId);
                     return new BaseResponse<CategoryDto>
@@ -181,12 +182,12 @@ namespace AnurStore.Application.Services
                 var categoryDto = new CategoryDto
                 {
                     Id = categoryId,
-                    Name = reportType.Name,
-                    Description = reportType.Description,
-                    CreatedBy = reportType.CreatedBy,
-                    LastModifiedBy = reportType.LastModifiedBy,
-                    CreatedOn = reportType.CreatedOn,
-                    LastModifiedOn = reportType.LastModifiedOn
+                    Name = category.Name,
+                    Description = category.Description,
+                    CreatedBy = category.CreatedBy,
+                    LastModifiedBy = category.LastModifiedBy,
+                    CreatedOn = category.CreatedOn,
+                    LastModifiedOn = category.LastModifiedOn
                 };
 
                 _logger.LogInformation("Successfully retrieved category with Id {CategoryId}.", categoryId);
@@ -269,4 +270,4 @@ namespace AnurStore.Application.Services
             return Enumerable.Empty<SelectListItem>();
         }
     }
-}
+} 

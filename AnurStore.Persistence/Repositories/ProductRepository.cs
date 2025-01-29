@@ -90,8 +90,5 @@ namespace AnurStore.Persistence.Repositories
                 .AsNoTracking() // Improves performance if no modifications are needed
                 .FirstOrDefaultAsync(ps => ps.ProductId == productId);
         }
-
-       
-
     }
 }

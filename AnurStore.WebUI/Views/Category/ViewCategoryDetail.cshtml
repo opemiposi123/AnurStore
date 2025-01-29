@@ -1,5 +1,73 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model AnurStore.Application.DTOs.CategoryDto
 @{
+    ViewData["Title"] = "Category Details";
+    Layout = "_DashboardLayout";
 }
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                    <div>
+                        <h4 class="mb-3">Category Details</h4>
+                        <p class="mb-0">
+                            View detailed information about the selected category.
+                        </p>
+                    </div>
+                    <a href="@Url.Action("Index", "Category")" class="btn btn-primary add-list"><i class="las la-arrow-left mr-3"></i>Back to List</a>
+                </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5 class="card-title">Basic Information</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>Name:</strong> @Model.Name
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Description:</strong> @Model.Description
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="card-title">Audit Information</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <strong>Created By:</strong> @Model.CreatedBy
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Created On:</strong> @Model.CreatedOn.ToString("dd/MM/yyyy HH:mm")
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Last Modified By:</strong> @(Model.LastModifiedBy ?? "N/A")
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Last Modified On:</strong> @(Model.LastModifiedOn?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Deleted By:</strong> @(Model.DeletedBy ?? "N/A")
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Deleted On:</strong> @(Model.DeletedOn?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                                    </li>
+                                    <li class="list-group-item">
+                                        <strong>Is Deleted:</strong> @(Model.IsDeleted ? "Yes" : "No")
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <a asp-action="EditCategory" asp-route-id="@Model.Id" class="btn btn-success mr-2"><i class="ri-pencil-line mr-2"></i>Edit</a>
+                            <a asp-action="DeleteCategory" asp-route-id="@Model.Id" class="btn btn-warning"><i class="ri-delete-bin-line mr-2"></i>Delete</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Page end  -->
+    </div>
+</div>
