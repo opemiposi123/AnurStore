@@ -48,7 +48,7 @@ namespace AnurStore.Application.Services
                     return new BaseResponse<string>
                     {
                         Status = false,
-                        Message = "Brand name already exists"
+                        Message = "Brand already exists"
                     };
                 }
 

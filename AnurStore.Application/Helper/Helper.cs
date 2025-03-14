@@ -37,9 +37,9 @@
             return value;
         }
 
-        public  decimal CalculateCostUnitPrice(decimal costPrice, int totalUnit)
+        public  decimal CalculateUnitCostPrice(decimal costPrice, int totalUnit) 
         {
-            return costPrice / totalUnit;
+            return costPrice / totalUnit; 
         }
 
         public  decimal RoundToNearestHundred(decimal number)

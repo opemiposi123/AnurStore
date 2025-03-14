@@ -160,7 +160,7 @@ namespace AnurStore.Application.Services
                     Id = r.Id,
                     Name = r.Name,
                     CategoryName = r.Category.Name,
-                    BrandName = r.Brand.Name,
+                    BrandName = r.Brand.Name ?? "Unknown",
                     UnitPrice = r.UnitPrice,
                     PricePerPack = r.PricePerPack,
                     TotalItemInPack = r.TotalItemInPack,
