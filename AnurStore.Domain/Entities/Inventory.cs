@@ -19,5 +19,5 @@ public class Inventory : BaseEntity
 
     public string? Remark { get; set; }
 
-    public StockStatus StockStatus { get; set; }
+    public StockStatus StockStatus { get; set; } 
 }

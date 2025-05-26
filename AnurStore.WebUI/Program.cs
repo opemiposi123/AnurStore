@@ -23,11 +23,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 
 //Database
-var connectionString = builder.Configuration.GetConnectionString("AnurStore");
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+var connectionString = 
+builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer       (builder.Configuration.GetConnectionString("AnurStore")));
 
 //Repositories
-builder.Services.AddScoped<IBrandRepository, BrandRepository>();
+builder.Services.AddTransient<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IProductUnitRepository, ProductUnitRepository>();

@@ -5,6 +5,6 @@ namespace AnurStore.Application.Abstractions.Services
 {
     public interface IProductPurchaseService
     {
-        //Task<BaseResponse<string>> CreateBrand(CreateProduct request);
+       
     }
 }

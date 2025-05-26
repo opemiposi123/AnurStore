@@ -1,6 +1,6 @@
 ﻿namespace AnurStore.Application.Services
 {
-    internal class ProductSaleService
+    public class ProductSaleService
     {
     }
 }
