@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
-using System.Runtime.CompilerServices;
 
 namespace AnurStore.Application.Services
 {
@@ -18,19 +17,19 @@ namespace AnurStore.Application.Services
 
         private readonly IProductRepository _productRepository;
         private readonly IProductSizeRepository _productSizeRepository;
-        private readonly ICategoryRepository _categoryRepository; 
-        private readonly IBrandRepository _brandRepository; 
-        private readonly IProductUnitRepository _productUnitRepository;  
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IBrandRepository _brandRepository;
+        private readonly IProductUnitRepository _productUnitRepository;
         private readonly ILogger<ProductService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICategoryService _categoryService;
-        private readonly IBrandService _brandService; 
+        private readonly IBrandService _brandService;
         private readonly IProductUnitService _productUnitService;
 
         public ProductService(IProductRepository productRepository,
             ICategoryService categoryService,
             IProductSizeRepository productSizeRepository,
-            ILogger<ProductService> logger, 
+            ILogger<ProductService> logger,
             IProductUnitService productUnitService,
             IBrandService brandService,
             ICategoryRepository categoryRepository,
@@ -40,7 +39,7 @@ namespace AnurStore.Application.Services
         {
             _productRepository = productRepository;
             _productSizeRepository = productSizeRepository;
-            _logger = logger; 
+            _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _categoryService = categoryService;
             _brandService = brandService;
@@ -69,15 +68,7 @@ namespace AnurStore.Application.Services
             try
             {
                 _logger.LogInformation("Checking if Product with name {ProductName} exists.", request.Name);
-                if (await _productRepository.Exist(request.Name))
-                {
-                    _logger.LogWarning("Product with name {ProductName} already exists.", request.Name);
-                    return new BaseResponse<string>
-                    {
-                        Status = false,
-                        Message = "Product name already exists"
-                    };
-                }
+               
 
                 string productImageUrl = null;
                 if (request.ProductImage != null && request.ProductImage.Length > 0)
@@ -406,8 +397,8 @@ namespace AnurStore.Application.Services
             {
                 var productList = productsResponse.Data.Select(d => new SelectListItem
                 {
-                    Value = d.Id.ToString(), 
-                    Text = d.Name 
+                    Value = d.Id.ToString(),
+                    Text = d.Name
                 });
 
                 return productList;
@@ -417,9 +408,11 @@ namespace AnurStore.Application.Services
 
         public async Task<FileResult> DownloadProductTemplateAsync()
         {
+
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var productUnits = await _productUnitService.GetProductUnitSelectList();
             var categories = await _categoryService.GetCategorySelectList();
             var brands = await _brandService.GetBrandSelectList();
-            var productUnits = await _productUnitService.GetProductUnitSelectList();
 
             using var package = new ExcelPackage();
             var worksheet = package.Workbook.Worksheets.Add("Product Template");
@@ -462,7 +455,7 @@ namespace AnurStore.Application.Services
                 FileDownloadName = "ProductTemplate.xlsx"
             };
         }
-  
+
         private void PopulateDropdownList(ExcelWorksheet worksheet, IEnumerable<string> items, string rangeName, int columnIndex)
         {
             var rowIndex = 2;
@@ -482,6 +475,7 @@ namespace AnurStore.Application.Services
             validation.Formula.ExcelFormula = $"={rangeName}";
         }
 
+
         public async Task UploadProductsFromExcelAsync(Stream excelStream)
         {
             try
@@ -491,14 +485,15 @@ namespace AnurStore.Application.Services
                 using var package = new ExcelPackage(excelStream);
                 var worksheet = package.Workbook.Worksheets.FirstOrDefault();
                 if (worksheet == null)
-                {
                     throw new ArgumentException("The Excel file is empty.");
-                }
 
                 var productList = new List<CreateProductRequest>();
+
                 for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
                 {
                     var name = worksheet.Cells[row, 1]?.Value?.ToString()?.Trim();
+                    if (string.IsNullOrWhiteSpace(name))
+                        break;
                     var description = worksheet.Cells[row, 2]?.Value?.ToString()?.Trim();
                     var barCode = worksheet.Cells[row, 3]?.Value?.ToString()?.Trim();
                     var unitPrice = decimal.TryParse(worksheet.Cells[row, 4]?.Value?.ToString(), out var unitPriceValue) ? unitPriceValue : 0;
@@ -511,19 +506,15 @@ namespace AnurStore.Application.Services
                     var unitName = worksheet.Cells[row, 11]?.Value?.ToString()?.Trim();
                     var productImage = worksheet.Cells[row, 12]?.Value?.ToString()?.Trim();
 
-                    if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(categoryName) || string.IsNullOrEmpty(unitName))
-                    {
+                    if (string.IsNullOrEmpty(categoryName) || string.IsNullOrEmpty(unitName))
                         continue;
-                    }
 
                     var category = await _categoryRepository.GetCategoryByNameAsync(categoryName);
                     var brand = await _brandRepository.GetBrandByNameAsync(brandName);
                     var productUnit = await _productUnitRepository.GetProductUnitByNameAsync(unitName);
 
                     if (category == null || productUnit == null)
-                    {
                         continue;
-                    }
 
                     var productRequest = new CreateProductRequest
                     {
@@ -538,7 +529,7 @@ namespace AnurStore.Application.Services
                         CategoryId = category.Id,
                         BrandId = brand?.Id,
                         UnitId = productUnit.Id,
-                        ProductImageUrl = productImage 
+                        ProductImageUrl = productImage
                     };
 
                     productList.Add(productRequest);
@@ -558,6 +549,7 @@ namespace AnurStore.Application.Services
                 throw new ApplicationException("An error occurred while processing the Excel file. Please try again later.", ex);
             }
         }
+
 
     }
 }
