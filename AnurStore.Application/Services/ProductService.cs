@@ -179,6 +179,74 @@ namespace AnurStore.Application.Services
             }
         }
 
+
+        public async Task<PaginatedResponse<List<ProductDto>>> SearchProducts(string searchTerm, int pageNumber = 1, int pageSize = 3)
+        {
+            _logger.LogInformation("Starting SearchProducts with term: {searchTerm}", searchTerm);
+
+            try
+            {
+
+                var products = await _productRepository.GetAllProduct();
+
+                var lowerSearchTerm = searchTerm.Trim().ToLower() ?? string.Empty;
+
+                var filteredProducts = products.Where(r => !r.IsDeleted &&
+                    ((r.Name != null && r.Name.ToLower().Contains(lowerSearchTerm)) ||
+                     (r.Category?.Name?.ToLower().Contains(lowerSearchTerm) ?? false) ||
+                     (r.Brand?.Name?.ToLower().Contains(lowerSearchTerm) ?? false) ||
+                     (r.Description?.ToLower().Contains(lowerSearchTerm) ?? false) ||
+                     (r.ProductSize?.Size.ToString().ToLower().Contains(lowerSearchTerm) ?? false) ||
+                     (r.ProductSize?.ProductUnit?.Name?.ToLower().Contains(lowerSearchTerm) ?? false)
+                    )
+                ).ToList();
+
+                int totalCount = filteredProducts.Count;
+
+                var paginatedProducts = filteredProducts
+                    .Skip((pageNumber - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                var productDtos = paginatedProducts.Select(r => new ProductDto
+                {
+                    Id = r.Id,
+                    Name = r.Name,
+                    CategoryName = r.Category?.Name,
+                    BrandName = r.Brand?.Name,
+                    UnitPrice = r.UnitPrice,
+                    PricePerPack = r.PricePerPack,
+                    TotalItemInPack = r.TotalItemInPack,
+                    ProductImageUrl = r.ProductImageUrl,
+                    Description = r.Description,
+                    SizeWithUnit = r.ProductSize != null && r.ProductSize.ProductUnit != null
+                        ? $"{r.ProductSize.Size}{r.ProductSize.ProductUnit.Name}"
+                        : "N/A"
+                }).ToList();
+
+                return new PaginatedResponse<List<ProductDto>>
+                {
+                    Status = true,
+                    Message = productDtos.Any() ? "Search results found." : "No products matched your search.",
+                    Data = productDtos,
+                    TotalCount = totalCount,
+                    PageNumber = pageNumber, 
+                    PageSize = pageSize      
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while searching products.");
+                return new PaginatedResponse<List<ProductDto>>
+                {
+                    Status = false,
+                    Message = "Failed to search products.",
+                };
+            }
+        }
+
+
+
         public async Task<BaseResponse<bool>> DeleteProduct(string productId)
         {
             try

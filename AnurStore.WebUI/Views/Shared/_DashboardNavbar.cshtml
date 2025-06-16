@@ -10,13 +10,14 @@
                 <i class="ri-menu-line wrapper-menu"></i>
                 <a href="~/backend/index.html" class="header-logo">
                     <img src="~/assets/images/logo.png"
-                         class="img-fluid rounded-normal" 
+                         class="img-fluid rounded-normal"
                          alt="logo" />
                     <h5 class="logo-title ml-3">AnurStore</h5>
                 </a>
             </div>
+
             <div class="iq-search-bar device-search">
-                <form action="#" class="searchbox">
+                @* <form action="#" class="searchbox">
                     <a class="search-link" href="#">
                         <i class="ri-search-line"></i>
                     </a>
@@ -24,6 +25,19 @@
                            class="text search-input"
                            placeholder="Search here..." />
                 </form>
+
+ *@      
+            <form asp-controller="Product" asp-action="SearchProducts" method="get" class="searchbox">
+                    <a class="search-link" href="#" onclick="this.closest('form').submit(); return false;">
+                        <i class="ri-search-line"></i>
+                    </a>
+                    <input type="text"
+                           class="text search-input"
+                           name="query"
+                           placeholder="Search here..."
+                           value="@ViewBag.Query" />
+                </form>
+
             </div>
             <div class="d-flex align-items-center">
                 <button class="navbar-toggler"
