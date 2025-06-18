@@ -6,7 +6,7 @@ namespace AnurStore.Domain.Entities;
 
 public class ProductSaleItem : BaseEntity
 {
-    public string ProductId { get; set; } = default!; 
+    public string ProductId { get; set; } = default!;  
 
     public Product? Product { get; set; }
 

@@ -35,11 +35,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
             builder.Property(i => i.CustomerName)
                    .HasMaxLength(50);
 
-            builder.Property(i => i.CustomerCare)
-                   .HasMaxLength(100);
 
-            builder.Property(i => i.Notes)
-                   .HasMaxLength(500);
 
             builder.Property(i => i.PaymentMethod)
                    .IsRequired();

@@ -20,9 +20,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<Brand> Brands { get; set; } = default!;
     public DbSet<Category> Categories { get; set; } = default!;
     public DbSet<Inventory> Inventories { get; set; } = default!;
-    public DbSet<Invoice> Invoices { get; set; } = default!;
     public DbSet<Reciept> Reciepts { get; set; } = default!;
-    public DbSet<InvoiceItem> InvoiceItems { get; set; } = default!;
     public DbSet<RecieptItem> RecieptItems { get; set; } = default!; 
     public DbSet<Payment> Payments { get; set; } = default!;
     public DbSet<Product> Products { get; set; } = default!;

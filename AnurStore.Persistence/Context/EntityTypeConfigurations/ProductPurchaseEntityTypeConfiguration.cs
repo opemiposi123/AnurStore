@@ -1,11 +1,6 @@
 ﻿using AnurStore.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 {
@@ -23,10 +18,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 
             builder.Property(pp => pp.Discount)
                 .HasColumnType("money");
-
-            builder.Property(pp => pp.PaymentMethod)
-                .IsRequired(); 
-
+ 
             builder.Property(pp => pp.SupplierId)
                 .IsRequired();
 

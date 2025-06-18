@@ -10,17 +10,15 @@ public class ProductSale : BaseEntity
 
     public DateTime SaleDate { get; set; } = DateTime.Now;
 
-    public string? CustomerName { get; set; }
+    public string? CustomerName { get; set; } 
 
     [Column(TypeName = "money")]
     public decimal? Discount { get; set; }
 
     public PaymentMethod PaymentMethod { get; set; }
 
-    public string InvoiceId { get; set; } = default!;
-
-    public Invoice Invoice { get; set; } = default!;
-
     public ICollection<ProductSaleItem> ProductSaleItems { get; set; } = [];
+    public string ReceiptId { get; set; } = default!;
+    public Reciept Receipt { get; set; } = default!;
 }
 

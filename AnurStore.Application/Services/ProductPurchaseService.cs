@@ -2,7 +2,7 @@
 
 namespace AnurStore.Application.Services
 {
-    public class ProductPurchaseService 
+    public class ProductPurchaseService : IProductPurchaseService
     {
        
     }

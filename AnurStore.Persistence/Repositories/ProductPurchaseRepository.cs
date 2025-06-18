@@ -12,34 +12,51 @@ namespace AnurStore.Persistence.Repositories
 
         public ProductPurchaseRepository(ApplicationContext context)
         {
-            _context = context; 
+            _context = context;
         }
 
-        public async Task<ProductPurchase> CreateAsync(ProductPurchase productPurchase)
+        public async Task<ProductPurchase> PurchaseProductAsync(ProductPurchase productPurchase)
         {
-            var result = await _context.AddAsync(productPurchase);
+            await _context.ProductPurchases.AddAsync(productPurchase);
             await _context.SaveChangesAsync();
-            return productPurchase; 
+            return productPurchase;
         }
 
         public async Task<IList<ProductPurchase>> GetAllAsync()
         {
-            var productPurchase = await _context.ProductPurchases 
-           .Where(x => x.IsDeleted == false)
-           .ToListAsync();
-            return productPurchase;
+            return await _context.ProductPurchases
+                .Include(p => p.PurchaseItems) 
+                  .ThenInclude(p => p.Product)
+                .OrderByDescending(p => p.PurchaseDate)
+                .ToListAsync();
         }
 
         public async Task<ProductPurchase> GetByIdAsync(string id)
         {
-            return await _context.ProductPurchases.FindAsync(id);
+            return await _context.ProductPurchases
+                .Include(p => p.PurchaseItems)
+                  .ThenInclude(p => p.Product)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
+
+        //public async Task<IList<ProductPurchase>> GetByProductIdAsync(string productId)
+        //{
+        //    return await _context.ProductPurchases
+        //        .Where(p => p.PurchaseItems.ProductId == productId)
+        //        .OrderByDescending(p => p.PurchaseDate)
+        //        .ToListAsync();
+        //}
 
         public async Task<bool> UpdateAsync(ProductPurchase productPurchase)
         {
+            var existing = await _context.ProductPurchases.FindAsync(productPurchase.Id);
+            if (existing == null)
+                return false;
 
-            var result = _context.ProductPurchases.Update(productPurchase);
-            return await _context.SaveChangesAsync() > 0;
+            _context.Entry(existing).CurrentValues.SetValues(productPurchase);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
+
 }

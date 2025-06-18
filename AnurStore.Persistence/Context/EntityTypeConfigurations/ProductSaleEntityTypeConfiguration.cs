@@ -28,14 +28,6 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
             builder.Property(ps => ps.PaymentMethod)
                 .IsRequired(); 
 
-            builder.Property(ps => ps.InvoiceId)
-                .IsRequired();
-
-            //builder.HasOne(ps => ps.Invoice)
-            //    .WithOne(i => i.ProductSale) // Assumes a one-to-one relationship with `Invoice`
-            //    .HasForeignKey<ProductSale>(ps => ps.InvoiceId)
-            //    .OnDelete(DeleteBehavior.Cascade); // Deletes ProductSale when Invoice is deleted
-
             builder.HasMany(ps => ps.ProductSaleItems)
                 .WithOne(psi => psi.ProductSale)
                 .HasForeignKey(psi => psi.ProductSaleId)
