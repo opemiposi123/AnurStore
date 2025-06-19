@@ -16,7 +16,7 @@ public class BrandRepository : IBrandRepository
     }
     public async Task<Brand> CreateBrand(Brand brand)
     {
-        var result = await _context.AddAsync(brand);
+        var result = await _context.Brands.AddAsync(brand);
         await _context.SaveChangesAsync();
         return brand;
     }

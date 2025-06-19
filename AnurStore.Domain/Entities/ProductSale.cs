@@ -18,7 +18,7 @@ public class ProductSale : BaseEntity
     public PaymentMethod PaymentMethod { get; set; }
 
     public ICollection<ProductSaleItem> ProductSaleItems { get; set; } = [];
-    public string ReceiptId { get; set; } = default!;
-    public Reciept Receipt { get; set; } = default!;
+    public string? ReceiptId { get; set; } = default!;
+    public Reciept? Receipt { get; set; } = default!;
 }
 

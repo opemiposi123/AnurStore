@@ -1,38 +1,57 @@
 ﻿using AnurStore.Application.Abstractions.Repositories;
 using AnurStore.Domain.Entities;
+using AnurStore.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnurStore.Persistence.Repositories
 {
     public class ProductSaleRepository : IProductSaleRepository
     {
-        public Task<ProductSale> AddAsync(ProductSale productSale)
-        {
-            throw new NotImplementedException();
-        } 
+        private readonly ApplicationContext _context;
 
-        public Task<bool> ExistsAsync(string productSaleName)
+        public ProductSaleRepository(ApplicationContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public List<ProductSale> GetAll()
+        public async Task<ProductSale> AddProductSaleAsync(ProductSale productSale)
         {
-            throw new NotImplementedException();
+            var result = await _context.ProductSales.AddAsync(productSale);
+            await _context.SaveChangesAsync();
+            return productSale;
         }
 
-        public Task<IList<ProductSale>> GetAllAsync()
+        public async Task<IList<ProductSale>> GetAllProductSalesAsync()
         {
-            throw new NotImplementedException();
+            var productSales = await _context.ProductSales
+                .Include(p => p.ProductSaleItems)
+                .ThenInclude(i => i.Product)
+                .Where(p => p.IsDeleted == false)
+                .ToListAsync();
+            return productSales;
         }
 
-        public Task<ProductSale> GetByIdAsync(string id)
+        public async Task<ProductSale> GetProductSaleByIdAsync(string id)
         {
-            throw new NotImplementedException();
+            var productSale = await _context.ProductSales
+                 .Include(p => p.ProductSaleItems)
+                 .ThenInclude(i => i.Product)
+                 .FirstOrDefaultAsync(p => p.Id == id);
+            return productSale;
         }
 
-        public Task<bool> UpdateAsync(ProductSale productSale)
+        public async Task RemoveProductSaleItemsAsync(IEnumerable<ProductSaleItem> items)
         {
-            throw new NotImplementedException();
+            _context.ProductSaleItems.RemoveRange(items);
+            await _context.SaveChangesAsync(); 
+        }
+
+
+        public async Task<bool> UpdateAsync(ProductSale productSale)
+        {
+            _context.ProductSales.Update(productSale);
+            var result = await _context.SaveChangesAsync();
+            return result > 0;
         }
     }
 }

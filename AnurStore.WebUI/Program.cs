@@ -34,6 +34,7 @@ builder.Services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
+builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
 
 //Services
 builder.Services.AddScoped<IUserAuthService,UserAuthService>();
@@ -43,6 +44,7 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IReceiptService, ReceiptService>();
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();

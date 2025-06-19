@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AnurStore.Persistence.Repositories
 {
     public class ProductRepository : IProductRepository
-    { 
+    {
         private readonly ApplicationContext _context;
 
         public ProductRepository(ApplicationContext context)
@@ -26,28 +26,31 @@ namespace AnurStore.Persistence.Repositories
             return product;
         }
 
-        public async Task<IList<Product>> GetAllProduct() 
+        public async Task<IList<Product>> GetAllProduct()
         {
             var produtcs = await _context.Products
-                  .Include(r  => r.ProductSize)
-                     .ThenInclude(r => r.ProductUnit)   
+                  .Include(r => r.ProductSize)
+                     .ThenInclude(r => r.ProductUnit)
                   .Include(r => r.Category)
                   .Include(r => r.Brand)
                   .ToListAsync();
             return produtcs;
         }
 
-        public async Task<Product> GetProductById(string id)
+        public async Task<Product?> GetProductById(string productId)
         {
-            return await _context.Products.FindAsync(id);
+            return await _context.Products
+                .Include(p => p.Inventory) 
+                .FirstOrDefaultAsync(p => p.Id == productId);
         }
+
 
         public List<Product> SelectProduct()
         {
             return _context.Products.ToList();
         }
 
-        public async  Task<bool> UpdateProduct(Product product)
+        public async Task<bool> UpdateProduct(Product product)
         {
             var result = _context.Products.Update(product);
             return await _context.SaveChangesAsync() > 0;
@@ -64,7 +67,7 @@ namespace AnurStore.Persistence.Repositories
 
                 if (productSize != null)
                 {
-                    productSize.ProductId = product.Id; 
+                    productSize.ProductId = product.Id;
                     _context.ProductSizes.Add(productSize);
                     await _context.SaveChangesAsync();
                 }
@@ -72,7 +75,7 @@ namespace AnurStore.Persistence.Repositories
                 // Commit the transaction
                 await transaction.CommitAsync();
 
-                return product.Id; 
+                return product.Id;
             }
             catch (Exception)
             {
