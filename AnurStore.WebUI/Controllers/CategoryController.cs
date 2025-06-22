@@ -4,7 +4,7 @@ using AnurStore.Application.RequestModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-
+ 
 namespace AnurStore.WebUI.Controllers
 {
     public class CategoryController : Controller

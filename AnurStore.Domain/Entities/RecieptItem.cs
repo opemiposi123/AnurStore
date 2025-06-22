@@ -5,6 +5,7 @@ namespace AnurStore.Domain.Entities
 {
     public class RecieptItem : BaseEntity
     {
+        public string ProductName { get; set; }  
         public int Quantity { get; set; }
         public string? Description { get; set; } = default!;
         [Column(TypeName = "decimal(18,2)")]

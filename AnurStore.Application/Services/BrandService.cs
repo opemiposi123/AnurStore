@@ -155,7 +155,7 @@ namespace AnurStore.Application.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while retrieving categories.");
+                _logger.LogError(ex, "Error occurred while retrieving brands.");
                 return new BaseResponse<IEnumerable<BrandDto>>
                 {
                     Status = false,

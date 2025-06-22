@@ -267,118 +267,6 @@ namespace AnurStore.Persistence.Migrations
                     b.ToTable("Inventories");
                 });
 
-            modelBuilder.Entity("AnurStore.Domain.Entities.Invoice", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CustomerCare")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CustomerName")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Discount")
-                        .HasColumnType("money");
-
-                    b.Property<string>("InvoiceNumber")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("NetAmount")
-                        .HasColumnType("money");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("money");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Invoices");
-                });
-
-            modelBuilder.Entity("AnurStore.Domain.Entities.InvoiceItem", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CreatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("InvoiceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvoiceId");
-
-                    b.ToTable("InvoiceItems", (string)null);
-                });
-
             modelBuilder.Entity("AnurStore.Domain.Entities.Payment", b =>
                 {
                     b.Property<string>("Id")
@@ -504,6 +392,10 @@ namespace AnurStore.Persistence.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Batch")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -531,9 +423,6 @@ namespace AnurStore.Persistence.Migrations
 
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("PaymentMethod")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("PurchaseDate")
                         .HasColumnType("datetime2");
@@ -630,10 +519,6 @@ namespace AnurStore.Persistence.Migrations
                     b.Property<decimal?>("Discount")
                         .HasColumnType("money");
 
-                    b.Property<string>("InvoiceId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -646,6 +531,10 @@ namespace AnurStore.Persistence.Migrations
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
 
+                    b.Property<string>("ReceiptId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("SaleDate")
                         .HasColumnType("datetime2");
 
@@ -654,7 +543,7 @@ namespace AnurStore.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("InvoiceId");
+                    b.HasIndex("ReceiptId");
 
                     b.ToTable("ProductSales", (string)null);
                 });
@@ -816,10 +705,6 @@ namespace AnurStore.Persistence.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CustomerCare")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("CustomerName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -845,16 +730,8 @@ namespace AnurStore.Persistence.Migrations
                     b.Property<decimal>("NetAmount")
                         .HasColumnType("money");
 
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<int>("PaymentMethod")
                         .HasColumnType("int");
-
-                    b.Property<string>("ProductSaleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("RecieptNumber")
                         .IsRequired()
@@ -865,8 +742,6 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("money");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductSaleId");
 
                     b.ToTable("Reciepts", (string)null);
                 });
@@ -901,6 +776,10 @@ namespace AnurStore.Persistence.Migrations
 
                     b.Property<DateTime?>("LastModifiedOn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("ProductName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -1343,17 +1222,6 @@ namespace AnurStore.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("AnurStore.Domain.Entities.InvoiceItem", b =>
-                {
-                    b.HasOne("AnurStore.Domain.Entities.Invoice", "Invoice")
-                        .WithMany("InvoiceItems")
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Invoice");
-                });
-
             modelBuilder.Entity("AnurStore.Domain.Entities.Payment", b =>
                 {
                     b.HasOne("AnurStore.Domain.Entities.Account", "Account")
@@ -1414,13 +1282,13 @@ namespace AnurStore.Persistence.Migrations
 
             modelBuilder.Entity("AnurStore.Domain.Entities.ProductSale", b =>
                 {
-                    b.HasOne("AnurStore.Domain.Entities.Invoice", "Invoice")
+                    b.HasOne("AnurStore.Domain.Entities.Reciept", "Receipt")
                         .WithMany()
-                        .HasForeignKey("InvoiceId")
+                        .HasForeignKey("ReceiptId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Invoice");
+                    b.Navigation("Receipt");
                 });
 
             modelBuilder.Entity("AnurStore.Domain.Entities.ProductSaleItem", b =>
@@ -1459,17 +1327,6 @@ namespace AnurStore.Persistence.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("ProductUnit");
-                });
-
-            modelBuilder.Entity("AnurStore.Domain.Entities.Reciept", b =>
-                {
-                    b.HasOne("AnurStore.Domain.Entities.ProductSale", "ProductSale")
-                        .WithMany()
-                        .HasForeignKey("ProductSaleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProductSale");
                 });
 
             modelBuilder.Entity("AnurStore.Domain.Entities.RecieptItem", b =>
@@ -1543,11 +1400,6 @@ namespace AnurStore.Persistence.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("AnurStore.Domain.Entities.Invoice", b =>
-                {
-                    b.Navigation("InvoiceItems");
                 });
 
             modelBuilder.Entity("AnurStore.Domain.Entities.Product", b =>

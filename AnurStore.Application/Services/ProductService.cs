@@ -4,6 +4,7 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
+using AnurStore.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,7 +26,6 @@ namespace AnurStore.Application.Services
         private readonly ICategoryService _categoryService;
         private readonly IBrandService _brandService;
         private readonly IProductUnitService _productUnitService;
-
         public ProductService(IProductRepository productRepository,
             ICategoryService categoryService,
             IProductSizeRepository productSizeRepository,
@@ -68,7 +68,7 @@ namespace AnurStore.Application.Services
             try
             {
                 _logger.LogInformation("Checking if Product with name {ProductName} exists.", request.Name);
-               
+
 
                 string productImageUrl = null;
                 if (request.ProductImage != null && request.ProductImage.Length > 0)
@@ -124,6 +124,15 @@ namespace AnurStore.Application.Services
                 };
             }
         }
+
+
+
+        public async Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query)
+        {
+            var products = await _productRepository.SearchProductsByNameAsync(query);
+            return products;
+        }
+
 
         public async Task<string> SaveFileAsync(IFormFile file)
         {
@@ -343,8 +352,8 @@ namespace AnurStore.Application.Services
             _logger.LogInformation("Starting GetProduct method for Id {ProductId}.", productId);
             try
             {
-                var reportType = await _productRepository.GetProductById(productId);
-                if (reportType == null)
+                var product = await _productRepository.GetProductById(productId);
+                if (product == null)
                 {
                     _logger.LogWarning("Product with Id {ProductId} not found.", productId);
                     return new BaseResponse<ProductDto>
@@ -356,18 +365,20 @@ namespace AnurStore.Application.Services
                 var productDto = new ProductDto
                 {
                     Id = productId,
-                    Name = reportType.Name,
-                    Description = reportType.Description,
-                    CategoryName = reportType.Category.Name,
-                    BrandName = reportType.Brand.Name,
-                    UnitPrice = reportType.UnitPrice,
-                    PricePerPack = reportType.PricePerPack,
-                    TotalItemInPack = reportType.TotalItemInPack,
-                    ProductImageUrl = reportType.ProductImageUrl,
-                    Size = reportType.ProductSize.Size,
-                    UnitName = reportType.ProductSize.ProductUnit.Name,
-                    CreatedBy = reportType.CreatedBy,
-                    CreatedOn = reportType.CreatedOn,
+                    Name = product.Name,
+                    Description = product.Description,
+                    UnitPrice = product.UnitPrice,
+                    PricePerPack = product.PricePerPack,
+                    PackPriceMarkup = product.PackPriceMarkup,
+                    TotalItemInPack = product.TotalItemInPack,
+                    ProductImageUrl = product.ProductImageUrl,
+                    CreatedBy = product.CreatedBy,
+                    CreatedOn = product.CreatedOn,
+                    CategoryName = product.Category?.Name ?? "N/A",
+                    BrandName = product.Brand?.Name ?? "N/A",
+                    Size = product.ProductSize?.Size ?? 0,
+                    UnitName = product.ProductSize?.ProductUnit?.Name ?? "N/A",
+
 
                 };
 

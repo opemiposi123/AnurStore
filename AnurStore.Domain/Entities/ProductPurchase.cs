@@ -6,13 +6,13 @@ namespace AnurStore.Domain.Entities;
 
 public class ProductPurchase : BaseEntity
 {
+    public string Batch { get; set; } 
+
     [Column(TypeName = "money")]
-    public decimal Total { get; set; }
+    public decimal Total { get; set; } 
 
     [Column(TypeName = "money")]
     public decimal? Discount { get; set; }
-
-    public PaymentMethod PaymentMethod { get; set; } 
 
     public string SupplierId { get; set; } = default!;
 
