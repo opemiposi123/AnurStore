@@ -10,20 +10,18 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
-                    <div>
-                        <h4 class="mb-3">Inventories</h4>
-                        <p class="mb-0">
-                            Below is the list of all available inventory items in your store. <br>
-                            You can monitor stock levels, batch numbers. Use the filters or click on any product to view more details or manage its stock.
-                        </p>
-
+                    <div class="d-flex flex-column text-left">
+                        <h4 class="mb-3">Product List</h4>
+                        <a href="@Url.Action("CreateProductPurchase","ProductPurchase")" class="btn btn-primary add-list">
+                            <i class="las la-plus mr-3"></i>Restock
+                        </a>
                     </div>
-                    <a href="@Url.Action("##","#")" class="btn btn-primary add-list"><i class="las la-plus mr-3"></i>Restock/a>
                 </div>
             </div>
+
             <div class="col-lg-12">
                 <div class="table-responsive rounded mb-3">
-                    <table class="data-table table mb-0 tbl-server-info">
+                    <table class="data-tables table mb-0 tbl-server-info">
                         <thead class="bg-white text-uppercase">
                             <tr class="ligth ligth-data">
                                 <th>
@@ -32,20 +30,20 @@
                                         <label for="checkbox1" class="mb-0"></label>
                                     </div>
                                 </th>
-                                <th>Name</th>
+                                <th>Product</th>
                                 <th>Category</th>
-                                <th>Brand</th>
+                                <th>Brand </th>
                                 <th>Price</th>
-                                <th>QuantityAvailable</th>
+                                <th>Size</th>
+                                <th>QtyAvailable</th>
                                 <th>StockStatus</th>
-                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="ligth-body">
                             @foreach (var item in Model)
                             {
                                 <tr>
-                                    <td> 
+                                    <td>
                                         <div class="checkbox d-inline-block">
                                             <input type="checkbox" class="checkbox-input" id="checkbox2">
                                             <label for="checkbox2" class="mb-0"></label>
@@ -54,7 +52,8 @@
                                     <td>@item.ProductName</td>
                                     <td>@item.ProductCategory</td>
                                     <td>@item.ProductBrand</td>
-                                    <td>@item.ProductPrice</td>
+                                    <td>#@item.ProductPrice</td>
+                                    <td>@item.ProductSize</td>
                                     <td>@item.QuantityAvailable</td>
                                     <td>
                                         @{
@@ -68,7 +67,6 @@
                                         }
                                         <span class="@badgeClass">@item.StockStatus</span>
                                     </td>
-
                                 </tr>
                             }
                         </tbody>
