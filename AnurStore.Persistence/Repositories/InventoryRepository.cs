@@ -38,35 +38,21 @@ namespace AnurStore.Persistence.Repositories
             _context.Inventories.Update(inventory);
         }
 
-        public Task<Inventory> CreateInventory(Inventory Inventory)
+        public async Task<IList<Inventory>> GetAllInventories()
         {
-            throw new NotImplementedException();
+            var inventory = await _context.Inventories
+                  .Include(r => r.Product)
+                     .ThenInclude(r => r.ProductSize)
+                       .ThenInclude(r => r.ProductUnit)
+                   .Include(r => r.Product)
+                     .ThenInclude(r => r.Category)
+                   .Include(r => r.Product)
+                     .ThenInclude(r => r.Brand)
+                  .ToListAsync();
+            return inventory;
         }
 
-        public Task<IList<Inventory>> GetAllInventories()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Inventory> GetInventoryById(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> UpdateInventory(Inventory inventory)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<bool> Exist(string inventoryName)
-        {
-            throw new NotImplementedException();
-        }
-
-        public List<Inventory> GetAllInventory()
-        {
-            throw new NotImplementedException();
-        }
+     
     }
 
 }

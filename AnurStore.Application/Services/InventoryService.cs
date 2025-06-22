@@ -32,7 +32,7 @@ namespace AnurStore.Application.Services
                     ProductPrice = r.Product?.PricePerPack,
                     QuantityAvailable = r.QuantityAvailable,
                     StockStatus = r.StockStatus,
-                    ProductSize = r.Product.ProductSize.Size
+                    ProductSize = $"{r.Product.ProductSize.Size}{r.Product.ProductSize.ProductUnit.Name}"
 
                 }).ToList();
 
@@ -78,7 +78,7 @@ namespace AnurStore.Application.Services
                 ProductCategory = i.Product.Category.Name,
                 QuantityAvailable = i.QuantityAvailable,
                 StockStatus = i.StockStatus,
-                ProductSize = i.Product.ProductSize.Size
+                ProductSize = $"{i.Product.ProductSize.Size}{i.Product.ProductSize.ProductUnit.Name}"
             });
 
             return new BaseResponse<IEnumerable<InventoryDto>>

@@ -9,7 +9,6 @@ public class Inventory : BaseEntity
     public Product Product { get; set; } = default!;
     public int QuantityAvailable { get; set; }
     public DateTime StockDate { get; set; }
-
     public DateTime? ExpirationDate { get; set; }
 
     public string BatchNumber { get; set; } = default!;
