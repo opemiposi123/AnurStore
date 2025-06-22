@@ -62,6 +62,9 @@ namespace AnurStore.WebUI.Controllers
             return View();
         }
 
+
+
+
         [HttpPost]
         public async Task<IActionResult> CreateProduct(CreateProductRequest model, [FromServices] IValidator<CreateProductRequest> validator)
         {

@@ -8,9 +8,10 @@ namespace AnurStore.Application.Abstractions.Services
     {
         Task<BaseResponse<byte[]>> AddProductSale(CreateProductSaleRequest request);
         Task<BaseResponse<ProductSaleDto>> GetProductSaleById(string productSaleId);
-        Task<BaseResponse<List<ProductSaleDto>>> GetAllProductSalesAsync();
-        Task<BaseResponse<PagedResponse<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter);
+        Task<PagedResponse<List<ProductSaleDto>>> GetAllProductSalesPagedAsync(int pageNumber, int pageSize);
+        Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter);
         Task<BaseResponse<bool>> CancelProductSaleAsync(string saleId);
-        Task<BaseResponse<bool>> UpdateProductSaleAsync(UpdateProductSaleRequest request);
+        Task<BaseResponse<bool>> UpdateProductSaleAsync(string productSaleId, UpdateProductSaleRequest request);
+        Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel);
     }
 }

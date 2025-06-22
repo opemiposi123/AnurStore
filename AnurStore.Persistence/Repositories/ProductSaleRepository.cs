@@ -46,6 +46,25 @@ namespace AnurStore.Persistence.Repositories
             await _context.SaveChangesAsync(); 
         }
 
+        public async Task<int> GetTotalProductSalesCountAsync()
+        {
+            return await _context.ProductSales.CountAsync();
+        }
+
+
+        public async Task<List<ProductSale>> GetProductSalesPagedAsync(int pageNumber, int pageSize)
+        {
+            return await _context.ProductSales
+                .Include(s => s.ProductSaleItems)
+                .ThenInclude(item => item.Product)
+                .OrderByDescending(s => s.SaleDate)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+
+
 
         public async Task<bool> UpdateAsync(ProductSale productSale)
         {

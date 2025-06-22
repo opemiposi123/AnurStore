@@ -1,34 +1,43 @@
-﻿using AnurStore.Application.Abstractions.Repositories;
+﻿using AnurStore.Application.DTOs;
 using AnurStore.Application.Abstractions.Services;
-using AnurStore.Application.RequestModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using AnurStore.Application.Abstractions.Repositories;
 
-namespace AnurStore.WebApi.Controllers
+namespace AnurStore.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ReceiptController : ControllerBase
     {
-        private readonly IProductSaleService _productSaleService;
+        private readonly IReceiptService _receiptService;
 
-        public ReceiptController(IReceiptService receiptService , IProductSaleService productSaleService)
+        public ReceiptController(IReceiptService receiptService)
         {
-           _productSaleService = productSaleService;
+            _receiptService = receiptService;
         }
 
-        [HttpPost("sales")]
-        public async Task<IActionResult> CreateSale([FromBody] CreateProductSaleRequest request)
+        /// <summary>
+        /// Generate a receipt from a given product sale.
+        /// </summary>
+        /// <param name="saleDto">The DTO containing sale information.</param>
+        /// <returns>PDF receipt file.</returns>
+        [HttpPost("generate")]
+        public async Task<IActionResult> GenerateReceipt([FromBody] ProductSaleDto saleDto)
         {
-            var result = await _productSaleService.AddProductSale(request);
+            if (saleDto == null || saleDto.ProductSaleItems == null || !saleDto.ProductSaleItems.Any())
+                return BadRequest("Invalid sale data. Ensure sale contains at least one item.");
 
-            if (!result.Status || result.Data == null)
-                return BadRequest(result.Message);
+            try
+            {
+                var (receipt, pdfBytes) = await _receiptService.GenerateFromProductSaleAsync(saleDto);
 
-            // This sets the response to trigger a file download in the browser
-            return File(result.Data, "application/pdf", $"Receipt_{DateTime.Now:yyyyMMddHHmmss}.pdf");
+                // Return the PDF as a downloadable file
+                return File(pdfBytes, "application/pdf", $"{receipt.RecieptNumber}.pdf");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Failed to generate receipt: {ex.Message}");
+            }
         }
-
-
     }
 }

@@ -12,6 +12,7 @@ namespace AnurStore.Application.RequestModel
         public PaymentMethod PaymentMethod { get; set; }
 
         public List<CreateProductSaleItemRequest> ProductSaleItems { get; set; } = new();
+        public string? ProductSaleItemsJson { get; set; }
     }
 
 }

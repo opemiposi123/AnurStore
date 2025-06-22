@@ -41,6 +41,10 @@ namespace AnurStore.Persistence.Repositories
         {
             return await _context.Products
                 .Include(p => p.Inventory) 
+                .Include(p => p.Category)
+                .Include(p => p.Brand)
+                .Include(p => p.ProductSize)
+                .ThenInclude(p => p.ProductUnit)
                 .FirstOrDefaultAsync(p => p.Id == productId);
         }
 

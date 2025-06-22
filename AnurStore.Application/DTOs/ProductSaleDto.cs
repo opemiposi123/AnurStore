@@ -15,7 +15,6 @@ namespace AnurStore.Application.DTOs
         public decimal? Discount { get; set; }
 
         public PaymentMethod PaymentMethod { get; set; }
-
         public string? ReceiptId { get; set; }
         public string CreatedBy { get; set; } = default!;
         public DateTime CreatedOn { get; set; }

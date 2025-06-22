@@ -3,7 +3,7 @@ namespace AnurStore.Application.RequestModel
 {
     public class UpdateProductSaleRequest
     {
-        public string SaleId { get; set; } = default!;
+        public string Id { get; set; } = default!;
         public string? CustomerName { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public decimal? Discount { get; set; }

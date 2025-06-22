@@ -1,4 +1,5 @@
 ﻿using AnurStore.Application.DTOs;
+using AnurStore.Application.Wrapper;
 
 namespace AnurStore.Application.Abstractions.Repositories
 {

@@ -1,14 +1,14 @@
 ﻿using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.DTOs;
 using AnurStore.Domain.Entities;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using System.Drawing;
+using System.Drawing.Imaging;
 using ZXing;
 using ZXing.Common;
 using ZXing.QrCode;
-using System.Drawing;
-using System.Drawing.Imaging;
-using AnurStore.Application.DTOs;
 
 public class ReceiptService : IReceiptService
 {
@@ -31,113 +31,118 @@ public class ReceiptService : IReceiptService
             TotalAmount = sale.TotalAmount,
             NetAmount = sale.TotalAmount,
             PaymentMethod = sale.PaymentMethod,
+            CreatedOn = DateTime.Now,
             RecieptItems = sale.ProductSaleItems.Select(item => new RecieptItem
             {
-                ProductName = item.ProductName!,
+                ProductName = item.ProductName ?? "Unknown",
                 Quantity = item.Quantity,
-                UnitPrice = item.SubTotal / item.Quantity,
+                UnitPrice = item.Quantity > 0 ? item.SubTotal / item.Quantity : 0,
                 TotalPrice = item.SubTotal,
-
+                CreatedOn = DateTime.Now
             }).ToList()
         };
 
         await _receiptRepository.GenerateReceiptAsync(receiptEntity);
 
         byte[] qrImageData = GenerateQrCodeImage(receiptNumber);
+        byte[] pdfBytes;
 
-        int itemHeight = 18; // Estimate per item row
-        int extraContentHeight = 200; // header + footer + totals
-        int dynamicHeight = extraContentHeight + (itemHeight * receiptEntity.RecieptItems.Count);
-
-        var pdf = Document.Create(container =>
+        try
         {
-            container.Page(page =>
+            var pdf = Document.Create(container =>
             {
-                page.Size(180, dynamicHeight);
-                page.Margin(5);
-                page.DefaultTextStyle(x => x.FontSize(8).FontFamily("Arial"));
-
-                page.Content().Column(column =>
+                container.Page(page =>
                 {
-                    // Header
-                    column.Item().AlignCenter().Text("AnurStore").Bold().FontSize(11);
-                    column.Item().AlignCenter().Text("6 Unity Road, Ayoafolabi, Lagos").FontSize(6);
-                    column.Item().AlignCenter().Text("Tel: 09068041575").FontSize(6);
-                    column.Item().AlignCenter().Text("Email: oseniahoseniahmadkorede@gmail.com").FontSize(6);
+                    page.Size(PageSizes.A6);
+                    page.Margin(5);
+                    page.DefaultTextStyle(x => x.FontSize(8).FontFamily("Arial"));
 
-                    column.Item().PaddingVertical(1).LineHorizontal(1);
-                    column.Item().AlignCenter().Text("SALES INVOICE").Bold().FontSize(8);
-
-                    // Detail section
-                    void AddDetail(string label, string value)
+                    page.Content().Column(column =>
                     {
-                        column.Item().Row(row =>
+                        // Header
+                        column.Item().AlignCenter().Text("AnurStore").Bold().FontSize(11);
+                        column.Item().AlignCenter().Text("6 Unity Road, Ayoafolabi, Lagos").FontSize(6);
+                        column.Item().AlignCenter().Text("Tel: 09068041575").FontSize(6);
+                        column.Item().AlignCenter().Text("Email: oseniahoseniahmadkorede@gmail.com").FontSize(6);
+
+                        column.Item().PaddingVertical(1).LineHorizontal(1);
+                        column.Item().AlignCenter().Text("SALES INVOICE").Bold().FontSize(8);
+
+                        // Detail section
+                        void AddDetail(string label, string value)
                         {
-                            row.ConstantItem(60).Text(label).Bold().FontSize(7);
-                            row.ConstantItem(5).Text(":");
-                            row.RelativeItem().AlignRight().Text(value).FontSize(7);
-                        });
-                    }
-
-                    AddDetail("INVOICE NO", receiptNumber);
-                    AddDetail("CUSTOMER", sale.CustomerName ?? "Guest");
-                    AddDetail("DATE", DateTime.Now.ToString("MMM dd, yyyy"));
-                    AddDetail("TIME", DateTime.Now.ToString("hh:mm tt"));
-
-                    column.Item().PaddingVertical(1).LineHorizontal(1);
-
-                    // Table
-                    column.Item().Table(table =>
-                    {
-                        table.ColumnsDefinition(columns =>
-                        {
-                            columns.RelativeColumn(5);
-                            columns.RelativeColumn(2);
-                            columns.RelativeColumn(3);
-                        });
-
-                        table.Header(header =>
-                        {
-                            header.Cell().Text("ITEM").Bold().FontSize(7);
-                            header.Cell().AlignCenter().Text("QTY").Bold().FontSize(7);
-                            header.Cell().AlignRight().Text("₦ AMOUNT").Bold().FontSize(7);
-                        });
-
-                        foreach (var item in receiptEntity.RecieptItems)
-                        {
-                            table.Cell().Element(CellStyle).Text(item.ProductName).FontSize(6.5f);
-                            table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString()).FontSize(6.5f);
-                            table.Cell().Element(CellStyle).AlignRight().Text($"{item.TotalPrice:N2}").FontSize(6.5f);
+                            column.Item().Row(row =>
+                            {
+                                row.ConstantItem(60).Text(label).Bold().FontSize(7);
+                                row.ConstantItem(5).Text(":");
+                                row.RelativeItem().AlignRight().Text(value).FontSize(7);
+                            });
                         }
 
-                        IContainer CellStyle(IContainer container) => container.PaddingVertical(1);
+                        AddDetail("INVOICE NO", receiptNumber);
+                        AddDetail("CUSTOMER", sale.CustomerName ?? "Guest");
+                        AddDetail("DATE", DateTime.Now.ToString("MMM dd, yyyy"));
+                        AddDetail("TIME", DateTime.Now.ToString("hh:mm tt"));
+
+                        column.Item().PaddingVertical(1).LineHorizontal(1);
+
+                        // Table
+                        column.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(columns =>
+                            {
+                                columns.RelativeColumn(5);
+                                columns.RelativeColumn(2);
+                                columns.RelativeColumn(3);
+                            });
+
+                            table.Header(header =>
+                            {
+                                header.Cell().Text("ITEM").Bold().FontSize(7);
+                                header.Cell().AlignCenter().Text("QTY").Bold().FontSize(7);
+                                header.Cell().AlignRight().Text("₦ AMOUNT").Bold().FontSize(7);
+                            });
+
+                            foreach (var item in receiptEntity.RecieptItems)
+                            {
+                                table.Cell().Element(CellStyle).Text(item.ProductName).FontSize(6.5f);
+                                table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString()).FontSize(6.5f);
+                                table.Cell().Element(CellStyle).AlignRight().Text($"{item.TotalPrice:N2}").FontSize(6.5f);
+                            }
+
+                            IContainer CellStyle(IContainer container) => container.PaddingVertical(1);
+                        });
+
+                        column.Item().PaddingVertical(1).LineHorizontal(1);
+
+                        AddDetail("TOTAL", $"₦{receiptEntity.TotalAmount:N2}");
+                        AddDetail("DISCOUNT", $"₦{receiptEntity.Discount:N2}");
+                        AddDetail("NET AMOUNT", $"₦{receiptEntity.NetAmount:N2}");
+                        AddDetail("PAID VIA", sale.PaymentMethod.ToString());
+
+                        column.Item().PaddingVertical(1).LineHorizontal(1);
+
+                        if (qrImageData != null && qrImageData.Length > 0)
+                        {
+                            column.Item().AlignCenter().Height(35).Image(qrImageData, ImageScaling.FitHeight);
+                        }
+
+                        column.Item().AlignCenter().Text("Thank you for your purchase!").Italic().FontSize(6.5f);
+                        column.Item().AlignCenter().Text("© 2025 AnurStore").FontSize(6);
                     });
-
-                    column.Item().PaddingVertical(1).LineHorizontal(1);
-
-                    AddDetail("TOTAL", $"₦{receiptEntity.TotalAmount:N2}");
-                    AddDetail("DISCOUNT", $"₦{receiptEntity.Discount:N2}");
-                    AddDetail("NET AMOUNT", $"₦{receiptEntity.NetAmount:N2}");
-                    AddDetail("PAID VIA", sale.PaymentMethod.ToString());
-
-                    column.Item().PaddingVertical(1).LineHorizontal(1);
-
-                    if (qrImageData != null)
-                    {
-                        using var qrStream = new MemoryStream(qrImageData);
-                        column.Item().AlignCenter().Height(35).Image(qrStream, ImageScaling.FitHeight);
-                    }
-
-                    column.Item().AlignCenter().Text("Thank you for your purchase!").Italic().FontSize(6.5f);
-                    column.Item().AlignCenter().Text("© 2025 AnurStore").FontSize(6);
                 });
             });
-        });
 
-
+            pdfBytes = pdf.GeneratePdf();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("PDF layout failed. Ensure all values and images are valid.", ex);
+        }
 
         var receiptDto = new ReceiptDto
         {
+            Id = receiptEntity.Id,
             RecieptNumber = receiptEntity.RecieptNumber,
             CustomerName = receiptEntity.CustomerName,
             TotalAmount = receiptEntity.TotalAmount,
@@ -153,9 +158,8 @@ public class ReceiptService : IReceiptService
             }).ToList()
         };
 
-        return (receiptDto, pdf.GeneratePdf());
+        return (receiptDto, pdfBytes);
     }
-
 
     private byte[] GenerateQrCodeImage(string text)
     {
@@ -182,3 +186,4 @@ public class ReceiptService : IReceiptService
         return stream.ToArray();
     }
 }
+

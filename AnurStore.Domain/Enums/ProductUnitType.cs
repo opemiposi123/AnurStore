@@ -3,6 +3,8 @@
     public enum ProductUnitType
     {
         Pack = 1,
-        SingleUnit
+        SingleUnit,
+        HalfPack,
+        QuarterPack
     }
 }

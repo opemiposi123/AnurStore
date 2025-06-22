@@ -4,6 +4,7 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
+using AnurStore.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -68,7 +69,7 @@ namespace AnurStore.Application.Services
             try
             {
                 _logger.LogInformation("Checking if Product with name {ProductName} exists.", request.Name);
-               
+
 
                 string productImageUrl = null;
                 if (request.ProductImage != null && request.ProductImage.Length > 0)
@@ -149,7 +150,7 @@ namespace AnurStore.Application.Services
                 var ProductDtos = report.Where(x => !x.IsDeleted).Select(r => new ProductDto
                 {
                     Id = r.Id,
-                    Name = r.Name,
+                    Name = $"{r.Name} - {r.ProductSize.Size} {r.ProductSize.ProductUnit.Name} ({r.Brand.Name})",
                     CategoryName = r.Category.Name,
                     BrandName = r.Brand.Name ?? "Unknown",
                     UnitPrice = r.UnitPrice,
@@ -178,6 +179,30 @@ namespace AnurStore.Application.Services
                 };
             }
         }
+
+
+        public async Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm)
+        {
+            var products = await _productRepository.GetAllProduct();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                products = products
+                    .Where(p => p.Name != null && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            return products.Select(p => new ProductSearchResultDto
+            {
+                Id = p.Id,
+                Name = $"{p.Name} - {p.ProductSize} {p.ProductSize.ProductUnit.Name} ({p.Brand})",
+                PricePerPack = p.PricePerPack,
+                ImageUrl = p.ProductImageUrl
+            }).ToList();
+
+        }
+
+
 
         public async Task<BaseResponse<bool>> DeleteProduct(string productId)
         {
