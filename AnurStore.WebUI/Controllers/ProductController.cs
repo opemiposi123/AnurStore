@@ -37,6 +37,21 @@ namespace AnurStore.WebUI.Controllers
             return View(Enumerable.Empty<ProductDto >());
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string query)
+        {
+            var products = await _productService.SearchProductsByNameAsync(query);
+
+            var result = products.Select(p => new
+            {
+                p.Id,
+                Display = $"{p.Name} ({p.CategoryName}) {p.SizeWithUnit}" 
+            });
+
+            return Ok(result);
+        }
+
+
         public async Task<IActionResult> ViewProductDetail(string id)
         {
             var product = await _productService.GetProductDetails(id);

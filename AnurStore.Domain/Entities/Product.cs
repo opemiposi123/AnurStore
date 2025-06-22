@@ -10,9 +10,9 @@ namespace AnurStore.Domain.Entities
 
         public string? BarCode { get;set; } 
 
-        public decimal? PricePerPack { get; set; } // Rate * PackPriceMarkup / 100 = 203
+        public decimal? PricePerPack { get; set; } 
 
-        public decimal PackPriceMarkup { get; set; } //3.5
+        public decimal PackPriceMarkup { get; set; }
 
         public decimal? UnitPrice { get; set; } 
 

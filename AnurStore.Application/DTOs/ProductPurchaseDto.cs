@@ -6,13 +6,15 @@ namespace AnurStore.Application.DTOs
 {
     public class ProductPurchaseDto
     {
+        public string Id { get; set; }
+
         [Column(TypeName = "money")]
         public decimal Total { get; set; }
 
         [Column(TypeName = "money")]
         public decimal? Discount { get; set; }
 
-        public PaymentMethod PaymentMethod { get; set; }
+        public string Batch { get; set; }
 
         public string SupplierId { get; set; } = default!;
 
@@ -21,6 +23,8 @@ namespace AnurStore.Application.DTOs
         public ICollection<ProductPurchaseItemDto> PurchaseItems { get; set; } = [];
 
         public DateTime PurchaseDate { get; set; }
+
+        public string CreatedBy { get; set; }
 
         public bool IsAddedToInventory { get; set; }
     }
