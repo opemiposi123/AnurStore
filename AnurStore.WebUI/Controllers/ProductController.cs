@@ -51,7 +51,6 @@ namespace AnurStore.WebUI.Controllers
             return Ok(result);
         }
 
-
         public async Task<IActionResult> ViewProductDetail(string id)
         {
             var product = await _productService.GetProductDetails(id);
@@ -76,9 +75,6 @@ namespace AnurStore.WebUI.Controllers
             ViewBag.ProductUnits = await _productUnitService.GetProductUnitSelectList();
             return View();
         }
-
-
-
 
         [HttpPost]
         public async Task<IActionResult> CreateProduct(CreateProductRequest model, [FromServices] IValidator<CreateProductRequest> validator)
