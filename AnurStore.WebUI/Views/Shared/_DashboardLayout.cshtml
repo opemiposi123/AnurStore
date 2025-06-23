@@ -55,5 +55,6 @@
 	<script src="~/assets/js/app.js"></script>
 	<ejs-scripts></ejs-scripts>
 	@await Component.InvokeAsync("Notyf")
+	@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
