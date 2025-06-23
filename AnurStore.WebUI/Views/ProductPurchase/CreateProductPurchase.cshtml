@@ -147,18 +147,25 @@
             recalculateTotals();
         });
 
-        function recalculateTotals() {
+              function recalculateTotals() {
             let grandTotal = 0;
             $('#purchase-items-body tr').each(function () {
                 const qty = parseFloat($(this).find('.quantity').val()) || 0;
                 const rate = parseFloat($(this).find('.rate').val()) || 0;
                 const subtotal = qty * rate;
-                $(this).find('.subtotal').text('₦' + subtotal.toFixed(2));
+
+                $(this).find('.subtotal').text('₦' + subtotal.toLocaleString('en-NG', { minimumFractionDigits: 2 }));
                 $(this).find('.total-cost').val(subtotal.toFixed(2));
+
                 grandTotal += subtotal;
             });
-            $('#grand-total').text(grandTotal.toFixed(2));
-            $('#total-hidden').val(grandTotal.toFixed(2)); // ✅ Push grand total to hidden input
+
+            // Display grand total with comma formatting
+            $('#grand-total').text(grandTotal.toLocaleString('en-NG', { minimumFractionDigits: 2 }));
+
+            // Pass plain number to hidden input (no commas)
+            $('#total-hidden').val(grandTotal.toFixed(2));
         }
+
     </script>
 }
