@@ -22,15 +22,17 @@
                                     <label class="form-label">Customer Name</label>
                                     <input type="text" id="customerName" class="form-control" placeholder="Walk-in customer (optional)" />
                                 </div>
+
                                 <div class="col-md-6">
-                                    <label class="form-label">Payment Method</label>
-                                    <select id="paymentMethod" class="form-select">
-                                        <option value="">-- Select Payment Method --</option>
+                                    <label asp-for="SaleRequest.PaymentMethod">Payment Method</label>
+                                    <select asp-for="SaleRequest.PaymentMethod" class="form-control">
+                                        <option value="">Select Payment Method</option>
                                         @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
                                         {
                                             <option value="@((int)method)">@method</option>
                                         }
                                     </select>
+                                    <span asp-validation-for="SaleRequest.PaymentMethod" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -124,7 +126,7 @@
                 row.innerHTML = `
                     <td>${item.Name}</td>
                     <td>
-                        <select class="form-select form-select-sm unit-type-select" data-index="${index}">
+                        <select class="form-control form-control-sm rounded unit-type-select" data-index="${index}">
                             <option value="1" ${item.ProductUnitType === 1 ? "selected" : ""}>Single</option>
                             <option value="0" ${item.ProductUnitType === 0 ? "selected" : ""}>Pack</option>
                             <option value="2" ${item.ProductUnitType === 2 ? "selected" : ""}>Half</option>

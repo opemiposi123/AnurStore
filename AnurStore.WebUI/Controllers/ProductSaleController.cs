@@ -67,25 +67,6 @@ namespace AnurStore.WebUI.Controllers
 
 
 
-        //[HttpPost("create-product-sale")]
-        //public async Task<IActionResult> CreateProductSale(CreateProductSaleViewModel viewModel)
-        //{
-        //    var request = viewModel.SaleRequest;
-
-        //    var response = await _productSaleService.AddProductSale(request);
-        //    if (!response.Status)
-        //    {
-        //        _notyf.Error(response.Message);
-
-        //        var availableProducts = await _productService.GetAllProduct();
-        //        viewModel.AvailableProducts = availableProducts.Data.ToList() ?? new List<ProductDto>();
-
-        //        return View(viewModel);
-        //    }
-
-        //    _notyf.Success("Product Sale Created Successfully");
-        //    return File(response.Data, "application/pdf", "ProductSaleReceipt.pdf");
-        //}
 
         [HttpPost("create-product-sale")]
         public async Task<IActionResult> CreateProductSale(string SaleRequestJson)

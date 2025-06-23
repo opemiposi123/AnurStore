@@ -67,7 +67,7 @@
                                 </div>
                                 <div class="col-md-4 offset-md-4 text-end">
                                     <h5>Grand Total: ₦<span id="grand-total">0.00</span></h5>
-                                    <input asp-for="Total" type="hidden" id="total-hidden" /> <!-- ✅ Ensure total is submitted -->
+                                    <input asp-for="Total" type="hidden" id="total-hidden" />
                                 </div>
                             </div>
 
@@ -144,10 +144,30 @@
 
         $(document).on('click', '.remove-row', function () {
             $(this).closest('tr').remove();
+            reindexPurchaseItems();
             recalculateTotals();
         });
 
-              function recalculateTotals() {
+        function reindexPurchaseItems() {
+            $('#purchase-items-body tr').each(function (index) {
+                // Update the row number
+                $(this).find('td:first').text(index + 1);
+
+                // Update all input/select name attributes to match new index
+                $(this).find('input, select').each(function () {
+                    const nameAttr = $(this).attr('name');
+                    if (nameAttr) {
+                        const updatedName = nameAttr.replace(/\[\d+\]/, `[${index}]`);
+                        $(this).attr('name', updatedName);
+                    }
+                });
+            });
+
+            // Reset productIndex to current number of rows
+            productIndex = $('#purchase-items-body tr').length;
+        }
+
+        function recalculateTotals() {
             let grandTotal = 0;
             $('#purchase-items-body tr').each(function () {
                 const qty = parseFloat($(this).find('.quantity').val()) || 0;
@@ -160,12 +180,10 @@
                 grandTotal += subtotal;
             });
 
-            // Display grand total with comma formatting
+            // Show grand total with comma format
             $('#grand-total').text(grandTotal.toLocaleString('en-NG', { minimumFractionDigits: 2 }));
-
-            // Pass plain number to hidden input (no commas)
             $('#total-hidden').val(grandTotal.toFixed(2));
         }
-
     </script>
 }
+
