@@ -33,7 +33,6 @@ namespace AnurStore.WebUI.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> CreateProductPurchase(CreateProductPurchaseRequest model, [FromServices] IValidator<CreateProductPurchaseRequest> validator)
         {
@@ -55,8 +54,6 @@ namespace AnurStore.WebUI.Controllers
             _notyf.Success("Product purchased successfully");
             return RedirectToAction("Index", "ProductPurchase");
         }
-
-
 
         public async Task<IActionResult> Index()
         {
