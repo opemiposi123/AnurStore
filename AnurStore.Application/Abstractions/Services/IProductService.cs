@@ -20,5 +20,7 @@ namespace AnurStore.Application.Abstractions.Services
         Task<FileResult> DownloadProductTemplateAsync();
         Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query);
 
+        Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm);
+
     }
 }

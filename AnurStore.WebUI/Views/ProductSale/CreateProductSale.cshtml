@@ -1,0 +1,193 @@
+﻿@using AnurStore.Domain.Enums
+@model AnurStore.Application.RequestModel.CreateProductSaleViewModel
+
+@{
+    ViewData["Title"] = "Create Product Sale";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- LEFT PANEL: Sale Cart -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Sale Cart</h5>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="CreateProductSale" asp-controller="ProductSale" method="post">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Customer Name</label>
+                                    <input type="text" id="customerName" class="form-control" placeholder="Walk-in customer (optional)" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Payment Method</label>
+                                    <select id="paymentMethod" class="form-select">
+                                        <option value="">-- Select Payment Method --</option>
+                                        @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
+                                        {
+                                            <option value="@((int)method)">@method</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <table class="table table-bordered text-center align-middle" id="cartTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Product</th>
+                                        <th>Unit Type</th>
+                                        <th>Qty</th>
+                                        <th>Subtotal</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                            <div class="text-end mt-2 fw-bold text-success fs-5">
+                                Total: ₦<span id="totalPayable">0.00</span>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Discount (₦)</label>
+                                    <input type="number" id="discount" class="form-control" />
+                                </div>
+                            </div>
+
+                            <input type="hidden" name="SaleRequestJson" id="SaleRequestJson" />
+
+                            <div class="mt-4 text-end">
+                                <button type="submit" class="btn btn-success px-4">Complete Sale</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Product Grid -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <input id="searchBox" class="form-control w-75" placeholder="Search product by name..." />
+                        <button class="btn btn-secondary ms-2"><i class="ri-barcode-line"></i></button>
+                    </div>
+                    <div class="card-body" style="min-height: 400px; overflow-y: auto;">
+                        <div class="row" id="productGrid">
+                            @foreach (var product in Model.AvailableProducts)
+                            {
+                                <div class="col-md-4 mb-3">
+                                    <div class="card h-100 text-center p-2 product-card">
+                                        <img src="@product.ProductImageUrl" class="img-fluid" style="height:100px; object-fit:contain;" />
+                                        <h6 class="mt-2 text-truncate" title="@product.Name">@product.Name</h6>
+                                        <span class="badge bg-success mb-2">₦@product.UnitPrice?.ToString("N2")</span>
+                                        <button type="button" class="btn btn-sm btn-primary w-100 add-to-cart-btn"
+                                                data-product='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(product))'>
+                                            Add
+                                        </button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let cartItems = [];
+
+        function renderCart() {
+            const tbody = document.querySelector("#cartTable tbody");
+            tbody.innerHTML = "";
+            let total = 0;
+
+            cartItems.forEach((item, index) => {
+                let subtotal = 0;
+                const qty = item.Quantity;
+                switch (item.ProductUnitType) {
+                    case 0: subtotal = (item.PricePerPack || 0) * qty; break;
+                    case 1: subtotal = (item.UnitPrice || 0) * qty; break;
+                    case 2: subtotal = ((item.PricePerPack || 0) / 2) * qty; break;
+                    case 3: subtotal = ((item.PricePerPack || 0) / 4) * qty; break;
+                }
+                item.SubTotal = subtotal;
+                total += subtotal;
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${item.Name}</td>
+                    <td>
+                        <select class="form-select form-select-sm unit-type-select" data-index="${index}">
+                            <option value="1" ${item.ProductUnitType === 1 ? "selected" : ""}>Single</option>
+                            <option value="0" ${item.ProductUnitType === 0 ? "selected" : ""}>Pack</option>
+                            <option value="2" ${item.ProductUnitType === 2 ? "selected" : ""}>Half</option>
+                            <option value="3" ${item.ProductUnitType === 3 ? "selected" : ""}>Quarter</option>
+                        </select>
+                    </td>
+                    <td><input type="number" min="1" value="${qty}" class="form-control form-control-sm quantity-input" data-index="${index}" /></td>
+                    <td>₦${subtotal.toFixed(2)}</td>
+                    <td><button type="button" class="btn btn-sm btn-danger remove-btn" data-index="${index}">×</button></td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById("totalPayable").textContent = total.toFixed(2);
+            updateRequestObject();
+        }
+
+        function updateRequestObject() {
+            const requestObj = {
+                CustomerName: document.getElementById("customerName").value,
+                PaymentMethod: parseInt(document.getElementById("paymentMethod").value) || 0,
+                Discount: parseFloat(document.getElementById("discount").value) || 0,
+                CreatedBy: "AdminUser",
+                ProductSaleItems: cartItems.map(p => ({
+                    ProductId: p.ProductId,
+                    Quantity: p.Quantity,
+                    ProductUnitType: p.ProductUnitType,
+                    SubTotal: p.SubTotal,
+                    CreatedBy: "AdminUser"
+                }))
+            };
+
+            document.getElementById("SaleRequestJson").value = JSON.stringify(requestObj);
+        }
+
+        $(document).on("click", ".add-to-cart-btn", function () {
+            const product = JSON.parse($(this).attr("data-product"));
+            const existing = cartItems.find(p => p.ProductId === product.Id);
+            if (existing) {
+                existing.Quantity += 1;
+            } else {
+                cartItems.push({
+                    ProductId: product.Id,
+                    Name: product.Name,
+                    UnitPrice: product.UnitPrice ?? 0,
+                    PricePerPack: product.PricePerPack ?? 0,
+                    TotalItemInPack: product.TotalItemInPack ?? 1,
+                    Quantity: 1,
+                    ProductUnitType: 1,
+                    SubTotal: 0,
+                    CreatedBy: "AdminUser"
+                });
+            }
+            renderCart();
+        });
+
+        $(document).on("click", ".remove-btn", function () {
+            cartItems.splice(parseInt($(this).data("index")), 1);
+            renderCart();
+        });
+
+        $(document).on("input change", ".quantity-input, .unit-type-select, #customerName, #paymentMethod, #discount", function () {
+            renderCart();
+        });
+    </script>
+}

@@ -1,4 +1,25 @@
-﻿using MassTransit;
+﻿using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.DTOs;
+using AnurStore.Application.RequestModel;
+using AnurStore.Application.Wrapper;
+using AnurStore.Domain.Entities;
+using AnurStore.Domain.Enums;
+using MassTransit;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using QuestPDF.Helpers;
+using SkiaSharp;
+using static QuestPDF.Helpers.Colors;
+using static System.Collections.Specialized.BitVector32;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Numerics;
+using System.Reflection.Emit;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System;
+using ZXing.QrCode.Internal;
 
 namespace AnurStore.Application.DTOs;
 
@@ -39,3 +60,5 @@ public  class ProductDto
     public string? DeletedBy { get; set; }
     public bool IsDeleted { get; set; }
 }
+
+

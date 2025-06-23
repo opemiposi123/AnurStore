@@ -1,0 +1,108 @@
+﻿@model AnurStore.Application.DTOs.PaginatedList<AnurStore.Application.DTOs.ProductSaleDto>
+
+@{
+    ViewData["Title"] = "Product Sale List";
+    Layout = "_DashboardLayout";
+}
+<div class="content-page">
+    <div class="container-fluid">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                    <div class="d-flex flex-column text-left">
+                        <h4 class="mb-3">Product Sales</h4>
+                        <a href="@Url.Action("CreateProductSale", "ProductSale")" class="btn btn-primary add-list">
+                            <i class="las la-plus mr-2"></i>New Sale
+                        </a>
+                    </div>
+                    <div class="d-flex flex-column text-right">
+                        <form method="get" asp-action="FilterSales" class="form-inline">
+                            <input type="text" name="CustomerName" class="form-control mr-2" placeholder="Customer" value="@ViewBag.Filter?.CustomerName" />
+                            <input type="date" name="StartDate" class="form-control mr-2" value="@ViewBag.Filter?.StartDate?.ToString("yyyy-MM-dd")" />
+                            <input type="date" name="EndDate" class="form-control mr-2" value="@ViewBag.Filter?.EndDate?.ToString("yyyy-MM-dd")" />
+                            <button type="submit" class="btn btn-outline-primary">Filter</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="table-responsive rounded mb-3">
+                    <table class="data-tables table mb-0 tbl-server-info">
+                        <thead class="bg-white text-uppercase">
+                            <tr class="ligth ligth-data">
+                                <th>Customer</th>
+                                <th>Payment</th>
+                                <th>Discount</th>
+                                <th>Total</th>
+                                <th>Sale Date</th>
+                                <th>Sold By</th>  
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="ligth-body">
+                            @if (Model != null && Model.Items.Any())
+                            {
+                                foreach (var sale in Model.Items)
+                                {
+                                    <tr>
+                                        <td>@sale.CustomerName</td>
+                                        <td>@sale.PaymentMethod</td>
+                                        <td>₦@sale.Discount?.ToString("N2")</td>
+                                        <td>₦@sale.TotalAmount.ToString("N2")</td>
+                                        <td>@sale.SaleDate.ToString("dd MMM yyyy")</td>
+                                        <td>@sale.CreatedBy</td>
+                                        <td>
+                                            <div class="d-flex align-items-center list-action">
+                                                <a asp-action="ViewProductSaleDetail" asp-route-id="@sale.Id" class="badge badge-info mr-2" title="View">
+                                                    <i class="ri-eye-line"></i>
+                                                </a>
+                                                <a asp-action="EditProductSale" asp-route-id="@sale.Id" class="badge bg-success mr-2" title="Edit">
+                                                    <i class="ri-pencil-line"></i>
+                                                </a>
+                                                <form asp-action="CancelProductSaleAsync" asp-route-id="@sale.Id" method="post" class="d-inline">
+                                                    <button type="submit" class="badge bg-warning border-0" title="Cancel" onclick="return confirm('Are you sure you want to cancel this sale?');">
+                                                        <i class="ri-close-line"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted">No sales found.</td>
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.HasPreviousPage ? "" : "disabled")">
+                            <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageNumber - 1, pageSize = Model.PageSize })">
+                                &laquo; Previous
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { pageNumber = i, pageSize = Model.PageSize })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.HasNextPage ? "" : "disabled")">
+                            <a class="page-link" href="@Url.Action("Index", new { pageNumber = Model.PageNumber + 1, pageSize = Model.PageSize })">
+                                Next &raquo;
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+</div>

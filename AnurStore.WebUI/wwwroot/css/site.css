@@ -20,3 +20,92 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+<style >
+body {
+    background: #f4f6fa;
+}
+
+.sale-container {
+    display: flex;
+    gap: 20px;
+    height: calc(100vh - 80px);
+}
+
+.sale-card,
+.product-card-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+    .sale-card .card-header,
+    .product-card-panel .card-header {
+        background: linear-gradient(135deg, #00b894, #00cec9);
+        color: #fff;
+        padding: 1rem;
+    }
+
+    .sale-card .card-body,
+    .product-card-panel .card-body {
+        padding: 1rem;
+        overflow-y: auto;
+    }
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+#productGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 10px;
+    background: #fff;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+.add-to-cart-btn {
+    background: #00b894;
+    border: none;
+}
+
+    .add-to-cart-btn:hover {
+        background: #00cec9;
+    }
+
+.total-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0984e3;
+}
+
+.complete-sale-btn {
+    background: linear-gradient(135deg, #00b894, #00cec9);
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+    border-radius: 8px;
+    color: #fff;
+    transition: background 0.3s;
+}
+
+    .complete-sale-btn:hover {
+        background: linear-gradient(135deg, #00cec9, #00b894);
+    }
+
+</style >

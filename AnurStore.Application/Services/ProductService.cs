@@ -158,7 +158,7 @@ namespace AnurStore.Application.Services
                 var ProductDtos = report.Where(x => !x.IsDeleted).Select(r => new ProductDto
                 {
                     Id = r.Id,
-                    Name = r.Name,
+                    Name = $"{r.Name} - {r.ProductSize.Size} {r.ProductSize.ProductUnit.Name} ({r.Brand.Name})",
                     CategoryName = r.Category.Name,
                     BrandName = r.Brand.Name ?? "Unknown",
                     UnitPrice = r.UnitPrice,
@@ -187,6 +187,30 @@ namespace AnurStore.Application.Services
                 };
             }
         }
+
+
+        public async Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm)
+        {
+            var products = await _productRepository.GetAllProduct();
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                products = products
+                    .Where(p => p.Name != null && p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            return products.Select(p => new ProductSearchResultDto
+            {
+                Id = p.Id,
+                Name = $"{p.Name} - {p.ProductSize} {p.ProductSize.ProductUnit.Name} ({p.Brand})",
+                PricePerPack = p.PricePerPack,
+                ImageUrl = p.ProductImageUrl
+            }).ToList();
+
+        }
+
+
 
         public async Task<BaseResponse<bool>> DeleteProduct(string productId)
         {

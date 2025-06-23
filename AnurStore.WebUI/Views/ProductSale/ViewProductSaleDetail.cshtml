@@ -1,0 +1,102 @@
+﻿@model AnurStore.Application.DTOs.ProductSaleDto
+@{
+    ViewData["Title"] = "Product Sale Details";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                    <div>
+                        <h4 class="mb-3">Product Sale Details</h4>
+                        <p class="mb-0">
+                            View detailed information about the selected sale.
+                        </p>
+                    </div>
+                    <a href="@Url.Action("Index", "ProductSale")" class="btn btn-primary add-list">
+                        <i class="las la-arrow-left mr-3"></i>Back to Sales List
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Sale Summary -->
+                            <div class="col-md-6">
+                                <h5 class="card-title">Sale Summary</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>Customer:</strong> @Model.CustomerName</li>
+                                    <li class="list-group-item"><strong>Payment Method:</strong> @Model.PaymentMethod</li>
+                                    <li class="list-group-item text-success"><strong>Total Amount:</strong> ₦@Model.TotalAmount.ToString("N2")</li>
+                                    <li class="list-group-item text-danger"><strong>Discount:</strong> ₦@Model.Discount?.ToString("N2")</li>
+                                    <li class="list-group-item font-weight-bold"><strong>Sale Date:</strong> @Model.SaleDate.ToString("dd/MM/yyyy HH:mm")</li>
+                                </ul>
+                            </div>
+
+                            <!-- Audit Info -->
+                            <div class="col-md-6">
+                                <h5 class="card-title">Audit Information</h5>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item"><strong>Created By:</strong> @Model.CreatedBy</li>
+                                    <li class="list-group-item"><strong>Created On:</strong> @Model.CreatedOn.ToString("dd/MM/yyyy HH:mm")</li>
+                                    <li class="list-group-item"><strong>Last Modified By:</strong> @(Model.LastModifiedBy ?? "N/A")</li>
+                                    <li class="list-group-item"><strong>Last Modified On:</strong> @(Model.LastModifiedOn?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Sold Items -->
+                        <div class="mt-5">
+                            <h5 class="card-title mb-3">Sold Items</h5>
+
+                            @if (Model.ProductSaleItems != null && Model.ProductSaleItems.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Type</th>
+                                                <th>Subtotal (₦)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.ProductSaleItems)
+                                            {
+                                                <tr>
+                                                    <td>@item.ProductName</td>
+                                                    <td>@item.Quantity</td>
+                                                    <td>@item.ProductUnitType</td>
+                                                    <td>@item.SubTotal.ToString("N2")</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info">No items found for this sale.</div>
+                            }
+                        </div>
+
+                        <div class="mt-4">
+                            <a asp-action="EditProductSale" asp-route-id="@Model.Id" class="btn btn-success mr-2">
+                                <i class="ri-pencil-line mr-2"></i>Edit
+                            </a>
+                            <a asp-action="DeleteProductSale" asp-route-id="@Model.Id" class="btn btn-danger">
+                                <i class="ri-delete-bin-line mr-2"></i>Delete
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
