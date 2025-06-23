@@ -16,15 +16,15 @@
                         <h5 class="mb-0">Sale Cart</h5>
                     </div>
                     <div class="card-body">
-                        <form asp-action="CreateProductSale" asp-controller="ProductSale" method="post">
+                        <form method="post" action="/ProductSale/create-product-sale" id="saleForm">
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Customer Name</label>
-                                    <input type="text" id="customerName" class="form-control" placeholder="Walk-in customer (optional)" />
+                                    <input type="text" name="CustomerName" class="form-control" placeholder="Walk-in customer (optional)" />
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Payment Method</label>
-                                    <select id="paymentMethod" class="form-select">
+                                    <select name="PaymentMethod" class="form-select">
                                         <option value="">-- Select Payment Method --</option>
                                         @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
                                         {
@@ -54,7 +54,11 @@
                             <div class="row mt-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Discount (₦)</label>
-                                    <input type="number" id="discount" class="form-control" />
+                                    <input type="number" name="Discount" class="form-control" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Created By</label>
+                                    <input type="text" name="CreatedBy" class="form-control" value="AdminUser" readonly />
                                 </div>
                             </div>
 
@@ -79,10 +83,11 @@
                         <div class="row" id="productGrid">
                             @foreach (var product in Model.AvailableProducts)
                             {
+                                var productDisplayName = product.Name;
                                 <div class="col-md-4 mb-3">
                                     <div class="card h-100 text-center p-2 product-card">
                                         <img src="@product.ProductImageUrl" class="img-fluid" style="height:100px; object-fit:contain;" />
-                                        <h6 class="mt-2 text-truncate" title="@product.Name">@product.Name</h6>
+                                        <h6 class="mt-2 text-truncate" title="@productDisplayName">@productDisplayName</h6>
                                         <span class="badge bg-success mb-2">₦@product.UnitPrice?.ToString("N2")</span>
                                         <button type="button" class="btn btn-sm btn-primary w-100 add-to-cart-btn"
                                                 data-product='@Html.Raw(System.Text.Json.JsonSerializer.Serialize(product))'>
@@ -95,6 +100,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
@@ -111,18 +117,22 @@
             cartItems.forEach((item, index) => {
                 let subtotal = 0;
                 const qty = item.Quantity;
+
                 switch (item.ProductUnitType) {
                     case 0: subtotal = (item.PricePerPack || 0) * qty; break;
                     case 1: subtotal = (item.UnitPrice || 0) * qty; break;
                     case 2: subtotal = ((item.PricePerPack || 0) / 2) * qty; break;
                     case 3: subtotal = ((item.PricePerPack || 0) / 4) * qty; break;
                 }
+
                 item.SubTotal = subtotal;
                 total += subtotal;
 
+                const productName = item.Name;
+
                 const row = document.createElement("tr");
                 row.innerHTML = `
-                    <td>${item.Name}</td>
+                    <td>${productName}</td>
                     <td>
                         <select class="form-select form-select-sm unit-type-select" data-index="${index}">
                             <option value="1" ${item.ProductUnitType === 1 ? "selected" : ""}>Single</option>
@@ -139,55 +149,117 @@
             });
 
             document.getElementById("totalPayable").textContent = total.toFixed(2);
-            updateRequestObject();
-        }
-
-        function updateRequestObject() {
-            const requestObj = {
-                CustomerName: document.getElementById("customerName").value,
-                PaymentMethod: parseInt(document.getElementById("paymentMethod").value) || 0,
-                Discount: parseFloat(document.getElementById("discount").value) || 0,
-                CreatedBy: "AdminUser",
-                ProductSaleItems: cartItems.map(p => ({
-                    ProductId: p.ProductId,
-                    Quantity: p.Quantity,
-                    ProductUnitType: p.ProductUnitType,
-                    SubTotal: p.SubTotal,
-                    CreatedBy: "AdminUser"
-                }))
-            };
-
-            document.getElementById("SaleRequestJson").value = JSON.stringify(requestObj);
         }
 
         $(document).on("click", ".add-to-cart-btn", function () {
-            const product = JSON.parse($(this).attr("data-product"));
-            const existing = cartItems.find(p => p.ProductId === product.Id);
+            const productRaw = $(this).data("product");
+            const product = typeof productRaw === "string" ? JSON.parse(productRaw) : productRaw;
+
+            const id = product.Id || product.id;
+            const name = product.Name || product.name;
+
+            const existing = cartItems.find(p => p.ProductId === id);
             if (existing) {
                 existing.Quantity += 1;
             } else {
                 cartItems.push({
-                    ProductId: product.Id,
-                    Name: product.Name,
-                    UnitPrice: product.UnitPrice ?? 0,
-                    PricePerPack: product.PricePerPack ?? 0,
-                    TotalItemInPack: product.TotalItemInPack ?? 1,
+                    ProductId: id,
+                    Name: name,
+                    UnitPrice: product.UnitPrice ?? product.unitPrice ?? 0,
+                    PricePerPack: product.PricePerPack ?? product.pricePerPack ?? 0,
+                    TotalItemInPack: product.TotalItemInPack ?? product.totalItemInPack ?? 1,
+                    Size: product.Size ?? product.size ?? "",
+                    UnitName: product.UnitName ?? product.unitName ?? "",
+                    BrandName: product.BrandName ?? product.brandName ?? "",
                     Quantity: 1,
                     ProductUnitType: 1,
                     SubTotal: 0,
                     CreatedBy: "AdminUser"
                 });
             }
+
             renderCart();
         });
 
         $(document).on("click", ".remove-btn", function () {
-            cartItems.splice(parseInt($(this).data("index")), 1);
+            const index = parseInt($(this).data("index"));
+            cartItems.splice(index, 1);
             renderCart();
         });
 
-        $(document).on("input change", ".quantity-input, .unit-type-select, #customerName, #paymentMethod, #discount", function () {
-            renderCart();
+        document.addEventListener("input", function (e) {
+            if (e.target.classList.contains("quantity-input")) {
+                const index = parseInt(e.target.dataset.index);
+                cartItems[index].Quantity = parseInt(e.target.value);
+                renderCart();
+            }
+        });
+
+        document.addEventListener("change", function (e) {
+            if (e.target.classList.contains("unit-type-select")) {
+                const index = parseInt(e.target.dataset.index);
+                cartItems[index].ProductUnitType = parseInt(e.target.value);
+                renderCart();
+            }
+        });
+
+        $('#searchBox').on('input', function () {
+            let term = $(this).val();
+            if (term.length < 2) return;
+
+            $.ajax({
+                url: '/ProductSale/search-products',
+                type: 'GET',
+                data: { term: term },
+                success: function (data) {
+                    updateProductGrid(data);
+                },
+                error: function () {
+                    alert("Failed to fetch products.");
+                }
+            });
+        });
+
+        function updateProductGrid(products) {
+            let grid = $('#productGrid');
+            grid.empty();
+
+            if (!products || products.length === 0) {
+                grid.append('<div class="col-12 text-center"><p>No products found</p></div>');
+                return;
+            }
+
+            products.forEach(product => {
+                $.get(`/ProductSale/get-product-by-id?id=${product.id || product.Id}`, function (productDetails) {
+                    const displayName = `${productDetails.name || productDetails.Name} - ${productDetails.size || productDetails.Size || ""} ${productDetails.unitName || productDetails.UnitName || ""} (${productDetails.brandName || productDetails.BrandName || ""})`;
+
+                    let html = `
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 text-center p-2 product-card">
+                                <img src="${productDetails.productImageUrl || productDetails.ProductImageUrl || '/images/placeholder.png'}" class="img-fluid" style="height:100px; object-fit:contain;" />
+                                <h6 class="mt-2 text-truncate" title="${displayName}">${displayName}</h6>
+                                <span class="badge bg-success mb-2">₦${(productDetails.unitPrice || productDetails.UnitPrice || 0).toLocaleString()}</span>
+                                <button type="button" class="btn btn-sm btn-primary w-100 add-to-cart-btn"
+                                    data-product='${JSON.stringify(productDetails).replace(/'/g, "&apos;")}'>
+                                    Add
+                                </button>
+                            </div>
+                        </div>`;
+                    grid.append(html);
+                });
+            });
+        }
+
+        document.getElementById("saleForm").addEventListener("submit", function (e) {
+            const saleRequest = {
+                CustomerName: this.CustomerName.value,
+                PaymentMethod: parseInt(this.PaymentMethod.value),
+                Discount: parseFloat(this.Discount.value) || 0,
+                CreatedBy: this.CreatedBy.value,
+                ProductSaleItems: cartItems
+            };
+
+            document.getElementById("SaleRequestJson").value = JSON.stringify(saleRequest);
         });
     </script>
 }
