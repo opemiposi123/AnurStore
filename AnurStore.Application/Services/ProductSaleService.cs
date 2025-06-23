@@ -6,6 +6,7 @@ using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Common.Contracts;
 using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
+using System.Text.Json;
 
 namespace AnurStore.Application.Services
 {
@@ -189,42 +190,38 @@ namespace AnurStore.Application.Services
 
 
 
-        public async Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel)
-        {
-            var request = viewModel.SaleRequest;
 
-            if (string.IsNullOrWhiteSpace(request.ProductSaleItemsJson))
-            {
-                return new BaseResponse<CreateProductSaleRequest>
-                {
-                    Status = false,
-                    Message = "No product items found in request."
-                };
-            }
+        //public async Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel)
+        //{
+        //    if (string.IsNullOrWhiteSpace(viewModel.SaleRequest.ProductSaleItemsJson))
+        //    {
+        //        return new BaseResponse<CreateProductSaleRequest>
+        //        {
+        //            Status = false,
+        //            Message = "No product items found in request."
+        //        };
+        //    }
 
-            try
-            {
-                request.ProductSaleItems = System.Text.Json.JsonSerializer
-                    .Deserialize<List<CreateProductSaleItemRequest>>(request.ProductSaleItemsJson) ?? new();
+        //    try
+        //    {
+        //        viewModel.SaleRequest.ProductSaleItems = JsonSerializer.Deserialize<List<CreateProductSaleItemRequest>>(viewModel.SaleRequest.ProductSaleItemsJson) ?? new();
 
-                return new BaseResponse<CreateProductSaleRequest>
-                {
-                    Status = true,
-                    Message = "Request prepared successfully.",
-                    Data = request
-                };
-            }
-            catch
-            {
-                viewModel.AvailableProducts = (await _productService.GetAllProduct()).Data.ToList();
-
-                return new BaseResponse<CreateProductSaleRequest>
-                {
-                    Status = false,
-                    Message = "Invalid format for product sale items."
-                };
-            }
-        }
+        //        return new BaseResponse<CreateProductSaleRequest>
+        //        {
+        //            Status = true,
+        //            Message = "Request prepared successfully.",
+        //            Data = viewModel.SaleRequest
+        //        };
+        //    }
+        //    catch
+        //    {
+        //        return new BaseResponse<CreateProductSaleRequest>
+        //        {
+        //            Status = false,
+        //            Message = "Invalid format for product sale items."
+        //        };
+        //    }
+        //}
 
 
 

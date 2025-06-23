@@ -6,6 +6,7 @@ using AnurStore.Domain.Entities;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Threading.Channels;
 
 namespace AnurStore.WebUI.Controllers
@@ -87,25 +88,22 @@ namespace AnurStore.WebUI.Controllers
         //}
 
         [HttpPost("create-product-sale")]
-        public async Task<IActionResult> CreateProductSale(CreateProductSaleViewModel viewModel)
+        public async Task<IActionResult> CreateProductSale(string SaleRequestJson)
         {
-            var prepareResponse = await _productSaleService.PrepareSaleRequestAsync(viewModel);
+            var request = JsonConvert.DeserializeObject<CreateProductSaleRequest>(SaleRequestJson);
 
-            if (!prepareResponse.Status)
+            if (request == null)
             {
-                _notyf.Error(prepareResponse.Message);
-                viewModel.AvailableProducts = (await _productService.GetAllProduct()).Data.ToList();
-                return View(viewModel);
+                _notyf.Error("Invalid request data.");
+                return RedirectToAction("CreateProductSale");
             }
-            var request = prepareResponse.Data;
 
             var response = await _productSaleService.AddProductSale(request);
 
             if (!response.Status)
             {
                 _notyf.Error(response.Message);
-                viewModel.AvailableProducts = (await _productService.GetAllProduct()).Data.ToList();
-                return View(viewModel);
+                return RedirectToAction("CreateProductSale");
             }
 
             _notyf.Success("Product Sale Created Successfully");

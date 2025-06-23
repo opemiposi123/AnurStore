@@ -85,7 +85,7 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopRight;
 }
 );
-
+QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();

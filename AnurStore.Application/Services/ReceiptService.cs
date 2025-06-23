@@ -21,6 +21,9 @@ public class ReceiptService : IReceiptService
 
     public async Task<(ReceiptDto Receipt, byte[] PdfBytes)> GenerateFromProductSaleAsync(ProductSaleDto sale)
     {
+        if (sale == null || sale.ProductSaleItems == null || !sale.ProductSaleItems.Any())
+            throw new Exception("Sale or Sale Items are empty. Cannot generate receipt.");
+
         var receiptNumber = $"INV-{DateTime.UtcNow.Ticks.ToString()[^6..]}";
 
         var receiptEntity = new Reciept
@@ -63,8 +66,11 @@ public class ReceiptService : IReceiptService
                         column.Item().AlignCenter().Text("AnurStore").Bold().FontSize(11);
                         column.Item().AlignCenter().Text("6 Unity Road, Ayoafolabi, Lagos").FontSize(6);
                         column.Item().AlignCenter().Text("Tel: 09068041575").FontSize(6);
-                        column.Item().AlignCenter().Text("Email: oseniahoseniahmadkorede@gmail.com").FontSize(6);
-
+                        column.Item().AlignCenter().Text(text =>
+                        {
+                            text.Span("Email: ").Bold().FontSize(6);
+                            text.Span("oseniahoseniahmadkorede@gmail.com").FontSize(6);
+                        });
                         column.Item().PaddingVertical(1).LineHorizontal(1);
                         column.Item().AlignCenter().Text("SALES INVOICE").Bold().FontSize(8);
 
