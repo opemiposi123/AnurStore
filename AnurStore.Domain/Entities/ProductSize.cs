@@ -4,7 +4,7 @@ namespace AnurStore.Domain.Entities;
 
 public class ProductSize : BaseEntity
 {
-    public double Size { get; set; }
+    public double Size { get; set; } 
     public string ProductId { get; set; } = default!;
     public string ProductUnitId { get; set; } = default!;
     //NP

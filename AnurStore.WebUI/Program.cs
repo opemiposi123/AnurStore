@@ -5,6 +5,7 @@ using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;
 using AnurStore.Application.Validators.Category;
 using AnurStore.Application.Validators.Product;
+using AnurStore.Application.Validators.ProductPurchase;
 using AnurStore.Application.Validators.ProductUnit;
 using AnurStore.Application.Validators.Supplier;
 using AnurStore.Application.Validators.User;
@@ -34,6 +35,9 @@ builder.Services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
+builder.Services.AddScoped<IProductPurchaseRepository, ProductPurchaseRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
 builder.Services.AddScoped<IProductSaleRepository, ProductSaleRepository>();
 
@@ -45,6 +49,8 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductPurchaseService, ProductPurchaseService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IProductSaleService, ProductSaleService>();
 
@@ -55,6 +61,8 @@ builder.Services.AddScoped<IValidator<CreateSupplierRequest>, CreateSupplierVali
 builder.Services.AddScoped<IValidator<CreateProductUnitRequest>, CreateProductUnitValidator>();
 builder.Services.AddScoped<IValidator<CreateProductRequest>, CreateProductValidator>();
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserValidator>();
+builder.Services.AddScoped<IValidator<CreateProductPurchaseRequest>, ProductPurchaseValidator>();
+builder.Services.AddScoped<IValidator<CreateProductPurchaseItemRequest>, ProductPurchaseItemValidator>();
 
 
 builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryValidator>();
@@ -96,6 +104,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
+    app.UseDeveloperExceptionPage();
 }
 
 await app.SeedToDatabaseAsync();
@@ -105,6 +114,8 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapControllers(); 
 
 app.MapControllerRoute(
     name: "default",

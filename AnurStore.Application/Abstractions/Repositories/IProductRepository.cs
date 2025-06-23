@@ -1,4 +1,5 @@
-﻿using AnurStore.Domain.Entities;
+﻿using AnurStore.Application.DTOs;
+using AnurStore.Domain.Entities;
 
 namespace AnurStore.Application.Abstractions.Repositories
 {
@@ -12,5 +13,7 @@ namespace AnurStore.Application.Abstractions.Repositories
         List<Product> SelectProduct();
         Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize);
         Task<ProductSize?> GetProductSizeByProductIdAsync(string productId);
+        Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query);
+
     }
 }

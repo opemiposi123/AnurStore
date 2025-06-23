@@ -18,6 +18,8 @@ namespace AnurStore.Application.Abstractions.Services
         Task<IEnumerable<SelectListItem>> GetProductSelectList();
         Task UploadProductsFromExcelAsync(Stream excelStream);
         Task<FileResult> DownloadProductTemplateAsync();
+        Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query);
+
         Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm);
 
     }

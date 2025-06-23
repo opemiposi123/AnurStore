@@ -1,0 +1,78 @@
+﻿@using AnurStore.Domain.Enums
+@model IEnumerable<AnurStore.Application.DTOs.InventoryDto>
+@{
+    ViewData["Title"] = "Inventories";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                    <div class="d-flex flex-column text-left">
+                        <h4 class="mb-3">Product List</h4>
+                        <a href="@Url.Action("CreateProductPurchase","ProductPurchase")" class="btn btn-primary add-list">
+                            <i class="las la-plus mr-3"></i>Restock
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="table-responsive rounded mb-3">
+                    <table class="data-tables table mb-0 tbl-server-info">
+                        <thead class="bg-white text-uppercase">
+                            <tr class="ligth ligth-data">
+                                <th>
+                                    <div class="checkbox d-inline-block">
+                                        <input type="checkbox" class="checkbox-input" id="checkbox1">
+                                        <label for="checkbox1" class="mb-0"></label>
+                                    </div>
+                                </th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Brand </th>
+                                <th>Price</th>
+                                <th>Size</th>
+                                <th>QtyAvailable</th>
+                                <th>StockStatus</th>
+                            </tr>
+                        </thead>
+                        <tbody class="ligth-body">
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="checkbox d-inline-block">
+                                            <input type="checkbox" class="checkbox-input" id="checkbox2">
+                                            <label for="checkbox2" class="mb-0"></label>
+                                        </div>
+                                    </td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.ProductCategory</td>
+                                    <td>@item.ProductBrand</td>
+                                    <td>#@item.ProductPrice</td>
+                                    <td>@item.ProductSize</td>
+                                    <td>@item.QuantityAvailable</td>
+                                    <td>
+                                        @{
+                                            var badgeClass = item.StockStatus switch
+                                            {
+                                                StockStatus.InStock => "badge badge-success",
+                                                StockStatus.LowStock => "badge badge-warning",
+                                                StockStatus.OutOfStock => "badge badge-danger",
+                                                _ => "badge badge-secondary"
+                                            };
+                                        }
+                                        <span class="@badgeClass">@item.StockStatus</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,5 +1,12 @@
 using AnurStore.Application.Abstractions.Repositories;
 using AnurStore.Application.Abstractions.Services;
+using AnurStore.Application.Services;
+using AnurStore.Persistence.Context;
+using AnurStore.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+
+using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;
@@ -19,6 +26,12 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var connectionString =
+builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AnurStore")));
+
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddControllersWithViews();
 

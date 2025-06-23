@@ -6,9 +6,9 @@ namespace AnurStore.Application.DTOs
     public class ProductPurchaseItemDto
     {
         public string ProductId { get; set; } = default!;
-
         public string ProductName { get; set; } = default!;
         public string ProductCategory { get; set; } = default!;
+        public string ProductBrand { get; set; } = default!; 
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal Rate { get; set; } 

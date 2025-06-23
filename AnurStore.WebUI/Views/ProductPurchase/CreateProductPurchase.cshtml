@@ -1,0 +1,164 @@
+﻿@using AspNetCoreHero.ToastNotification.Abstractions
+@model AnurStore.Application.RequestModel.CreateProductPurchaseRequest
+@inject INotyfService _notyf
+
+@{
+    ViewData["Title"] = "Create Product Purchase";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid add-form-list">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Create Purchase</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="CreateProductPurchase" asp-controller="ProductPurchase" method="post">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label>Date</label>
+                                    <input asp-for="PurchaseDate" class="form-control" type="date" readonly value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="SupplierId">Supplier</label>
+                                    <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.Suppliers">
+                                        <option value="">Select Supplier</option>
+                                    </select>
+                                    <span asp-validation-for="SupplierId" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="Batch">Batch</label>
+                                    <input asp-for="Batch" class="form-control" placeholder="Enter Batch" required />
+                                    <span asp-validation-for="Batch" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label>Product</label>
+                                <input id="product-search" type="text" class="form-control" placeholder="Search Product by Name" autocomplete="off" />
+                            </div>
+
+                            <table class="table table-bordered" id="purchase-items-table">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Product</th>
+                                        <th>Rate</th>
+                                        <th>Qty</th>
+                                        <th>Discount</th>
+                                        <th>Subtotal</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="purchase-items-body"></tbody>
+                            </table>
+
+                            <div class="row mt-3">
+                                <div class="col-md-4">
+                                    <label asp-for="Discount">Total Discount</label>
+                                    <input asp-for="Discount" class="form-control" />
+                                </div>
+                                <div class="col-md-4 offset-md-4 text-end">
+                                    <h5>Grand Total: ₦<span id="grand-total">0.00</span></h5>
+                                    <input asp-for="Total" type="hidden" id="total-hidden" /> <!-- ✅ Ensure total is submitted -->
+                                </div>
+                            </div>
+
+                            <input asp-for="IsAddedToInventory" type="hidden" value="true" />
+                            <button type="submit" class="btn btn-primary mt-3">Submit Purchase</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" />
+
+    <script>
+        let productIndex = 0;
+
+        $(document).ready(function () {
+            $("#product-search").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/api/product/search',
+                        data: { query: request.term },
+                        success: function (data) {
+                            response(data.map(p => ({
+                                label: p.display,
+                                value: p.id
+                            })));
+                        },
+                        error: function () {
+                            console.error("Product search failed.");
+                        }
+                    });
+                },
+                minLength: 1,
+                select: function (event, ui) {
+                    addProductRow(ui.item.label, ui.item.value);
+                    $("#product-search").val('');
+                    return false;
+                }
+            });
+        });
+
+        function addProductRow(display, productId) {
+            let currentIndex = productIndex++;
+            let row = `
+                <tr>
+                    <td>${currentIndex + 1}</td>
+                    <td>
+                        ${display}
+                        <input type="hidden" name="PurchaseItems[${currentIndex}].ProductId" value="${productId}" />
+                    </td>
+                    <td><input type="number" name="PurchaseItems[${currentIndex}].Rate" class="form-control rate" value="0" step="0.01" /></td>
+                    <td><input type="number" name="PurchaseItems[${currentIndex}].Quantity" class="form-control quantity" value="1" /></td>
+                    <td><input type="number" name="PurchaseItems[${currentIndex}].Discount" class="form-control discount" value="0" /></td>
+                    <td>
+                        <span class="subtotal">₦0.00</span>
+                        <input type="hidden" name="PurchaseItems[${currentIndex}].TotalCost" class="total-cost" value="0" />
+                    </td>
+                    <td><button type="button" class="btn btn-danger btn-sm remove-row">X</button></td>
+                </tr>
+            `;
+            $('#purchase-items-body').append(row);
+            recalculateTotals();
+        }
+
+        $(document).on('input', '.quantity, .rate', function () {
+            recalculateTotals();
+        });
+
+        $(document).on('click', '.remove-row', function () {
+            $(this).closest('tr').remove();
+            recalculateTotals();
+        });
+
+        function recalculateTotals() {
+            let grandTotal = 0;
+            $('#purchase-items-body tr').each(function () {
+                const qty = parseFloat($(this).find('.quantity').val()) || 0;
+                const rate = parseFloat($(this).find('.rate').val()) || 0;
+                const subtotal = qty * rate;
+                $(this).find('.subtotal').text('₦' + subtotal.toFixed(2));
+                $(this).find('.total-cost').val(subtotal.toFixed(2));
+                grandTotal += subtotal;
+            });
+            $('#grand-total').text(grandTotal.toFixed(2));
+            $('#total-hidden').val(grandTotal.toFixed(2)); // ✅ Push grand total to hidden input
+        }
+    </script>
+}

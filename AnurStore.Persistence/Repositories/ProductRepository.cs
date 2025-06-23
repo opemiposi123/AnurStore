@@ -1,7 +1,9 @@
 ﻿using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.DTOs;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AnurStore.Persistence.Repositories
 {
@@ -19,6 +21,25 @@ namespace AnurStore.Persistence.Repositories
             await _context.SaveChangesAsync();
             return product;
         }
+
+        public async Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query)
+        {
+            var products = await _context.Products
+               .Where(p => !p.IsDeleted && p.Name.ToLower().Contains(query.ToLower()))
+                .Include(p => p.Category)
+                .Include(p => p.ProductSize)
+                 .ThenInclude(p => p.ProductUnit) 
+                .ToListAsync();
+
+            return products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                CategoryName = p.Category?.Name ?? "N/A",
+                SizeWithUnit = $"{p.ProductSize.Size}{p.ProductSize.ProductUnit.Name}"
+            });
+        }
+
 
         public async Task<bool> Exist(string productName)
         {

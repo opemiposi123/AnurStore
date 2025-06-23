@@ -1,0 +1,73 @@
+﻿@model IEnumerable<AnurStore.Application.DTOs.ProductPurchaseDto>
+@{
+    ViewData["Title"] = "Productpurchased List";
+    Layout = "_DashboardLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+                    <div class="d-flex flex-column text-left">
+                        <h4 class="mb-3">Product List</h4>
+                        <a href="@Url.Action("PurchaseProduct", "PurchaseProduct")" class="btn btn-primary add-list">
+                            <i class="las la-plus mr-3"></i>Purhase Product
+                        </a>
+                    </div>
+                    <div class="d-flex flex-column text-right">
+                        <a href="@Url.Action("DownloadProductTemplate", "Product")" class="btn btn-secondary mb-2">
+                            Download Excel Template
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="table-responsive rounded mb-3">
+                    <table class="data-tables table mb-0 tbl-server-info">
+                        <thead class="bg-white text-uppercase">
+                            <tr class="ligth ligth-data">
+
+                                <th>Batch</th>
+                                <th>Supplier</th>
+                                <th>Total</th>
+                                <th>Discount</th>
+                                <th>PurchaseDate</th>
+                                <th>CreatedBy</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="ligth-body">
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Batch</td>
+                                    <td>@item.SupplierName</td>
+                                    <td>@item.Total.ToString("N2")</td>
+                                    <td>₦@item.Discount..ToString("N2")</td>
+                                    <td>₦@item.PurchaseDate.ToString("dd MMM yyyy")</td>
+                                    <td>@item.CreatedBy</td>
+                                    <td>
+                                        <div class="d-flex align-items-center list-action">
+                                            <a asp-action="ViewProductDetail" asp-route-id="@item.Id" class="badge badge-info mr-2" data-toggle="tooltip" data-placement="top" title="View">
+                                                <i class="ri-eye-line mr-0"></i>
+                                            </a>
+                                            <a asp-action="EditProduct" asp-route-id="@item.Id" class="badge bg-success mr-2" data-toggle="tooltip" data-placement="top" title="Edit">
+                                                <i class="ri-pencil-line mr-0"></i>
+                                            </a>
+                                            <a asp-action="DeleteProduct" asp-route-id="@item.Id" class="badge bg-warning mr-2" data-toggle="tooltip" data-placement="top" title="Delete">
+                                                <i class="ri-delete-bin-line mr-0"></i>
+                                            </a>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
