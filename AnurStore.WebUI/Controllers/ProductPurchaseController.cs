@@ -95,7 +95,7 @@ namespace AnurStore.WebUI.Controllers
             return View(Enumerable.Empty<ProductPurchaseDto>());
         }
 
-        public async Task<IActionResult> ViewProductDetail(string id)
+        public async Task<IActionResult> ViewProductPurchaseDetail([FromRoute]string id) 
         {
             var productPurchase = await _productPurchaseService.GetPurchaseDetailsAsync(id);
 
