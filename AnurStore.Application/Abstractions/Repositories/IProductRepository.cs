@@ -12,7 +12,7 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<bool> Exist(string productName);
         List<Product> SelectProduct();
         Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize);
-        Task<ProductSize?> GetProductSizeByProductIdAsync(string productId);
+        Task<ProductSize?> GetProductSizeByProductIdAsync(string productId, bool noTracking = false);
         Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query);
 
     }

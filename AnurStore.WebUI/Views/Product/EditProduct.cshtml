@@ -1,5 +1,137 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model AnurStore.Application.RequestModel.UpdateProductRequest;
 @{
+    ViewData["Title"] = "Edit Product";
+    Layout = "_DashboardLayout";
 }
+<div class="content-page">
+    <div class="container-fluid add-form-list"> 
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Edit Product</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <form asp-action="EditProduct" data-toggle="validator" enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label">Name *</label>
+                                        <input asp-for="Name" class="form-control" value="@Model.Name" placeholder="Enter Category Name" required />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UnitPrice" class="control-label">UnitPrice</label>
+                                        <input asp-for="UnitPrice" class="form-control" value="@Model.UnitPrice"  placeholder="Enter Unit Price" required />
+                                        <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="CategoryId" class="control-label">Category</label>
+                                        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                                            <option value="">Select Category</option>
+                                        </select>
+                                        <span asp-validation-for="CategoryId" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="BrandId" class="control-label">Brand</label>
+                                        <select asp-for="BrandId" class="form-control" asp-items="ViewBag.Brands">
+                                            <option value="">Select Brand</option>
+                                        </select>
+                                        <span asp-validation-for="BrandId" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ProductSize" class="control-label">ProductSize</label>
+                                        <input asp-for="ProductSize" class="form-control" value="@Model.ProductSize" placeholder="Enter Product Size" required />
+                                        <span asp-validation-for="ProductSize" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="UnitId" class="control-label">Product Unit</label>
+                                        <select asp-for="UnitId" class="form-control" asp-items="ViewBag.ProductUnits">
+                                            <option value="">Select ProductUnit</option>
+                                        </select>
+                                        <span asp-validation-for="UnitId" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="PricePerPack" class="control-label">PricePack</label>
+                                        <input asp-for="PricePerPack" class="form-control" value="@Model.PricePerPack" placeholder="Enter Pack PricePack" />
+                                        <span asp-validation-for="PricePerPack" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="PackPriceMarkup" class="control-label">PackPriceMarkup</label>
+                                        <input asp-for="PackPriceMarkup" class="form-control" value="@Model.PackPriceMarkup" placeholder="Enter Pack PriceMarkup" />
+                                        <span asp-validation-for="PackPriceMarkup" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="TotalItemInPack" class="control-label">ItemInPack</label>
+                                        <input asp-for="TotalItemInPack" class="form-control" value="@Model.TotalItemInPack" placeholder="Enter ItemInPack" />
+                                        <span asp-validation-for="TotalItemInPack" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="BarCode" class="control-label">BarCode</label>
+                                        <input asp-for="BarCode" class="form-control" value="@Model.BarCode" placeholder="Enter BarCode" />
+                                        <span asp-validation-for="BarCode" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="ProductImage" class="control-label">Product Image</label>
+                                        <input asp-for="ProductImage" type="file" class="form-control image-file" accept="image/*" required />
+                                        <span asp-validation-for="ProductImage" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label asp-for="Description" class="control-label">Description</label>
+                                        <input asp-for="Description" class="form-control" value="@Model.Description" placeholder="Enter Description" />
+                                        <span asp-validation-for="Description" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <button type="submit" class="btn btn-primary mr-2">Edit product</button>
+                                    <button type="reset" class="btn btn-danger">Reset</button>
+                                    <a class="btn btn-primary" asp-action="Index">Return to product List</a>
+                                </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

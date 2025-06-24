@@ -103,7 +103,23 @@ namespace AnurStore.WebUI.Controllers
             {
                 return NotFound();
             }
-            return View(response.Data);
+            var product = response.Data;
+            var model = new UpdateProductRequest
+            {
+                Name = product.Name,
+                Description = product.Description,
+                BarCode = product.BarCode,
+                BrandId = product.BrandId,
+                CategoryId = product.CategoryId,
+                UnitPrice = product.UnitPrice,
+                PricePerPack = product.PricePerPack,
+                PackPriceMarkup = product.PackPriceMarkup,
+                TotalItemInPack = product.TotalItemInPack,
+                ProductSize = product.Size,
+                UnitId = product.UnitId
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -116,6 +132,9 @@ namespace AnurStore.WebUI.Controllers
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
                 }
+                ViewBag.Categories = await _categoryService.GetCategorySelectList();
+                ViewBag.Brands = await _brandService.GetBrandSelectList();
+                ViewBag.ProductUnits = await _productUnitService.GetProductUnitSelectList();
                 return View(model);
             }
             var response = await _productService.UpdateProduct(id, model);

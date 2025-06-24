@@ -60,41 +60,43 @@ namespace AnurStore.WebUI.Controllers
             var response = await _productPurchaseService.GetAllPurchasesAsync();
             if (response.Status)
             {
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
                 return View(response.Data);
             }
             return View(Enumerable.Empty<ProductPurchaseDto>());
-        } 
-        
-        public async Task<IActionResult> ViewPurchasesBySupplier(string supplierId)  
+        }
+
+        public async Task<IActionResult> ViewPurchasesBySupplier(string supplierId)
         {
             var response = await _productPurchaseService.GetPurchasesBySupplierAsync(supplierId);
             if (response.Status)
             {
-                return View(response.Data);
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
+                return View("Index", response.Data);
             }
-            return View(Enumerable.Empty<ProductPurchaseDto>());
-        } 
+            return View("Index", Enumerable.Empty<ProductPurchaseDto>());
+        }
 
-        public async Task<IActionResult> ViewPurchasesByProductAsync(string productId)   
-        {
-            var response = await _productPurchaseService.GetPurchasesBySupplierAsync(productId); 
-            if (response.Status)
-            {
-                return View(response.Data);
-            }
-            return View(Enumerable.Empty<ProductPurchaseDto>());
-        } 
-
-        public async Task<IActionResult> GetPurchasesByDateRangeAsync(DateTime startDate, DateTime endDate)   
+        public async Task<IActionResult> GetPurchasesByDateRangeAsync(DateTime startDate, DateTime endDate)
         {
             var response = await _productPurchaseService.GetPurchasesByDateRangeAsync(startDate, endDate);
+            if (response.Status)
+            {
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
+                return View("Index", response.Data); 
+            }
+            return View("Index", Enumerable.Empty<ProductPurchaseDto>());
+        }
+
+        public async Task<IActionResult> ViewPurchasesByProductAsync(string productId)
+        {
+            var response = await _productPurchaseService.GetPurchasesBySupplierAsync(productId);
             if (response.Status)
             {
                 return View(response.Data);
             }
             return View(Enumerable.Empty<ProductPurchaseDto>());
         }
-
         public async Task<IActionResult> ViewProductPurchaseDetail([FromRoute]string id) 
         {
             var productPurchase = await _productPurchaseService.GetPurchaseDetailsAsync(id);

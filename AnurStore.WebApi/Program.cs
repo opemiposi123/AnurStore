@@ -40,8 +40,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Database
-var connectionString =
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AnurStore")));
+//var connectionString =
+//builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AnurStore")));
 
 //Repositories
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();

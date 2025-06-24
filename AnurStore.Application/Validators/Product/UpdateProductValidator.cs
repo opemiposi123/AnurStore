@@ -26,9 +26,6 @@ namespace AnurStore.Application.Validators.Product
             RuleFor(x => x.UnitPrice)
                 .GreaterThanOrEqualTo(0).WithMessage("Unit price cannot be negative.");
 
-            RuleFor(x => x.UnitPriceMarkup)
-                .GreaterThanOrEqualTo(0).WithMessage("Unit price markup cannot be negative.");
-
             RuleFor(x => x.TotalItemInPack)
                 .GreaterThanOrEqualTo(0).WithMessage("Total items in pack cannot be negative.");
 
