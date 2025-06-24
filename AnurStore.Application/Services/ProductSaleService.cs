@@ -270,6 +270,59 @@ namespace AnurStore.Application.Services
         }
 
 
+        public async Task<BaseResponse<List<ProductDto>>> GetTopFrequentlySoldProductsAsync(int days = 7)
+        {
+            try
+            {
+                var endDate = DateTime.Now.Date.AddDays(1).AddTicks(-1);
+                var startDate = DateTime.Now.Date.AddDays(-7);
+
+                var recentProductIds = await _productSaleRepository.GetTopSoldProductsRawAsync(startDate, endDate);
+
+                var products = new List<ProductDto>();
+
+                foreach (var productId in recentProductIds)
+                {
+                    var product = await _productRepository.GetProductById(productId);
+                    if (product != null)
+                    {
+                        products.Add(new ProductDto
+                        {
+                            Id = product.Id,
+                            Name = product.Name,
+                            Description = product.Description,
+                            UnitPrice = product.UnitPrice,
+                            PricePerPack = product.PricePerPack,
+                            PackPriceMarkup = product.PackPriceMarkup,
+                            TotalItemInPack = product.TotalItemInPack,
+                            ProductImageUrl = product.ProductImageUrl,
+                            CreatedBy = product.CreatedBy,
+                            CreatedOn = product.CreatedOn,
+                            CategoryName = product.Category?.Name ?? "N/A",
+                            BrandName = product.Brand?.Name ?? "N/A",
+                            Size = product.ProductSize?.Size ?? 0,
+                            UnitName = product.ProductSize?.ProductUnit?.Name ?? "N/A"
+                        });
+                    }
+                }
+                return new BaseResponse<List<ProductDto>>
+                {
+                    Data = products,
+                    Status = true
+                };
+            }
+            catch (Exception ex)
+            {
+                return new BaseResponse<List<ProductDto>>
+                {
+                    Message = $"Failed to retrieve products: {ex.Message}",
+                    Status = false
+                };
+            }
+        }
+
+
+
         public async Task<PagedResponse<List<ProductSaleDto>>> GetAllProductSalesPagedAsync(int pageNumber, int pageSize)
         {
             var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize);

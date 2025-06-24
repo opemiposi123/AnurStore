@@ -12,6 +12,7 @@ namespace AnurStore.Application.Abstractions.Services
         Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter);
         Task<BaseResponse<bool>> CancelProductSaleAsync(string saleId);
         Task<BaseResponse<bool>> UpdateProductSaleAsync(string productSaleId, UpdateProductSaleRequest request);
-       // Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel);
+        // Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel);
+        Task<BaseResponse<List<ProductDto>>> GetTopFrequentlySoldProductsAsync(int days = 7);
     }
 }

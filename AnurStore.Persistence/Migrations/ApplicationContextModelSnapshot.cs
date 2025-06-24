@@ -241,7 +241,7 @@ namespace AnurStore.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("QuantityAvailable")
                         .HasColumnType("int");
 
                     b.Property<string>("Remark")

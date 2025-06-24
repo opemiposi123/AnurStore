@@ -39,8 +39,7 @@ namespace AnurStore.WebUI.Controllers
         [HttpGet("create-product-sale")]
         public async Task<IActionResult> CreateProductSale()
         {
-            var products = await _productService.GetAllProduct();
-
+            var products = await _productSaleService.GetTopFrequentlySoldProductsAsync(7);
             var viewModel = new CreateProductSaleViewModel
             {
                 SaleRequest = new CreateProductSaleRequest(),
@@ -89,6 +88,7 @@ namespace AnurStore.WebUI.Controllers
 
             _notyf.Success("Product Sale Created Successfully");
             return File(response.Data, "application/pdf", "ProductSaleReceipt.pdf");
+
         }
 
 
