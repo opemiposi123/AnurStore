@@ -16,7 +16,8 @@ namespace AnurStore.Application.RequestModel
 
         public decimal PackPriceMarkup { get; set; }
 
-        public IFormFile? ProductImage { get; set; } 
+        public IFormFile? ProductImage { get; set; }  
+
         public string? ProductImageUrl { get; set; } 
 
         public int TotalItemInPack { get; set; }

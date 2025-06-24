@@ -8,6 +8,7 @@ using AnurStore.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
@@ -158,7 +159,7 @@ namespace AnurStore.Application.Services
                 var ProductDtos = report.Where(x => !x.IsDeleted).Select(r => new ProductDto
                 {
                     Id = r.Id,
-                    Name = $"{r.Name} - {r.ProductSize.Size} {r.ProductSize.ProductUnit.Name} ({r.Brand.Name})",
+                    Name = r.Name,
                     CategoryName = r.Category.Name,
                     BrandName = r.Brand.Name ?? "Unknown",
                     UnitPrice = r.UnitPrice,
@@ -313,17 +314,15 @@ namespace AnurStore.Application.Services
                 product.LastModifiedBy = userName;
                 product.LastModifiedOn = DateTime.Now;
 
-                // Update product image if a new one is provided
                 if (request.ProductImage != null && request.ProductImage.Length > 0)
                 {
                     var newImageUrl = await SaveFileAsync(request.ProductImage);
                     product.ProductImageUrl = newImageUrl;
                 }
 
-                // Update product size if provided
                 if (request.ProductSize != null)
                 {
-                    var existingSize = await _productRepository.GetProductSizeByProductIdAsync(productId);
+                    var existingSize = await _productRepository.GetProductSizeByProductIdAsync(productId, noTracking: true);
                     if (existingSize != null)
                     {
                         existingSize.Size = request.ProductSize;
