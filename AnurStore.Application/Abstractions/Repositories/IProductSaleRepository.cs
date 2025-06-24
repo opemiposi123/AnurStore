@@ -11,6 +11,7 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task RemoveProductSaleItemsAsync(IEnumerable<ProductSaleItem> items);
         Task<int> GetTotalProductSalesCountAsync();
         Task<List<ProductSale>> GetProductSalesPagedAsync(int pageNumber, int pageSize);
+        Task<List<string>> GetTopSoldProductsRawAsync(DateTime startDate, DateTime endDate, int limit = 9);
     }
 
 }
