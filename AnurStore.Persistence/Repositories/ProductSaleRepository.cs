@@ -40,6 +40,22 @@ namespace AnurStore.Persistence.Repositories
             return productSale;
         }
 
+        public async Task<List<string>> GetTopSoldProductsRawAsync(DateTime startDate, DateTime endDate, int limit = 9)
+        {
+            var result = await _context.ProductSaleItems
+                .Where(x => x.ProductSale.SaleDate >= startDate && x.ProductSale.SaleDate <= endDate)
+                .OrderByDescending(x => x.ProductSale.SaleDate) 
+                .Select(x => x.ProductId)
+                .Distinct()
+                .Take(limit)
+                .ToListAsync();
+
+            return result;
+        }
+
+
+
+
         public async Task RemoveProductSaleItemsAsync(IEnumerable<ProductSaleItem> items)
         {
             _context.ProductSaleItems.RemoveRange(items);

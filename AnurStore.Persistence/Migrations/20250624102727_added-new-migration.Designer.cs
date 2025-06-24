@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnurStore.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250619005730_MakeReceiptIdNullableInProductSales")]
-    partial class MakeReceiptIdNullableInProductSales
+    [Migration("20250624102727_added-new-migration")]
+    partial class addednewmigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -244,7 +244,7 @@ namespace AnurStore.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("Quantity")
+                    b.Property<int>("QuantityAvailable")
                         .HasColumnType("int");
 
                     b.Property<string>("Remark")

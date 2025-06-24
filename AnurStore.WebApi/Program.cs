@@ -22,6 +22,7 @@ using AspNetCoreHero.ToastNotification;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AnurStore.Application.Validators.ProductPurchase;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,10 +40,6 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-//Database
-var connectionString =
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("AnurStore")));
-
 //Repositories
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -51,9 +48,11 @@ builder.Services.AddScoped<IProductUnitRepository, ProductUnitRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IProductSizeRepository, ProductSizeRepository>();
+builder.Services.AddScoped<IProductPurchaseRepository, ProductPurchaseRepository>();
+builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
 builder.Services.AddScoped<IProductSaleRepository, ProductSaleRepository>();
-
 
 //Services
 builder.Services.AddScoped<IUserAuthService, UserAuthService>();
@@ -63,9 +62,10 @@ builder.Services.AddScoped<ISupplierService, SupplierService>();
 builder.Services.AddScoped<IProductUnitService, ProductUnitService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IProductPurchaseService, ProductPurchaseService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IProductSaleService, ProductSaleService>();
-
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();
@@ -74,6 +74,8 @@ builder.Services.AddScoped<IValidator<CreateSupplierRequest>, CreateSupplierVali
 builder.Services.AddScoped<IValidator<CreateProductUnitRequest>, CreateProductUnitValidator>();
 builder.Services.AddScoped<IValidator<CreateProductRequest>, CreateProductValidator>();
 builder.Services.AddScoped<IValidator<CreateUserRequest>, CreateUserValidator>();
+builder.Services.AddScoped<IValidator<CreateProductPurchaseRequest>, ProductPurchaseValidator>();
+builder.Services.AddScoped<IValidator<CreateProductPurchaseItemRequest>, ProductPurchaseItemValidator>();
 
 
 builder.Services.AddScoped<IValidator<UpdateCategoryRequest>, UpdateCategoryValidator>();
