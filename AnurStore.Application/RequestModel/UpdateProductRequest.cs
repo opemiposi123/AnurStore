@@ -10,13 +10,11 @@ namespace AnurStore.Application.RequestModel
 
         public string? BarCode { get; set; } // 5800 * 3.5/100
 
-        public decimal PricePerPack { get; set; }
+        public decimal? PricePerPack { get; set; }
 
         public decimal PackPriceMarkup { get; set; }
 
-        public decimal UnitPrice { get; set; }
-
-        public decimal UnitPriceMarkup { get; set; }
+        public decimal? UnitPrice { get; set; }
 
         public IFormFile? ProductImage { get; set; }
 

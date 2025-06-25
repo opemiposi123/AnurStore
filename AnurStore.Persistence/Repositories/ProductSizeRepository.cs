@@ -9,7 +9,7 @@ namespace AnurStore.Persistence.Repositories
     {
         private readonly ApplicationContext _context;
 
-        public ProductSizeRepository(ApplicationContext context) 
+        public ProductSizeRepository(ApplicationContext context)
         {
             _context = context;
         }
@@ -26,10 +26,19 @@ namespace AnurStore.Persistence.Repositories
                   .ToListAsync();
             return produtcs;
         }
-        public async Task<bool> UpdateProductSize(ProductSize ProductSize)
+        public async Task UpdateProductSize(ProductSize productSize)
         {
-            var result = _context.ProductSizes.Update(ProductSize);
-            return await _context.SaveChangesAsync() > 0;
+            var local = _context.ProductSizes.Local.FirstOrDefault(x => x.Id == productSize.Id);
+            if (local != null)
+            {
+                _context.Entry(local).State = EntityState.Detached; // Detach any tracked version
+            }
+
+            _context.ProductSizes.Attach(productSize); // Now attach the updated one
+            _context.Entry(productSize).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
         }
+
     }
 }

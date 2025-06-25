@@ -6,6 +6,6 @@ namespace AnurStore.Application.Abstractions.Repositories
     {
         Task<ProductSize> CreateProductSize(ProductSize ProductSize);
         Task<IList<ProductSize>> GetAllProductSize();
-        Task<bool> UpdateProductSize(ProductSize ProductSize);
+        Task UpdateProductSize(ProductSize productSize);
     }
 }

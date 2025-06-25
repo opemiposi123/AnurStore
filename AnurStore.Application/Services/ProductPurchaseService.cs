@@ -267,6 +267,7 @@ namespace AnurStore.Application.Services
                 PurchaseDate = purchase.PurchaseDate,
                 SupplierName = purchase.Supplier.Name,
                 IsAddedToInventory = purchase.IsAddedToInventory,
+                CreatedBy = purchase.CreatedBy,
                 PurchaseItems = purchase.PurchaseItems.Select(item => new ProductPurchaseItemDto
                 {
                     ProductName = item.Product.Name,
