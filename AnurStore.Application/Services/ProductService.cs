@@ -189,6 +189,46 @@ namespace AnurStore.Application.Services
         }
 
 
+        public async Task<BaseResponse<IEnumerable<ProductDto>>> GetAllDisplayProducts()
+        {
+            _logger.LogInformation("Starting GetAllProduct method.");
+            try
+            {
+                var report = await _productRepository.GetAllProduct();
+                var ProductDtos = report.Where(x => !x.IsDeleted).Select(r => new ProductDto
+                {
+                    Id = r.Id,
+                    Name = $"{r.Name} - {r.ProductSize.Size} {r.ProductSize.ProductUnit.Name} ({r.Brand.Name})",
+                    CategoryName = r.Category.Name,
+                    BrandName = r.Brand.Name ?? "Unknown",
+                    UnitPrice = r.UnitPrice,
+                    PricePerPack = r.PricePerPack,
+                    TotalItemInPack = r.TotalItemInPack,
+                    ProductImageUrl = r.ProductImageUrl,
+                    Description = r.Description,
+                    SizeWithUnit = $"{r.ProductSize.Size}{r.ProductSize.ProductUnit.Name}"
+                }).ToList().Take(9);
+
+                _logger.LogInformation("Successfully retrieved products.");
+                return new BaseResponse<IEnumerable<ProductDto>>
+                {
+                    Message = "Record Found Successfully",
+                    Status = true,
+                    Data = ProductDtos,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while retrieving products.");
+                return new BaseResponse<IEnumerable<ProductDto>>
+                {
+                    Status = false,
+                    Message = "Failed",
+                };
+            }
+        }
+
+
         public async Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm)
         {
             var products = await _productRepository.GetAllProduct();

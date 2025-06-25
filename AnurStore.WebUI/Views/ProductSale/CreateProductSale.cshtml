@@ -24,13 +24,17 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Payment Method</label>
-                                    <select name="PaymentMethod" class="form-select">
+                                    <select name="PaymentMethod" class="form-select" required>
                                         <option value="">-- Select Payment Method --</option>
                                         @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
                                         {
                                             <option value="@((int)method)">@method</option>
                                         }
                                     </select>
+                                    <div class="invalid-feedback">
+                                        Please select a payment method.
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -119,10 +123,10 @@
                 const qty = item.Quantity;
 
                 switch (item.ProductUnitType) {
-            case 1: subtotal = (item.PricePerPack || 0) * qty; break;               // Pack
-            case 2: subtotal = (item.UnitPrice || 0) * qty; break;                  // Single
-            case 3: subtotal = ((item.PricePerPack || 0) / 2) * qty; break;         // Half
-            case 4: subtotal = ((item.PricePerPack || 0) / 4) * qty; break;         // Quarter
+            case 1: subtotal = (item.PricePerPack || 0) * qty; break;              
+            case 2: subtotal = (item.UnitPrice || 0) * qty; break;                 
+            case 3: subtotal = ((item.PricePerPack || 0) / 2) * qty; break;         
+            case 4: subtotal = ((item.PricePerPack || 0) / 4) * qty; break;         
         }
 
                 item.SubTotal = subtotal;
