@@ -39,15 +39,31 @@ namespace AnurStore.WebUI.Controllers
         [HttpGet("create-product-sale")]
         public async Task<IActionResult> CreateProductSale()
         {
-            var products = await _productSaleService.GetTopFrequentlySoldProductsAsync(7);
+            var productsResponse = await _productSaleService.GetTopFrequentlySoldProductsAsync(7);
+
+            List<ProductDto> products;
+
+            if (productsResponse.Status && productsResponse.Data != null && productsResponse.Data.Any())
+            {
+                // If there are recent sales, use frequently sold products
+                products = productsResponse.Data.ToList();
+            }
+            else
+            {
+                // If no sales yet, fallback to all products
+                var allProducts = await _productService.GetAllDisplayProducts();
+                products = allProducts.Data?.ToList() ?? new List<ProductDto>();
+            }
+
             var viewModel = new CreateProductSaleViewModel
             {
                 SaleRequest = new CreateProductSaleRequest(),
-                AvailableProducts = products.Data.ToList() ?? new List<ProductDto>()
+                AvailableProducts = products
             };
 
             return View(viewModel);
         }
+
 
 
         [HttpGet("search-products")]

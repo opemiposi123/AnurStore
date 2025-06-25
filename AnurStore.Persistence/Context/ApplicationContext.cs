@@ -1,14 +1,19 @@
-﻿using AnurStore.Domain.Entities;
+﻿using AnurStore.Domain.Common.Contracts;
+using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace AnurStore.Persistence.Context;
 
-public class ApplicationContext(DbContextOptions<ApplicationContext> options) : IdentityDbContext<User>(options)
+public class ApplicationContext(DbContextOptions<ApplicationContext> options, IHttpContextAccessor httpContextAccessor) : IdentityDbContext<User>(options)
 {
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -32,5 +37,52 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options) : 
     public DbSet<ProductUnit> ProductUnits { get; set; } = default!;
     public DbSet<Report> Reports { get; set; } = default!;
     public DbSet<Supplier> Suppliers { get; set; } = default!;
-    public DbSet<Transaction> Transactions { get; set; } = default!;        
+    public DbSet<Transaction> Transactions { get; set; } = default!;
+
+
+
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        ApplyAuditInfo();
+        return base.SaveChangesAsync(cancellationToken);
+    }
+
+
+    private void ApplyAuditInfo()
+    {
+        string fullName = "System";
+
+        var httpContext = _httpContextAccessor?.HttpContext;
+        if (httpContext != null && httpContext.User?.Identity?.IsAuthenticated == true)
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var currentUser = Users.FirstOrDefault(u => u.FirstName == userId);
+                fullName = currentUser != null ? $"{currentUser.FirstName} {currentUser.LastName}" : "System";
+            }
+        }
+
+        foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Entity.CreatedOn = DateTime.UtcNow;
+                entry.Entity.CreatedBy = fullName;
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+                entry.Entity.LastModifiedOn = DateTime.UtcNow;
+                entry.Entity.LastModifiedBy = fullName;
+            }
+
+            if (entry.State == EntityState.Deleted && entry.Entity is ISoftDelete deletable)
+            {
+                entry.State = EntityState.Modified;
+                deletable.IsDeleted = true;
+            }
+        }
+    }
 }

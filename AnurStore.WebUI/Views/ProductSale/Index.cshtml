@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody class="ligth-body">
-                            @if (Model != null)
+                            @if (Model?.Items != null && Model.Items.Any())
                             {
                                 foreach (var sale in Model.Items)
                                 {
@@ -76,8 +76,8 @@
                                     <td colspan="7" class="text-center text-muted">No sales found.</td>
                                 </tr>
                             }
-
                         </tbody>
+
                     </table>
                 </div>
                 <nav aria-label="Page navigation" class="mt-4">

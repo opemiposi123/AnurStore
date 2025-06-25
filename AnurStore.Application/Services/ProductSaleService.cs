@@ -71,7 +71,7 @@ namespace AnurStore.Application.Services
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
-                            Message = $"Inventory not found for product: {product.Name}"
+                            Message = $"{product.Name} has not been stocked yet. Please check back later or contact inventory management."
                         };
                     }
 
