@@ -16,19 +16,26 @@ namespace AnurStore.Application.Services
         private readonly IProductRepository _productRepository;
         private readonly IReceiptService _receiptService;
         private readonly IProductService _productService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductSaleService(IProductSaleRepository productSaleRepository, IProductRepository productRepository, IReceiptService receiptService, IProductService productService)
+        public ProductSaleService(IProductSaleRepository productSaleRepository,
+            IProductRepository productRepository,
+            IReceiptService receiptService,
+            IProductService productService, IUnitOfWork unitOfWork)
         {
             _productSaleRepository = productSaleRepository;
             _productRepository = productRepository;
             _receiptService = receiptService;
             _productService = productService;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<BaseResponse<byte[]>> AddProductSale(CreateProductSaleRequest request)
         {
             try
             {
+                await _unitOfWork.BeginTransactionAsync();
+
                 decimal totalAmount = 0;
                 var saleItems = new List<ProductSaleItem>();
                 var productNames = new Dictionary<string, string>();
@@ -39,6 +46,7 @@ namespace AnurStore.Application.Services
 
                     if (product == null)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -48,6 +56,7 @@ namespace AnurStore.Application.Services
 
                     if (item.ProductUnitType == ProductUnitType.SingleUnit && product.UnitPrice == null)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -56,9 +65,10 @@ namespace AnurStore.Application.Services
                     }
 
                     if ((item.ProductUnitType == ProductUnitType.Pack ||
-                        item.ProductUnitType == ProductUnitType.HalfPack ||
-                        item.ProductUnitType == ProductUnitType.QuarterPack) && product.PricePerPack == null)
+                         item.ProductUnitType == ProductUnitType.HalfPack ||
+                         item.ProductUnitType == ProductUnitType.QuarterPack) && product.PricePerPack == null)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -68,6 +78,7 @@ namespace AnurStore.Application.Services
 
                     if (product.Inventory == null)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -77,6 +88,7 @@ namespace AnurStore.Application.Services
 
                     if (product.TotalItemInPack <= 0)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -111,6 +123,7 @@ namespace AnurStore.Application.Services
 
                     if (totalAvailableUnits < totalUnitsToDeduct)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -151,6 +164,7 @@ namespace AnurStore.Application.Services
                 };
 
                 await _productSaleRepository.AddProductSaleAsync(productSale);
+                await _unitOfWork.SaveChangesAsync();
 
                 var saleDto = new ProductSaleDto
                 {
@@ -170,6 +184,9 @@ namespace AnurStore.Application.Services
 
                 var (receiptDto, pdfBytes) = await _receiptService.GenerateFromProductSaleAsync(saleDto);
 
+                productSale.ReceiptId = receiptDto.Id;
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
 
                 return new BaseResponse<byte[]>
                 {
@@ -180,13 +197,16 @@ namespace AnurStore.Application.Services
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackAsync();
                 return new BaseResponse<byte[]>
                 {
                     Status = false,
-                    Message = $"Failed to record product sale: {ex.Message}"
+                    Message = $"Failed to record product sale. Please try again later."
                 };
             }
         }
+
+
 
 
 
