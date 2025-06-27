@@ -54,28 +54,6 @@ namespace AnurStore.Application.Services
                         };
                     }
 
-                    if (item.ProductUnitType == ProductUnitType.SingleUnit && product.UnitPrice == null)
-                    {
-                        await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Product {product.Name} does not support unit pricing"
-                        };
-                    }
-
-                    if ((item.ProductUnitType == ProductUnitType.Pack ||
-                         item.ProductUnitType == ProductUnitType.HalfPack ||
-                         item.ProductUnitType == ProductUnitType.QuarterPack) && product.PricePerPack == null)
-                    {
-                        await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Product {product.Name} does not support pack-based pricing"
-                        };
-                    }
-
                     if (product.Inventory == null)
                     {
                         await _unitOfWork.RollbackAsync();
@@ -205,45 +183,6 @@ namespace AnurStore.Application.Services
                 };
             }
         }
-
-
-
-
-
-
-        //public async Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel)
-        //{
-        //    if (string.IsNullOrWhiteSpace(viewModel.SaleRequest.ProductSaleItemsJson))
-        //    {
-        //        return new BaseResponse<CreateProductSaleRequest>
-        //        {
-        //            Status = false,
-        //            Message = "No product items found in request."
-        //        };
-        //    }
-
-        //    try
-        //    {
-        //        viewModel.SaleRequest.ProductSaleItems = JsonSerializer.Deserialize<List<CreateProductSaleItemRequest>>(viewModel.SaleRequest.ProductSaleItemsJson) ?? new();
-
-        //        return new BaseResponse<CreateProductSaleRequest>
-        //        {
-        //            Status = true,
-        //            Message = "Request prepared successfully.",
-        //            Data = viewModel.SaleRequest
-        //        };
-        //    }
-        //    catch
-        //    {
-        //        return new BaseResponse<CreateProductSaleRequest>
-        //        {
-        //            Status = false,
-        //            Message = "Invalid format for product sale items."
-        //        };
-        //    }
-        //}
-
-
 
         public async Task<BaseResponse<ProductSaleDto>> GetProductSaleById(string productSaleId)
         {
@@ -466,161 +405,11 @@ namespace AnurStore.Application.Services
 
             sale.IsDeleted = true;
             sale.DeletedOn = DateTime.Now;
+           await _unitOfWork.SaveChangesAsync();
 
             var result = _productSaleRepository.UpdateAsync(sale);
 
             return new BaseResponse<bool> { Status = true, Message = "Sale canceled successfully.", Data = true };
         }
-
-
-        public async Task<BaseResponse<bool>> UpdateProductSaleAsync(string productSaleId, UpdateProductSaleRequest request)
-        {
-            try
-            {
-                var sale = await _productSaleRepository.GetProductSaleByIdAsync(productSaleId);
-                if (sale == null)
-                    return new BaseResponse<bool> { Status = false, Message = "Sale not found." };
-
-                if (sale.IsDeleted)
-                    return new BaseResponse<bool> { Status = false, Message = "Cannot update a cancelled sale." };
-
-                // === Revert Old Inventory ===
-                foreach (var oldItem in sale.ProductSaleItems)
-                {
-                    var product = await _productRepository.GetProductById(oldItem.ProductId);
-                    if (product == null) continue;
-
-                    int unitsToAddBack = oldItem.ProductUnitType switch
-                    {
-                        ProductUnitType.Pack => oldItem.Quantity * product.TotalItemInPack,
-                        ProductUnitType.HalfPack => (int)(0.5 * product.TotalItemInPack * oldItem.Quantity),
-                        ProductUnitType.QuarterPack => (int)(0.25 * product.TotalItemInPack * oldItem.Quantity),
-                        ProductUnitType.SingleUnit => oldItem.Quantity,
-                        _ => 0
-                    };
-
-                    int currentUnits = product.Inventory.QuantityAvailable * product.TotalItemInPack;
-                    int updatedUnits = currentUnits + unitsToAddBack;
-                    product.Inventory.QuantityAvailable = updatedUnits / product.TotalItemInPack;
-
-                    await _productRepository.UpdateProduct(product);
-                }
-
-                // Clear old sale items
-                await _productSaleRepository.RemoveProductSaleItemsAsync(sale.ProductSaleItems);
-                sale.ProductSaleItems.Clear();
-
-                // === Recalculate New Items ===
-                decimal totalAmount = 0;
-                var newSaleItems = new List<ProductSaleItem>();
-
-                foreach (var item in request.ProductSaleItems)
-                {
-                    var product = await _productRepository.GetProductById(item.ProductId);
-                    if (product == null)
-                        return new BaseResponse<bool> { Status = false, Message = $"Product {item.ProductId} not found." };
-
-                    // Pricing Validation
-                    if (item.ProductUnitType == ProductUnitType.SingleUnit && product.UnitPrice == null)
-                        return new BaseResponse<bool> { Status = false, Message = $"Product {product.Name} does not support unit pricing" };
-
-                    if ((item.ProductUnitType == ProductUnitType.Pack ||
-                        item.ProductUnitType == ProductUnitType.HalfPack ||
-                        item.ProductUnitType == ProductUnitType.QuarterPack) && product.PricePerPack == null)
-                        return new BaseResponse<bool> { Status = false, Message = $"Product {product.Name} does not support pack pricing" };
-
-                    if (item.Quantity <= 0)
-                        return new BaseResponse<bool> { Status = false, Message = $"Invalid quantity for {product.Name}" };
-
-                    // Calculate unit price from pack
-                    decimal unitPriceFromPack = product.PricePerPack.HasValue && product.TotalItemInPack > 0
-                        ? product.PricePerPack.Value / product.TotalItemInPack
-                        : 0;
-
-                    decimal subTotal = item.ProductUnitType switch
-                    {
-                        ProductUnitType.SingleUnit => product.UnitPrice!.Value * item.Quantity,
-                        ProductUnitType.Pack => product.PricePerPack!.Value * item.Quantity,
-                        ProductUnitType.HalfPack => unitPriceFromPack * product.TotalItemInPack * 0.5m * item.Quantity,
-                        ProductUnitType.QuarterPack => unitPriceFromPack * product.TotalItemInPack * 0.25m * item.Quantity,
-                        _ => 0
-                    };
-
-                    int unitsToDeduct = item.ProductUnitType switch
-                    {
-                        ProductUnitType.Pack => item.Quantity * product.TotalItemInPack,
-                        ProductUnitType.HalfPack => (int)(0.5 * product.TotalItemInPack * item.Quantity),
-                        ProductUnitType.QuarterPack => (int)(0.25 * product.TotalItemInPack * item.Quantity),
-                        ProductUnitType.SingleUnit => item.Quantity,
-                        _ => 0
-                    };
-
-                    int availableUnits = product.Inventory.QuantityAvailable * product.TotalItemInPack;
-
-                    if (availableUnits < unitsToDeduct)
-                    {
-                        return new BaseResponse<bool>
-                        {
-                            Status = false,
-                            Message = $"Insufficient stock for {product.Name}. Only {availableUnits} units available."
-                        };
-                    }
-
-                    // Deduct from inventory
-                    availableUnits -= unitsToDeduct;
-                    product.Inventory.QuantityAvailable = availableUnits / product.TotalItemInPack;
-
-                    await _productRepository.UpdateProduct(product);
-
-                    newSaleItems.Add(new ProductSaleItem
-                    {
-                        ProductId = product.Id,
-                        Quantity = item.Quantity,
-                        ProductUnitType = item.ProductUnitType,
-                        SubTotal = subTotal,
-                        CreatedBy = sale.CreatedBy
-                    });
-
-                    totalAmount += subTotal;
-                }
-
-                // === Update Sale ===
-                decimal discount = request.Discount ?? 0;
-                sale.CustomerName = request.CustomerName;
-                sale.PaymentMethod = request.PaymentMethod;
-                sale.Discount = discount;
-                sale.TotalAmount = totalAmount - discount;
-                sale.ProductSaleItems = newSaleItems;
-                sale.LastModifiedOn = DateTime.Now;
-
-                var updated = await _productSaleRepository.UpdateAsync(sale);
-                if (!updated)
-                {
-                    return new BaseResponse<bool>
-                    {
-                        Status = false,
-                        Message = "Failed to update sale."
-                    };
-                }
-
-                return new BaseResponse<bool>
-                {
-                    Status = true,
-                    Message = "Sale updated successfully.",
-                    Data = true
-                };
-            }
-            catch (Exception ex)
-            {
-                return new BaseResponse<bool>
-                {
-                    Status = false,
-                    Message = $"Error occurred while updating sale: {ex.Message}"
-                };
-            }
-        }
-
-
-
     }
 }

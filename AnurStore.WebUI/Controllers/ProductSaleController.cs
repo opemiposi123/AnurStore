@@ -1,13 +1,9 @@
 ﻿using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
-using AnurStore.Application.Services;
-using AnurStore.Domain.Entities;
 using AspNetCoreHero.ToastNotification.Abstractions;
-using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Threading.Channels;
 
 namespace AnurStore.WebUI.Controllers
 {
@@ -45,12 +41,10 @@ namespace AnurStore.WebUI.Controllers
 
             if (productsResponse.Status && productsResponse.Data != null && productsResponse.Data.Any())
             {
-                // If there are recent sales, use frequently sold products
                 products = productsResponse.Data.ToList();
             }
             else
             {
-                // If no sales yet, fallback to all products
                 var allProducts = await _productService.GetAllDisplayProducts();
                 products = allProducts.Data?.ToList() ?? new List<ProductDto>();
             }
@@ -80,67 +74,197 @@ namespace AnurStore.WebUI.Controllers
             return Json(result);
         }
 
+        //[HttpPost("create-product-sale")]
+        //public async Task<IActionResult> CreateProductSale(string SaleRequestJson)
+        //{
+        //    var request = JsonConvert.DeserializeObject<CreateProductSaleRequest>(SaleRequestJson);
 
+        //    if (request == null)
+        //    {
+        //        _notyf.Error("Invalid request data.");
+        //        return RedirectToAction("CreateProductSale");
+        //    }
 
+        //    var response = await _productSaleService.AddProductSale(request);
+
+        //    if (!response.Status)
+        //    {
+        //        _notyf.Error(response.Message);
+        //        return RedirectToAction("CreateProductSale");
+        //    }
+
+        //    _notyf.Success("Product Sale Created Successfully");
+        //    return File(response.Data, "application/pdf", "ProductSaleReceipt.pdf");
+
+        //}
 
         [HttpPost("create-product-sale")]
         public async Task<IActionResult> CreateProductSale(string SaleRequestJson)
         {
-            var request = JsonConvert.DeserializeObject<CreateProductSaleRequest>(SaleRequestJson);
-
-            if (request == null)
+            try
             {
-                _notyf.Error("Invalid request data.");
+                if (string.IsNullOrWhiteSpace(SaleRequestJson))
+                {
+                    _notyf.Error("Invalid request data.");
+                    return RedirectToAction("CreateProductSale");
+                }
+
+                CreateProductSaleRequest request;
+                try
+                {
+                    request = JsonConvert.DeserializeObject<CreateProductSaleRequest>(SaleRequestJson);
+                }
+                catch (JsonException)
+                {
+                    _notyf.Error("Invalid JSON data format.");
+                    return RedirectToAction("CreateProductSale");
+                }
+
+                if (request == null)
+                {
+                    _notyf.Error("Invalid request data.");
+                    return RedirectToAction("CreateProductSale");
+                }
+
+                var response = await _productSaleService.AddProductSale(request);
+
+                if (!response.Status)
+                {
+                    _notyf.Error(response.Message);
+                    return RedirectToAction("CreateProductSale");
+                }
+                var receiptId = Guid.NewGuid().ToString();
+                var tempPath = Path.GetTempPath();
+                var filePath = Path.Combine(tempPath, $"receipt_{receiptId}.pdf");
+
+                try
+                {
+                    await System.IO.File.WriteAllBytesAsync(filePath, response.Data);
+
+                    TempData["ReceiptFilePath"] = filePath;
+                    TempData["ReceiptId"] = receiptId;
+                    TempData["ReceiptFileName"] = $"Receipt_{DateTime.Now:yyyyMMddHHmmss}.pdf";
+
+                    _notyf.Success("Product Sale Created Successfully");
+
+                    return RedirectToAction("DisplayReceipt");
+                }
+                catch (Exception ex)
+                {
+                    _notyf.Error("Failed to save receipt file.");
+                    return RedirectToAction("CreateProductSale");
+                }
+            }
+            catch (Exception ex)
+            {
+                _notyf.Error("An error occurred while processing the sale. Please try again.");
                 return RedirectToAction("CreateProductSale");
             }
+        }
 
-            var response = await _productSaleService.AddProductSale(request);
+        [HttpGet("display-receipt")]
+        public async Task<IActionResult> DisplayReceipt()
+        {
+            var filePath = TempData["ReceiptFilePath"]?.ToString();
+            var receiptId = TempData["ReceiptId"]?.ToString();
+            var fileName = TempData["ReceiptFileName"]?.ToString();
 
-            if (!response.Status)
+            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
             {
-                _notyf.Error(response.Message);
-                return RedirectToAction("CreateProductSale");
+                _notyf.Warning("No receipt to display or file has expired.");
+                return RedirectToAction("Index", "ProductSale");
             }
 
-            _notyf.Success("Product Sale Created Successfully");
-            return File(response.Data, "application/pdf", "ProductSaleReceipt.pdf");
+            try
+            {
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+                var base64String = Convert.ToBase64String(fileBytes);
 
+                TempData.Keep("ReceiptFilePath");
+                TempData.Keep("ReceiptId");
+                TempData.Keep("ReceiptFileName");
+
+                ViewBag.ReceiptData = base64String;
+                ViewBag.ReceiptFileName = fileName ?? "Receipt.pdf";
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _notyf.Error("Failed to load receipt.");
+                return RedirectToAction("Index", "ProductSale");
+            }
         }
 
 
+
+
+
+        [HttpGet("download-receipt")]
+        public async Task<IActionResult> DownloadReceipt()
+        {
+            var filePath = TempData["ReceiptFilePath"]?.ToString();
+            var fileName = TempData["ReceiptFileName"]?.ToString() ?? "Receipt.pdf";
+
+            if (string.IsNullOrEmpty(filePath) || !System.IO.File.Exists(filePath))
+            {
+                _notyf.Warning("No receipt available for download or file has expired.");
+                return RedirectToAction("Index", "ProductSale");
+            }
+
+            try
+            {
+                var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+
+                try
+                {
+                    System.IO.File.Delete(filePath);
+                }
+                catch (Exception ex )
+                {
+                    _notyf.Error("Failed to download receipt.");
+                    return RedirectToAction("Index");
+                }
+
+                return File(fileBytes, "application/pdf", fileName);
+            }
+            catch (Exception ex)
+            {
+                _notyf.Error("Failed to download receipt.");
+                return RedirectToAction("Index", "ProductSale");
+            }
+        }
+
+
+
+
+        [HttpPost("continue-to-sales")]
+        public IActionResult ContinueToSales()
+        {
+            var filePath = TempData["ReceiptFilePath"]?.ToString();
+            if (!string.IsNullOrEmpty(filePath) && System.IO.File.Exists(filePath))
+            {
+                try
+                {
+                    System.IO.File.Delete(filePath);
+                }
+                catch
+                {
+                    _notyf.Error("Failed to download receipt.");
+                    return RedirectToAction("Index");
+                }
+            }
+            TempData.Clear();
+            return RedirectToAction("Index", "ProductSale");
+        }
 
 
         [HttpGet("product-sale-cancel/{id}")]
-        public async Task<IActionResult> CancelProductSaleAsync([FromRoute] string id)
+        public async Task<IActionResult> CancelProductSale([FromRoute] string id)
         {
             var response = await _productSaleService.CancelProductSaleAsync(id);
             _notyf.Success("Product sale canceled successfully.");
-            return RedirectToAction("Index", "Product Sale");
-        }
-
-        [HttpGet("product-sale/edit/{id}")]
-        public async Task<IActionResult> EditProductSale(string id)
-        {
-            var response = await _productSaleService.GetProductSaleById(id);
-            if (!response.Status)
-            {
-                _notyf.Error(response.Message);
-                return NotFound();
-            }
-            _notyf.Error(response.Message);
-            return View(response.Data);
-        }
-
-        [HttpPost("update-product-sale")]
-        public async Task<IActionResult> EditProductSale([FromRoute] string id, [FromForm] UpdateProductSaleRequest request)
-        {var response = await _productSaleService.UpdateProductSaleAsync(request.Id, request);
-            if (response.Status)
-            {
-                _notyf.Success("Product Updated Succesfully");
-                return RedirectToAction("Index", "Product");
-            }
-            _notyf.Error(response.Message, 3);
-            return View(request);
+            return RedirectToAction("Index", "ProductSale");
         }
 
 
@@ -168,7 +292,7 @@ namespace AnurStore.WebUI.Controllers
             if (response != null && response.Status)
             {
                 _notyf.Success(response.Message);
-                return Json(response.Data); 
+                return Json(response.Data);
             }
 
             _notyf.Error(response?.Message ?? "Failed to load sale details");

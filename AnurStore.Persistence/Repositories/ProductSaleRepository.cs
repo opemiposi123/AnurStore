@@ -17,7 +17,6 @@ namespace AnurStore.Persistence.Repositories
         public async Task<ProductSale> AddProductSaleAsync(ProductSale productSale)
         {
             var result = await _context.ProductSales.AddAsync(productSale);
-            await _context.SaveChangesAsync();
             return productSale;
         }
 
@@ -36,9 +35,11 @@ namespace AnurStore.Persistence.Repositories
             var productSale = await _context.ProductSales
                  .Include(p => p.ProductSaleItems)
                  .ThenInclude(i => i.Product)
+                   .ThenInclude(p => p.Inventory)
                  .FirstOrDefaultAsync(p => p.Id == id);
             return productSale;
         }
+
 
         public async Task<List<string>> GetTopSoldProductsRawAsync(DateTime startDate, DateTime endDate, int limit = 9)
         {
@@ -82,11 +83,11 @@ namespace AnurStore.Persistence.Repositories
 
 
 
-        public async Task<bool> UpdateAsync(ProductSale productSale)
+        public Task<bool> UpdateAsync(ProductSale productSale)
         {
             _context.ProductSales.Update(productSale);
-            var result = await _context.SaveChangesAsync();
-            return result > 0;
+            return Task.FromResult(true);
         }
+
     }
 }
