@@ -16,6 +16,7 @@ namespace AnurStore.Domain.Entities
 
         public decimal? UnitPrice { get; set; } 
 
+
         public string? ProductImageUrl { get; set; } 
 
         public int TotalItemInPack { get; set; }

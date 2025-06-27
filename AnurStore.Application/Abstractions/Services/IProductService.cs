@@ -22,5 +22,6 @@ namespace AnurStore.Application.Abstractions.Services
 
         Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm);
         Task<BaseResponse<IEnumerable<ProductDto>>> GetAllDisplayProducts();
+
     }
 }

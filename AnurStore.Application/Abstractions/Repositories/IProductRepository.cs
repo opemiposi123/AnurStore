@@ -10,10 +10,12 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<Product> GetProductById(string id);
         Task<bool> UpdateProduct(Product product);
         Task<bool> Exist(string productName);
-        List<Product> SelectProduct();
+        List<Product> SelectProduct(); 
         Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize);
         Task<ProductSize?> GetProductSizeByProductIdAsync(string productId, bool noTracking = false);
         Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query);
+        Task<List<Product>> GetProductsByIdsAsync(List<string> productIds);
+        Task UpdateRangeAsync(List<Product> products);
 
     }
 }

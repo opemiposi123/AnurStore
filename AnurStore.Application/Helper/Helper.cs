@@ -46,5 +46,13 @@
         {
             return Math.Round(number / 100, MidpointRounding.AwayFromZero) * 100;
         }
+
+        public static string GetFormattedQuantity(int totalPieces, int itemsPerPack)
+        {
+            int packs = totalPieces / itemsPerPack;
+            int pieces = totalPieces % itemsPerPack;
+            return $"{packs} pack(s), {pieces} piece(s)";
+        }
+
     }
 }

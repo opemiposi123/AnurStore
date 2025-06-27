@@ -126,14 +126,11 @@ namespace AnurStore.Application.Services
             }
         }
 
-
-
         public async Task<IEnumerable<ProductDto>> SearchProductsByNameAsync(string query)
         {
             var products = await _productRepository.SearchProductsByNameAsync(query);
             return products;
         }
-
 
         public async Task<string> SaveFileAsync(IFormFile file)
         {
@@ -189,7 +186,6 @@ namespace AnurStore.Application.Services
             }
         }
 
-
         public async Task<BaseResponse<IEnumerable<ProductDto>>> GetAllDisplayProducts()
         {
             _logger.LogInformation("Starting GetAllProduct method.");
@@ -229,7 +225,6 @@ namespace AnurStore.Application.Services
             }
         }
 
-
         public async Task<List<ProductSearchResultDto>> SearchProductsAsync(string searchTerm)
         {
             var products = await _productRepository.GetAllProduct();
@@ -251,14 +246,12 @@ namespace AnurStore.Application.Services
 
         }
 
-
-
         public async Task<BaseResponse<bool>> DeleteProduct(string productId)
         {
             try
             {
-                var Product = await _productRepository.GetProductById(productId);
-                if (Product == null)
+                var product = await _productRepository.GetProductById(productId);
+                if (product == null)
                 {
                     _logger.LogWarning($"Product with Id {productId} not found.");
                     return new BaseResponse<bool>
@@ -268,28 +261,34 @@ namespace AnurStore.Application.Services
                     };
                 }
 
-                Product.IsDeleted = true;
+                product.IsDeleted = true;
 
-                var result = await _productRepository.UpdateProduct(Product);
+                 await _productRepository.UpdateProduct(product);
+                _logger.LogInformation($"Product with Id {productId} deleted successfully.");
+                return new BaseResponse<bool>
+                {
+                    Message = $"Product deleted successfuly",
+                    Status = false,
+                };
 
-                if (result)
-                {
-                    _logger.LogInformation($"Product with Id {productId} deleted successfully.");
-                    return new BaseResponse<bool>
-                    {
-                        Message = $"Product deleted successfuly",
-                        Status = false,
-                    };
-                }
-                else
-                {
-                    _logger.LogError($"Failed to delete Product with Id {productId}.");
-                    return new BaseResponse<bool>
-                    {
-                        Message = $"Fail to delete Product",
-                        Status = false,
-                    };
-                }
+                //if (result)
+                //{
+                //    _logger.LogInformation($"Product with Id {productId} deleted successfully.");
+                //    return new BaseResponse<bool>
+                //    {
+                //        Message = $"Product deleted successfuly",
+                //        Status = false,
+                //    };
+                //}
+                //else
+                //{
+                //    _logger.LogError($"Failed to delete Product with Id {productId}.");
+                //    return new BaseResponse<bool>
+                //    {
+                //        Message = $"Fail to delete Product",
+                //        Status = false,
+                //    };
+                //}
             }
             catch (Exception ex)
             {
