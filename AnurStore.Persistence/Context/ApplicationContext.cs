@@ -38,6 +38,7 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options, IH
     public DbSet<Report> Reports { get; set; } = default!;
     public DbSet<Supplier> Suppliers { get; set; } = default!;
     public DbSet<Transaction> Transactions { get; set; } = default!;
+    public DbSet<PasswordReset> PasswordResets { get; set; } = default!;
 
 
 
@@ -59,7 +60,8 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options, IH
 
             if (!string.IsNullOrEmpty(userId))
             {
-                var currentUser = Users.FirstOrDefault(u => u.FirstName == userId);
+                var currentUser = Users.FirstOrDefault(u => u.Id == userId);
+
                 fullName = currentUser != null ? $"{currentUser.FirstName} {currentUser.LastName}" : "System";
             }
         }

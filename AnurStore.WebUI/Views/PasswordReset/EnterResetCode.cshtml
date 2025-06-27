@@ -1,0 +1,87 @@
+﻿@model AnurStore.Application.DTOs.ValidateResetCode
+@{
+    ViewData["Title"] = "Enter Reset Code";
+    Layout = "_LoginLayout";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header text-center">
+                    <h4>Enter Reset Code</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="EnterResetCode" asp-controller="PasswordReset">
+                        <!-- OTP Style Reset Code Input -->
+                        <div class="form-group text-center mb-4">
+                            <label class="form-label mb-2">Reset Code</label>
+                            <div class="d-flex justify-content-center gap-2">
+                                @for (int i = 0; i < 6; i++)
+                                {
+                                    <input type="text" maxlength="1" class="form-control text-center otp-input" name="CodeDigits" required />
+                                }
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="NewPassword">New Password</label>
+                            <input type="password" class="form-control" id="NewPassword" name="NewPassword" placeholder="Enter new password" required />
+                        </div>
+
+                        <input type="hidden" id="ResetCode" name="ResetCode" />
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary w-100">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        const otpInputs = document.querySelectorAll('.otp-input');
+
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', function () {
+                if (this.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+                updateResetCode();
+            });
+
+            input.addEventListener('keydown', function (e) {
+                if (e.key === "Backspace" && this.value === "" && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+
+            // ✅ Handle paste event
+            input.addEventListener('paste', function (e) {
+                e.preventDefault();
+                const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+                const digits = pastedData.replace(/\D/g, '').slice(0, otpInputs.length);
+
+                digits.split('').forEach((digit, i) => {
+                    if (otpInputs[i]) {
+                        otpInputs[i].value = digit;
+                    }
+                });
+
+                otpInputs[digits.length - 1]?.focus();
+                updateResetCode();
+            });
+        });
+
+        function updateResetCode() {
+            let code = '';
+            otpInputs.forEach(input => {
+                code += input.value;
+            });
+            document.getElementById("ResetCode").value = code;
+        }
+    </script>
+}
+

@@ -40,6 +40,7 @@
 
     <!-- app JavaScript -->
     <script src="~/assets/js/app.js"></script>
+    @await Component.InvokeAsync("Notyf")
     @RenderSection("Scripts", required: false)
     <ejs-scripts></ejs-scripts>
 </body>

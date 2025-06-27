@@ -56,28 +56,6 @@ namespace AnurStore.Application.Services
                         };
                     }
 
-                    if (item.ProductUnitType == ProductUnitType.SingleUnit && product.UnitPrice == null)
-                    {
-                        await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Product {product.Name} does not support unit pricing"
-                        };
-                    }
-
-                    if ((item.ProductUnitType == ProductUnitType.Pack ||
-                         item.ProductUnitType == ProductUnitType.HalfPack ||
-                         item.ProductUnitType == ProductUnitType.QuarterPack) && product.PricePerPack == null)
-                    {
-                        await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Product {product.Name} does not support pack-based pricing"
-                        };
-                    }
-
                     if (product.Inventory == null)
                     {
                         await _unitOfWork.RollbackAsync();
@@ -431,6 +409,7 @@ namespace AnurStore.Application.Services
 
             sale.IsDeleted = true;
             sale.DeletedOn = DateTime.Now;
+           await _unitOfWork.SaveChangesAsync();
 
             var result = _productSaleRepository.UpdateAsync(sale);
 
