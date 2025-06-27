@@ -14,7 +14,7 @@ namespace AnurStore.Persistence.Context.EntityTypeConfigurations
 
             builder.Property(pp => pp.Total)
                 .IsRequired()
-                .HasColumnType("money");
+                .HasPrecision(16,2);
 
             builder.Property(pp => pp.Discount)
                 .HasColumnType("money");

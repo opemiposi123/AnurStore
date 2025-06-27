@@ -16,8 +16,7 @@ namespace AnurStore.Application.RequestModel
 
         public DateTime PurchaseDate { get; set; } = DateTime.Now;
 
-        public bool IsAddedToInventory { get; set; } = true;
-
+        public bool IsAddedToInventory { get; set; }
         public List<CreateProductPurchaseItemRequest> PurchaseItems { get; set; } = new();
     }
 

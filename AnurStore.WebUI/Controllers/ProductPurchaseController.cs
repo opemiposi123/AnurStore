@@ -4,6 +4,7 @@ using AnurStore.Application.Pagination;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using Azure;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,7 +51,13 @@ namespace AnurStore.WebUI.Controllers
             }
             var userName = User?.Identity?.Name ?? "System";
 
-            await _productPurchaseService.PurchaseProductsAsync(model,userName);
+            var request = await _productPurchaseService.PurchaseProductsAsync(model,userName);
+            if (!request.Status)
+            {
+                _notyf.Error(request.Message);
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
+                return View(model);
+            }
             _notyf.Success("Product purchased successfully");
             return RedirectToAction("Index", "ProductPurchase");
         }

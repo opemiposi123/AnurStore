@@ -78,10 +78,6 @@ namespace AnurStore.Persistence.Repositories
                 .Take(pageSize)
                 .ToListAsync();
         }
-
-
-
-
         public async Task<bool> UpdateAsync(ProductSale productSale)
         {
             _context.ProductSales.Update(productSale);

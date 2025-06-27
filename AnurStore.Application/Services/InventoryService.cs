@@ -22,20 +22,29 @@ namespace AnurStore.Application.Services
             _logger.LogInformation("Starting GetAllInventory method."); 
             try
             {
-                var result = await _inventoryRepository.GetAllInventories(); 
-                var inventoryDtos = result.Select(r => new InventoryDto
-                {
-                    Id = r.Id,
-                    ProductName = r.Product.Name,
-                    ProductBrand = r.Product.Brand.Name,
-                    ProductCategory = r.Product.Category.Name,
-                    PackPrice = r.Product?.PricePerPack,
-                    UnitPrice = r.Product?.UnitPrice,
-                    QuantityAvailable = r.QuantityAvailable,
-                    StockStatus = r.StockStatus,
-                    ProductSize = $"{r.Product.ProductSize.Size}{r.Product.ProductSize.ProductUnit.Name}"
+                var result = await _inventoryRepository.GetAllInventories();
+                var inventoryDtos = result.Select(r => {
+                    var totalPieces = r.TotalPiecesAvailable;
+                    var itemsPerPack = r.Product.TotalItemInPack;
 
+                    int packs = totalPieces / itemsPerPack;
+                    int pieces = totalPieces % itemsPerPack;
+
+                    return new InventoryDto
+                    {
+                        Id = r.Id,
+                        ProductName = r.Product.Name,
+                        ProductBrand = r.Product.Brand.Name,
+                        ProductCategory = r.Product.Category.Name,
+                        PackPrice = r.Product?.PricePerPack,
+                        UnitPrice = r.Product?.UnitPrice,
+                        TotalPiecesAvailable = r.TotalPiecesAvailable,
+                        StockStatus = r.StockStatus,
+                        ProductSize = $"{r.Product.ProductSize.Size}{r.Product.ProductSize.ProductUnit.Name}",
+                        FormattedQuantity = $"{packs} pack(s), {pieces} piece(s)"
+                    };
                 }).ToList();
+
 
                 _logger.LogInformation("Successfully retrieved inventories."); 
                 return new BaseResponse<IEnumerable<InventoryDto>> 
@@ -78,7 +87,7 @@ namespace AnurStore.Application.Services
                 PackPrice = i.Product?.PricePerPack,
                 UnitPrice = i.Product?.UnitPrice,
                 ProductCategory = i.Product.Category.Name,
-                QuantityAvailable = i.QuantityAvailable,
+                TotalPiecesAvailable = i.TotalPiecesAvailable,
                 StockStatus = i.StockStatus,
                 ProductSize = $"{i.Product.ProductSize.Size}{i.Product.ProductSize.ProductUnit.Name}"
             });

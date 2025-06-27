@@ -24,8 +24,15 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllersWithViews();
 
 //Database
-var connectionString = 
-builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer       (builder.Configuration.GetConnectionString("AnurStore")));
+builder.Services.AddDbContext<ApplicationContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AnurStore")));
+
+builder.Services.AddDbContextFactory<ApplicationContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AnurStore")),
+    lifetime: ServiceLifetime.Scoped);
+
+
+
 
 //Repositories
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();

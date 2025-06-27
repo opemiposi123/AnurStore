@@ -19,7 +19,6 @@ namespace AnurStore.Persistence.Repositories
         public async Task<ProductPurchase> PurchaseProductAsync(ProductPurchase productPurchase)
         {
             await _context.ProductPurchases.AddAsync(productPurchase);
-            await _context.SaveChangesAsync();
             return productPurchase;
         }
 
@@ -33,7 +32,7 @@ namespace AnurStore.Persistence.Repositories
                 .ToListAsync();
         }
 
-        public async Task<ProductPurchase> GetByIdAsync(string id)
+        public async Task<ProductPurchase?> GetByIdAsync(string id)
         {
             return await _context.ProductPurchases
                 .Include(p => p.Supplier)
@@ -115,7 +114,6 @@ namespace AnurStore.Persistence.Repositories
                 return false;
 
             _context.Entry(existing).CurrentValues.SetValues(productPurchase);
-            await _context.SaveChangesAsync();
             return true;
         }
     }
