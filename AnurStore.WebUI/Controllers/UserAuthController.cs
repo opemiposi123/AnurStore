@@ -32,11 +32,12 @@ namespace AnurStore.WebUI.Controllers
             var result = await _userAuthService.LoginAsync(model);
             if (result.StatusCode == 1)
             {
+               // _notyf.Success(result.Message);
                 return RedirectToAction("Index", "Home");
             }
             else
             {
-                TempData["msg"] = result.Message;
+              //  _notyf.Error(result.Message);
                 return RedirectToAction(nameof(Login));
             }
         }

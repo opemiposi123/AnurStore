@@ -3,6 +3,7 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.Pagination;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
+using AnurStore.Persistence;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Azure;
 using FluentValidation;
@@ -15,20 +16,26 @@ namespace AnurStore.WebUI.Controllers
         private readonly INotyfService _notyf;
         private readonly IProductPurchaseService _productPurchaseService;
         private readonly ISupplierService _supplierService;
-        public ProductPurchaseController(INotyfService notyf, IProductPurchaseService productPurchaseService, ISupplierService supplierService)
+        private readonly BatchHelper _batchHelper;
+        public ProductPurchaseController(INotyfService notyf, 
+            IProductPurchaseService productPurchaseService,
+            ISupplierService supplierService,
+            BatchHelper batchHelper)
         {
             _notyf = notyf;
             _productPurchaseService = productPurchaseService;
             _supplierService = supplierService;
+            _batchHelper = batchHelper;
         }
 
         public async Task<IActionResult> CreateProductPurchase()
         {
+            var batchNumber = await _batchHelper.GenerateBatchNumberAsync();
             var model = new CreateProductPurchaseRequest
             {
-                PurchaseDate = DateTime.Now
+                PurchaseDate = DateTime.Now,
+                Batch = batchNumber
             };
-
             ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
 
             return View(model);

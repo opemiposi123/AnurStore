@@ -26,17 +26,17 @@
                                 </div>
 
                                 <div class="col-md-4">
+                                    <label asp-for="Batch">Batch</label>
+                                    <input asp-for="Batch" class="form-control" placeholder="Enter Batch" readonly />
+                                    <span asp-validation-for="Batch" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
                                     <label asp-for="SupplierId">Supplier</label>
                                     <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.Suppliers">
                                         <option value="">Select Supplier</option> 
                                     </select> 
                                     <span asp-validation-for="SupplierId" class="text-danger"></span>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <label asp-for="Batch">Batch</label>
-                                    <input asp-for="Batch" class="form-control" placeholder="Enter Batch" required />
-                                    <span asp-validation-for="Batch" class="text-danger"></span>
                                 </div>
                             </div>
 

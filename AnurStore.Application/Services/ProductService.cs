@@ -4,11 +4,9 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
-using AnurStore.Domain.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
@@ -434,6 +432,7 @@ namespace AnurStore.Application.Services
                     PackPriceMarkup = product.PackPriceMarkup,
                     TotalItemInPack = product.TotalItemInPack,
                     ProductImageUrl = product.ProductImageUrl,
+                    BarCode = product.BarCode,
                     CreatedBy = product.CreatedBy,
                     CreatedOn = product.CreatedOn,
                     CategoryName = product.Category?.Name ?? "N/A",
@@ -483,6 +482,7 @@ namespace AnurStore.Application.Services
         {
 
             ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
             var productUnits = await _productUnitService.GetProductUnitSelectList();
             var categories = await _categoryService.GetCategorySelectList();
             var brands = await _brandService.GetBrandSelectList();
@@ -528,6 +528,7 @@ namespace AnurStore.Application.Services
                 FileDownloadName = "ProductTemplate.xlsx"
             };
         }
+
 
         private void PopulateDropdownList(ExcelWorksheet worksheet, IEnumerable<string> items, string rangeName, int columnIndex)
         {

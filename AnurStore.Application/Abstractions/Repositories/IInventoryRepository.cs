@@ -12,5 +12,6 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<List<Inventory>> GetByProductsAndBatchAsync(List<string> productIds, string batch);
         Task AddRangeAsync(List<Inventory> inventories);
         Task UpdateRangeAsync(List<Inventory> inventories);
+        Task<Inventory?> GetByProductAndBatchAsync(string productId, string batchNumber);
     }
 }

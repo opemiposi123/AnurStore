@@ -24,4 +24,3 @@ public class ProductPurchase : BaseEntity
 
     public bool IsAddedToInventory { get; set; }    
 }
-

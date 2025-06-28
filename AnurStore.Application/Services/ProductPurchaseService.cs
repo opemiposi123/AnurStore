@@ -48,15 +48,120 @@ namespace AnurStore.Application.Services
 
             try
             {
-                var productPurchase = CreateProductPurchase(request, userName);
+                var productPurchase = new ProductPurchase
+                {
+                    Batch = request.Batch,
+                    SupplierId = request.SupplierId,
+                    Discount = request.Discount,
+                    Total = request.Total,
+                    PurchaseDate = request.PurchaseDate,
+                    IsAddedToInventory = request.IsAddedToInventory,
+                    CreatedBy = userName,
+                    CreatedOn = DateTime.Now,
+                    PurchaseItems = []
+                };
 
-                var productIds = request.PurchaseItems.Select(x => x.ProductId).Distinct().ToList();
+                var inventoryToAdd = new List<Inventory>();
+                var productToUpdate = new List<Product>();
+                var items = request.PurchaseItems.ToList();
 
-                var (products, inventories) = await FetchRequiredDataAsync(productIds, request.Batch);
+                // Fetch all inventories and products sequentially to avoid concurrency issues
+                var inventories = new List<Inventory?>();
+                var products = new List<Product?>();
 
-                var changes = await ProcessPurchaseItemsAsync(request, userName, productPurchase, products, inventories);
+                foreach (var i in items)
+                {
+                    // Await each call before starting the next
+                    var inventory = await _inventoryRepo.GetByProductAndBatchAsync(i.ProductId, request.Batch);
+                    inventories.Add(inventory);
+                    var product = await _productRepo.GetProductById(i.ProductId);
+                    products.Add(product);
+                }
 
-                await ApplyChangesAsync(productPurchase, changes);
+                for (int i = 0; i < items.Count; i++)
+                {
+                    var item = items[i];
+                    _logger.LogInformation("Processing item for ProductId: {ProductId}, Qty: {Quantity}, Rate: {Rate}",
+                        item.ProductId, item.Quantity, item.Rate);
+
+                    var purchaseItem = new ProductPurchaseItem
+                    {
+                        ProductId = item.ProductId,
+                        Quantity = item.Quantity,
+                        Rate = item.Rate,
+                        TotalCost = item.TotalCost,
+                        CreatedBy = userName,
+                        CreatedOn = DateTime.Now
+                    };
+
+                    productPurchase.PurchaseItems.Add(purchaseItem);
+
+                    if (request.IsAddedToInventory)
+                    {
+                        var product = await _productRepo.GetProductById(item.ProductId);
+
+                        if (product == null)
+                            throw new Exception($"Product with ID {item.ProductId} not found.");
+
+                        int totalPieces = item.Quantity * product.TotalItemInPack;
+
+                        var existingInventory = inventories[i];
+                        if (existingInventory != null)
+                        {
+                            existingInventory.TotalPiecesAvailable += totalPieces;
+                            existingInventory.StockDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            inventoryToAdd.Add(new Inventory
+                            {
+                                ProductId = item.ProductId,
+                                TotalPiecesAvailable = totalPieces,
+                                StockDate = DateTime.Now,
+                                BatchNumber = request.Batch,
+                                ExpirationDate = item.ExpirationDate,
+                                StockStatus = StockStatus.InStock,
+                                Remark = "Restocked",
+                                CreatedBy = userName,
+                                CreatedOn = DateTime.Now
+                            });
+                        }
+                    }
+
+
+                    var productEntity = products[i];
+                    if (productEntity != null)
+                    {
+                        var newPackPrice = PricingCalculator.CalculatePackSellingPrice(item.Rate, productEntity.PackPriceMarkup);
+                        var unitsPerPack = productEntity.TotalItemInPack;
+
+                        var newUnitPrice = unitsPerPack > 0
+                            ? PricingCalculator.CalculateUnitSellingPrice(newPackPrice, unitsPerPack)
+                            : 0;
+
+                        productEntity.PricePerPack = newPackPrice;
+                        productEntity.UnitPrice = newUnitPrice;
+
+                        productToUpdate.Add(productEntity);
+                    }
+                }
+
+                await _productpurchaseRepo.PurchaseProductAsync(productPurchase);
+
+                foreach (var inventory in inventoryToAdd)
+                {
+                    await _inventoryRepo.AddAsync(inventory);
+                }
+
+                foreach (var inventory in inventories.Where(x => x != null))
+                {
+                    await _inventoryRepo.UpdateAsync(inventory!);
+                }
+
+                foreach (var product in productToUpdate)
+                {
+                    await _productRepo.UpdateProduct(product);
+                }
 
                 await _unitOfWork.SaveChangesAsync();
                 await _unitOfWork.CommitAsync();
@@ -412,6 +517,50 @@ namespace AnurStore.Application.Services
             public List<Inventory> InventoriesToAdd { get; } = new();
             public List<Inventory> InventoriesToUpdate { get; } = new();
             public List<Product> ProductsToUpdate { get; } = new();
+        }
+
+        public async Task<BaseResponse<string>> UpdatePurchaseProductsAsync(CreateProductPurchaseRequest request, string userName)
+        {
+            _logger.LogInformation("Starting product purchase transaction. SupplierId: {SupplierId}, Batch: {Batch}",
+                request.SupplierId, request.Batch);
+
+            await _unitOfWork.BeginTransactionAsync();
+
+            try
+            {
+                var productPurchase = CreateProductPurchase(request, userName);
+
+                var productIds = request.PurchaseItems.Select(x => x.ProductId).Distinct().ToList();
+
+                var (products, inventories) = await FetchRequiredDataAsync(productIds, request.Batch);
+
+                var changes = await ProcessPurchaseItemsAsync(request, userName, productPurchase, products, inventories);
+
+                await ApplyChangesAsync(productPurchase, changes);
+
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
+
+                _logger.LogInformation("Product purchase completed. PurchaseId: {PurchaseId}", productPurchase.Id);
+
+                return new BaseResponse<string>
+                {
+                    Status = true,
+                    Message = "Product purchase completed successfully",
+                    Data = productPurchase.Id
+                };
+            }
+            catch (Exception ex)
+            {
+                await _unitOfWork.RollbackAsync();
+                _logger.LogError(ex, "Purchase failed. SupplierId: {SupplierId}, Batch: {Batch}", request.SupplierId, request.Batch);
+
+                return new BaseResponse<string>
+                {
+                    Status = false,
+                    Message = $"Purchase failed: {ex.Message}"
+                };
+            }
         }
 
         private ProductPurchase CreateProductPurchase(CreateProductPurchaseRequest request, string userName)
