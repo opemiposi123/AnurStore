@@ -180,7 +180,7 @@ namespace AnurStore.Application.Services
                 return new BaseResponse<byte[]>
                 {
                     Status = false,
-                    Message = $"Failed to record product sale. Please try again later."
+                    Message = $"Failed to record product sale. Please try again later.{ex.Message}"
                 };
             }
         }
