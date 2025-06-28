@@ -72,7 +72,7 @@ namespace AnurStore.Application.Services
                 foreach (var i in items)
                 {
                     // Await each call before starting the next
-                    var inventory = await _inventoryRepo.GetByProductAndBatchAsync(i.ProductId, request.Batch);
+                    var inventory = await _inventoryRepo.GetByProductAndBatchAsync(i.ProductId);
                     inventories.Add(inventory);
                     var product = await _productRepo.GetProductById(i.ProductId);
                     products.Add(product);
