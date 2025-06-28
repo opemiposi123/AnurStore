@@ -56,10 +56,10 @@ namespace AnurStore.Persistence.Repositories
             return inventory;
         }
 
-        public async Task<Inventory?> GetByProductAndBatchAsync(string productId, string batchNumber)
+        public async Task<Inventory?> GetByProductAndBatchAsync(string productId)
         {
             return await _context.Inventories
-                .FirstOrDefaultAsync(i => i.ProductId == productId && i.BatchNumber == batchNumber);
+                .FirstOrDefaultAsync(i => i.ProductId == productId);
         }
 
         public async Task<List<Inventory>> GetByProductsAndBatchAsync(List<string> productIds, string batch)
