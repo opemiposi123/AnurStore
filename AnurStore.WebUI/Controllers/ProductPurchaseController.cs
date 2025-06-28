@@ -61,7 +61,7 @@ namespace AnurStore.WebUI.Controllers
             var request = await _productPurchaseService.PurchaseProductsAsync(model,userName);
             if (!request.Status)
             {
-                _notyf.Error("An error occured.Contact the Suport team");
+                _notyf.Error(request.Message);
                 ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
                 return View(model);
             }
