@@ -11,6 +11,7 @@ using AnurStore.Application.Validators.ProductUnit;
 using AnurStore.Application.Validators.Supplier;
 using AnurStore.Application.Validators.User;
 using AnurStore.Domain.Entities;
+using AnurStore.Persistence;
 using AnurStore.Persistence.Context;
 using AnurStore.Persistence.Context.Seeder;
 using AnurStore.Persistence.Repositories;
@@ -58,6 +59,8 @@ builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IProductSaleService, ProductSaleService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<BatchHelper>();
+
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();

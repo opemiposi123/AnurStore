@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Receipt\**" />
+    <Content Remove="Views\Receipt\**" />
+    <EmbeddedResource Remove="Views\Receipt\**" />
+    <None Remove="Views\Receipt\**" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
@@ -23,10 +30,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AnurStore.Persistence\AnurStore.Persistence.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Views\Receipt\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties wwwroot_4lib_4bootstrap_4dist_4css_4bootstrap-grid_1css_1map__JsonSchema="" /></VisualStudio></ProjectExtensions>
