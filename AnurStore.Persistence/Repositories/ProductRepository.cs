@@ -124,13 +124,13 @@ namespace AnurStore.Persistence.Repositories
         {
             return await _context.Products
                 .Where(p => productIds.Contains(p.Id))
-                .ToListAsync();
+                .ToListAsync(); 
         }
 
         public async Task UpdateRangeAsync(List<Product> products)
         {
             _context.Products.UpdateRange(products);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(); 
         }
 
     }
