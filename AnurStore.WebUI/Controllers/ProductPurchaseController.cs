@@ -28,6 +28,18 @@ namespace AnurStore.WebUI.Controllers
             _batchHelper = batchHelper;
         }
 
+        public async Task<IActionResult> Index()
+        {
+            var response = await _productPurchaseService.GetAllPurchasesAsync();
+            if (response.Status)
+            {
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
+                return View(response.Data);
+            }
+            return View(Enumerable.Empty<ProductPurchaseDto>());
+        }
+
+
         public async Task<IActionResult> CreateProductPurchase()
         {
             var batchNumber = await _batchHelper.GenerateBatchNumberAsync();
@@ -69,17 +81,7 @@ namespace AnurStore.WebUI.Controllers
             return RedirectToAction("Index", "ProductPurchase");
         }
 
-        public async Task<IActionResult> Index()
-        {
-            var response = await _productPurchaseService.GetAllPurchasesAsync();
-            if (response.Status)
-            {
-                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
-                return View(response.Data);
-            }
-            return View(Enumerable.Empty<ProductPurchaseDto>());
-        }
-
+      
         public async Task<IActionResult> ViewPurchasesBySupplier(string supplierId)
         {
             var response = await _productPurchaseService.GetPurchasesBySupplierAsync(supplierId);

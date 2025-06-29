@@ -11,7 +11,7 @@ namespace AnurStore.Application.Abstractions.Services
         Task<BaseResponse<bool>> UpdateCategory(string CategoryId, UpdateCategoryRequest request);
         Task<BaseResponse<CategoryDto>> GetCategory(string CategoryId);
         Task<BaseResponse<IEnumerable<CategoryDto>>> GetAllCategory();
-        Task<BaseResponse<bool>> DeleteCategory(string categoryId);
+        Task<BaseResponse<bool>> DeleteCategory(string categoryId); 
         Task<IEnumerable<SelectListItem>> GetCategorySelectList();
     }
 }
