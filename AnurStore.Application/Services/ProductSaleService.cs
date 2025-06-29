@@ -133,7 +133,7 @@ namespace AnurStore.Application.Services
 
                 var productSale = new ProductSale
                 {
-                    CustomerName = request.CustomerName,
+                    CustomerName = string.IsNullOrWhiteSpace(request.CustomerName) ? "Guest Customer" : request.CustomerName,
                     PaymentMethod = request.PaymentMethod,
                     Discount = discount,
                     TotalAmount = totalAmount,
@@ -180,7 +180,7 @@ namespace AnurStore.Application.Services
                 return new BaseResponse<byte[]>
                 {
                     Status = false,
-                    Message = $"Failed to record product sale. Please try again later."
+                    Message = $"Failed to record product sale. Please try again later.{ex.Message}"
                 };
             }
         }

@@ -149,13 +149,13 @@ namespace AnurStore.WebUI.Controllers
 
                     return RedirectToAction("DisplayReceipt");
                 }
-                catch (Exception ex)
+                catch 
                 {
                     _notyf.Error("Failed to save receipt file.");
                     return RedirectToAction("CreateProductSale");
                 }
             }
-            catch (Exception ex)
+            catch 
             {
                 _notyf.Error("An error occurred while processing the sale. Please try again.");
                 return RedirectToAction("CreateProductSale");
@@ -189,7 +189,7 @@ namespace AnurStore.WebUI.Controllers
 
                 return View();
             }
-            catch (Exception ex)
+            catch
             {
                 _notyf.Error("Failed to load receipt.");
                 return RedirectToAction("Index", "ProductSale");
@@ -220,7 +220,7 @@ namespace AnurStore.WebUI.Controllers
                 {
                     System.IO.File.Delete(filePath);
                 }
-                catch (Exception ex )
+                catch 
                 {
                     _notyf.Error("Failed to download receipt.");
                     return RedirectToAction("Index");
@@ -228,7 +228,7 @@ namespace AnurStore.WebUI.Controllers
 
                 return File(fileBytes, "application/pdf", fileName);
             }
-            catch (Exception ex)
+            catch 
             {
                 _notyf.Error("Failed to download receipt.");
                 return RedirectToAction("Index", "ProductSale");
