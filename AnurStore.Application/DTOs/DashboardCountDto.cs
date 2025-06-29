@@ -32,7 +32,7 @@
 
     public class MonthlyRevenueCostDto
     {
-        public string Month { get; set; } // e.g. "Jan", "Feb"
+        public string Month { get; set; } 
         public decimal Revenue { get; set; }
         public decimal Cost { get; set; }
     }

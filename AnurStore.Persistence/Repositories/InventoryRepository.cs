@@ -54,9 +54,9 @@ namespace AnurStore.Persistence.Repositories
                      .ThenInclude(r => r.Brand)
                   .ToListAsync();
             return inventory;
-        }
+        } 
 
-        public async Task<Inventory?> GetByProductAndBatchAsync(string productId)
+        public async Task<Inventory?> GetByProductAsync(string productId)
         {
             return await _context.Inventories
                 .FirstOrDefaultAsync(i => i.ProductId == productId);

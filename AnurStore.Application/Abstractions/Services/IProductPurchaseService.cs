@@ -8,6 +8,7 @@ namespace AnurStore.Application.Abstractions.Services
     public interface IProductPurchaseService
     {
         Task<BaseResponse<string>> PurchaseProductsAsync(CreateProductPurchaseRequest request, string userName);
+        Task<BaseResponse<string>> ProcessInventoryAndProductUpdateAsync(string purchaseId, string userName);
         Task<BaseResponse<ProductPurchaseDto>> GetPurchaseDetailsAsync(string purchaseId); 
         Task<BaseResponse<IEnumerable<ProductPurchaseDto>>> GetAllPurchasesAsync();
         Task<BaseResponse<IEnumerable<ProductPurchaseDto>>> GetPurchasesBySupplierAsync(string supplierId);

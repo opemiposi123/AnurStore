@@ -5,6 +5,7 @@ namespace AnurStore.Application.Abstractions.Repositories;
 
 public interface IProductPurchaseRepository
 {
+    Task<ProductPurchase?> GetByIdWithItemsAsync(string purchaseId);
     Task<ProductPurchase> PurchaseProductAsync(ProductPurchase productPurchase); 
     Task<IList<ProductPurchase>> GetAllAsync();
     Task<ProductPurchase?> GetByIdAsync(string id);
