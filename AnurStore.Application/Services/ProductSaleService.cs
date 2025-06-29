@@ -133,7 +133,7 @@ namespace AnurStore.Application.Services
 
                 var productSale = new ProductSale
                 {
-                    CustomerName = request.CustomerName,
+                    CustomerName = string.IsNullOrWhiteSpace(request.CustomerName) ? "Guest Customer" : request.CustomerName,
                     PaymentMethod = request.PaymentMethod,
                     Discount = discount,
                     TotalAmount = totalAmount,
