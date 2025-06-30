@@ -1,0 +1,124 @@
+﻿@model AnurStore.Application.DTOs.SalesReportDto
+
+@{
+    ViewData["Title"] = "Report";
+    Layout = "_DashboardLayout";
+
+    var fromDate = Context.Request.Query["fromDate"];
+    var toDate = Context.Request.Query["toDate"];
+    var paymentType = Context.Request.Query["paymentType"];
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <h4 class="mb-4">
+            <i class="fas fa-chart-bar me-2"></i> Sales Report for the Month of
+            <span class="text-info fw-bold">@DateTime.Now.ToString("MMMM, yyyy")</span>
+        </h4>
+
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <h6 class="card-title">Cash Payment</h6>
+                        <p class="card-text fw-bold">₦@Model.TotalCash.ToString("N2")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <h6 class="card-title">Transfer Payment</h6>
+                        <p class="card-text fw-bold">₦@Model.TotalTransfer.ToString("N2")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <h6 class="card-title">POS Payment</h6>
+                        <p class="card-text fw-bold">₦@Model.TotalPOS.ToString("N2")</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body">
+                        <h6 class="card-title">Cheque Payment</h6>
+                        <p class="card-text fw-bold">₦@Model.TotalCheque.ToString("N2")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="fromDate" class="form-label">From</label>
+                        <input type="date" id="fromDate" name="fromDate" class="form-control" value="@fromDate" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="toDate" class="form-label">To</label>
+                        <input type="date" id="toDate" name="toDate" class="form-control" value="@toDate" />
+                    </div>
+                    <div class="col-md-3">
+                        <label for="paymentType" class="form-label">Payment Type</label>
+                        <select class="form-select form-control" id="paymentType" name="paymentType">
+                            <option value="" selected="@(string.IsNullOrEmpty(paymentType))">All Payments</option>
+                            <option value="Cash" selected="@(paymentType == "Cash")">Cash</option>
+                            <option value="POS" selected="@(paymentType == "POS")">POS</option>
+                            <option value="Transfer" selected="@(paymentType == "Transfer")">Transfer</option>
+                            <option value="Cheque" selected="@(paymentType == "Cheque")">Cheque</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-grid">
+                        <button type="submit" class="btn btn-dark">
+                            <i class="fas fa-search me-1"></i> Search Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ORDER ID</th>
+                            <th>CUSTOMER</th>
+                            <th>SOLD BY</th>
+                            <th>AMOUNT</th>
+                            <th>TYPE</th>
+                            <th>STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Sales != null && Model.Sales.Any())
+                        {
+                            foreach (var sale in Model.Sales)
+                            {
+                                <tr>
+                                    <td>@sale.OrderId</td>
+                                    <td>@sale.CustomerName</td>
+                                    <td>@sale.SoldBy</td>
+                                    <td>@sale.Amount.ToString("C")</td>
+                                    <td><span class="badge bg-info text-white">@sale.PaymentType</span></td>
+                                    <td><span class="badge bg-success">@sale.Status</span></td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center">No sales records found for the selected criteria.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>

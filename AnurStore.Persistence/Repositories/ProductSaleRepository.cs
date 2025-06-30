@@ -14,6 +14,7 @@ namespace AnurStore.Persistence.Repositories
             _context = context;
         }
 
+
         public async Task<ProductSale> AddProductSaleAsync(ProductSale productSale)
         {
             var result = await _context.ProductSales.AddAsync(productSale);
@@ -81,13 +82,28 @@ namespace AnurStore.Persistence.Repositories
         }
 
 
-
-
         public Task<bool> UpdateAsync(ProductSale productSale)
         {
             _context.ProductSales.Update(productSale);
             return Task.FromResult(true);
         }
 
+        public async Task<List<ProductSale>> GetSalesWithFiltersAsync(DateTime? fromDate, DateTime? toDate, string? paymentType)
+        {
+            var query = _context.ProductSales
+                .Include(s => s.ProductSaleItems)
+                .AsQueryable();
+
+            if (fromDate.HasValue)
+                query = query.Where(s => s.SaleDate >= fromDate.Value);
+
+            if (toDate.HasValue)
+                query = query.Where(s => s.SaleDate <= toDate.Value);
+
+            if (!string.IsNullOrWhiteSpace(paymentType) && paymentType != "All Payments")
+                query = query.Where(s => s.PaymentMethod.ToString() == paymentType);
+
+            return await query.ToListAsync();
+        }
     }
 }

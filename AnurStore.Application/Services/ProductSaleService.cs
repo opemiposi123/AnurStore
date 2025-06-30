@@ -42,14 +42,14 @@ namespace AnurStore.Application.Services
                 var saleItems = new List<ProductSaleItem>();
                 var productNames = new Dictionary<string, string>();
 
-                foreach (var item in request.ProductSaleItems)
+                foreach (var item in request.ProductSaleItems) 
                 {
                     var product = await _productRepository.GetProductById(item.ProductId);
 
                     if (product == null)
                     {
                         await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]>
+                        return new BaseResponse<byte[]> 
                         {
                             Status = false,
                             Message = $"Product with ID {item.ProductId} not found"

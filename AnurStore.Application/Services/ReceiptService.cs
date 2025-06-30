@@ -1,4 +1,5 @@
 ﻿using AnurStore.Application.Abstractions.Repositories;
+using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.DTOs;
 using AnurStore.Domain.Entities;
 using QuestPDF.Fluent;
@@ -120,6 +121,7 @@ public class ReceiptService : IReceiptService
                             detailsColumn.Item().PaddingTop(2).Row(row =>
                             {
                                 row.RelativeItem().Text($"Date: {DateTime.Now:MMM dd, yyyy HH:mm}").FontSize(9);
+                                row.RelativeItem().AlignRight().Text($"Receipt #: {receipt.RecieptNumber}").FontSize(9).Bold();
                             });
                         });
 

@@ -61,6 +61,7 @@ builder.Services.AddScoped<IProductSaleService, ProductSaleService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<BatchHelper>();
 
 
