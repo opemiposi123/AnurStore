@@ -4,6 +4,7 @@ using AnurStore.Application.RequestModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using QuestPDF.Helpers;
 
 namespace AnurStore.WebUI.Controllers
 {
@@ -149,13 +150,13 @@ namespace AnurStore.WebUI.Controllers
 
                     return RedirectToAction("DisplayReceipt");
                 }
-                catch (Exception ex)
+                catch 
                 {
                     _notyf.Error("Failed to save receipt file.");
                     return RedirectToAction("CreateProductSale");
                 }
             }
-            catch (Exception ex)
+            catch 
             {
                 _notyf.Error("An error occurred while processing the sale. Please try again.");
                 return RedirectToAction("CreateProductSale");
@@ -189,7 +190,7 @@ namespace AnurStore.WebUI.Controllers
 
                 return View();
             }
-            catch (Exception ex)
+            catch
             {
                 _notyf.Error("Failed to load receipt.");
                 return RedirectToAction("Index", "ProductSale");
@@ -220,7 +221,7 @@ namespace AnurStore.WebUI.Controllers
                 {
                     System.IO.File.Delete(filePath);
                 }
-                catch (Exception ex )
+                catch 
                 {
                     _notyf.Error("Failed to download receipt.");
                     return RedirectToAction("Index");
@@ -228,7 +229,7 @@ namespace AnurStore.WebUI.Controllers
 
                 return File(fileBytes, "application/pdf", fileName);
             }
-            catch (Exception ex)
+            catch 
             {
                 _notyf.Error("Failed to download receipt.");
                 return RedirectToAction("Index", "ProductSale");
@@ -300,20 +301,35 @@ namespace AnurStore.WebUI.Controllers
         }
 
 
+       
         [HttpGet("product-sale/filter")]
         public async Task<IActionResult> FilterSales([FromQuery] ProductSaleFilterRequest filter)
         {
             if (filter.PageNumber <= 0) filter.PageNumber = 1;
             if (filter.PageSize <= 0) filter.PageSize = 10;
+
             var response = await _productSaleService.GetFilteredProductSalesPagedAsync(filter);
-            if (response != null)
+
+            if (response.Status && response.Data != null)
             {
                 _notyf.Success(response.Message);
-                return RedirectToAction("Index");
+
+                var paginatedList = new PaginatedList<ProductSaleDto>(
+                    response.Data,
+                    response.TotalRecords,
+                    response.PageNumber,
+                    response.PageSize
+                );
+
+                ViewBag.Filter = filter;
+                return View("Index", paginatedList);
             }
+
+            _notyf.Error("Failed to retrieve sales.");
             ViewBag.Filter = filter;
-            return View("Index", response);
+            return View("Index", new PaginatedList<ProductSaleDto>(new List<ProductSaleDto>(), 0, filter.PageNumber, filter.PageSize));
         }
+
 
     }
 }

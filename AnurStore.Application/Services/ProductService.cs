@@ -4,12 +4,13 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
-
+using ClosedXML.Excel;
 namespace AnurStore.Application.Services
 {
     public class ProductService : IProductService
@@ -261,7 +262,7 @@ namespace AnurStore.Application.Services
 
                 product.IsDeleted = true;
 
-                 await _productRepository.UpdateProduct(product);
+                await _productRepository.UpdateProduct(product);
                 _logger.LogInformation($"Product with Id {productId} deleted successfully.");
                 return new BaseResponse<bool>
                 {
@@ -478,107 +479,306 @@ namespace AnurStore.Application.Services
             return Enumerable.Empty<SelectListItem>();
         }
 
+        //public async Task<FileResult> DownloadProductTemplateAsync()
+        //{
+
+        //    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+        //    var productUnits = await _productUnitService.GetProductUnitSelectList();
+        //    var categories = await _categoryService.GetCategorySelectList();
+        //    var brands = await _brandService.GetBrandSelectList();
+
+        //    using var package = new ExcelPackage();
+        //    var worksheet = package.Workbook.Worksheets.Add("Product Template");
+
+        //    worksheet.Cells[1, 1].Value = "Name";
+        //    worksheet.Cells[1, 2].Value = "Description";
+        //    worksheet.Cells[1, 3].Value = "BarCode";
+        //    worksheet.Cells[1, 4].Value = "Unit Price";
+        //    worksheet.Cells[1, 5].Value = "Price Per Pack";
+        //    worksheet.Cells[1, 6].Value = "Pack Price Markup";
+        //    worksheet.Cells[1, 7].Value = "Total Item in Pack";
+        //    worksheet.Cells[1, 8].Value = "Product Size";
+        //    worksheet.Cells[1, 9].Value = "Category Name";
+        //    worksheet.Cells[1, 10].Value = "Brand Name";
+        //    worksheet.Cells[1, 11].Value = "Product Unit";
+        //    worksheet.Cells[1, 12].Value = "Product Image URL";
+
+        //    var categoryRangeName = "CategoryList";
+        //    var brandRangeName = "BrandList";
+        //    var productUnitRangeName = "ProductUnitList";
+
+        //    PopulateDropdownList(worksheet, categories.Select(c => c.Text), categoryRangeName, 16);
+        //    PopulateDropdownList(worksheet, brands.Select(b => b.Text), brandRangeName, 17);
+        //    PopulateDropdownList(worksheet, productUnits.Select(u => u.Text), productUnitRangeName, 18);
+
+        //    AddDropdownValidation(worksheet, categoryRangeName, 9);
+        //    AddDropdownValidation(worksheet, brandRangeName, 10);
+        //    AddDropdownValidation(worksheet, productUnitRangeName, 11);
+
+        //    worksheet.Column(16).Hidden = true;
+        //    worksheet.Column(17).Hidden = true;
+        //    worksheet.Column(18).Hidden = true;
+
+        //    var stream = new MemoryStream();
+        //    package.SaveAs(stream);
+        //    stream.Position = 0;
+
+        //    return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        //    {
+        //        FileDownloadName = "ProductTemplate.xlsx"
+        //    };
+        //}
+
         public async Task<FileResult> DownloadProductTemplateAsync()
         {
-
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
             var productUnits = await _productUnitService.GetProductUnitSelectList();
             var categories = await _categoryService.GetCategorySelectList();
             var brands = await _brandService.GetBrandSelectList();
 
-            using var package = new ExcelPackage();
-            var worksheet = package.Workbook.Worksheets.Add("Product Template");
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Product Template");
 
-            worksheet.Cells[1, 1].Value = "Name";
-            worksheet.Cells[1, 2].Value = "Description";
-            worksheet.Cells[1, 3].Value = "BarCode";
-            worksheet.Cells[1, 4].Value = "Unit Price";
-            worksheet.Cells[1, 5].Value = "Price Per Pack";
-            worksheet.Cells[1, 6].Value = "Pack Price Markup";
-            worksheet.Cells[1, 7].Value = "Total Item in Pack";
-            worksheet.Cells[1, 8].Value = "Product Size";
-            worksheet.Cells[1, 9].Value = "Category Name";
-            worksheet.Cells[1, 10].Value = "Brand Name";
-            worksheet.Cells[1, 11].Value = "Product Unit";
-            worksheet.Cells[1, 12].Value = "Product Image URL";
+            // Create headers
+            CreateHeaders(worksheet);
 
-            var categoryRangeName = "CategoryList";
-            var brandRangeName = "BrandList";
-            var productUnitRangeName = "ProductUnitList";
+            // Hidden dropdown columns
+            const int categoryCol = 16;
+            const int brandCol = 17;
+            const int productUnitCol = 18;
 
-            PopulateDropdownList(worksheet, categories.Select(c => c.Text), categoryRangeName, 16);
-            PopulateDropdownList(worksheet, brands.Select(b => b.Text), brandRangeName, 17);
-            PopulateDropdownList(worksheet, productUnits.Select(u => u.Text), productUnitRangeName, 18);
+            // Populate dropdown lists into hidden columns
+            PopulateDropdownList(worksheet, categories.Select(c => c.Text), "CategoryList", categoryCol);
+            PopulateDropdownList(worksheet, brands.Select(b => b.Text), "BrandList", brandCol);
+            PopulateDropdownList(worksheet, productUnits.Select(u => u.Text), "ProductUnitList", productUnitCol);
 
-            AddDropdownValidation(worksheet, categoryRangeName, 9);
-            AddDropdownValidation(worksheet, brandRangeName, 10);
-            AddDropdownValidation(worksheet, productUnitRangeName, 11);
+            // Apply dropdowns to user-facing columns
+            AddDropdownValidation(worksheet, "CategoryList", 9);
+            AddDropdownValidation(worksheet, "BrandList", 10);
+            AddDropdownValidation(worksheet, "ProductUnitList", 11);
 
-            worksheet.Column(16).Hidden = true;
-            worksheet.Column(17).Hidden = true;
-            worksheet.Column(18).Hidden = true;
+            // Hide dropdown source columns
+            worksheet.Column(categoryCol).Hide();
+            worksheet.Column(brandCol).Hide();
+            worksheet.Column(productUnitCol).Hide();
 
+            // Format the worksheet
+            FormatWorksheet(worksheet);
+
+            // Create and return file result with proper disposal
+            return CreateFileResult(workbook);
+        }
+
+        private void CreateHeaders(IXLWorksheet worksheet)
+        {
+            var headers = new[]
+            {
+        "Name", "Description", "BarCode", "Unit Price", "Price Per Pack",
+        "Pack Price Markup", "Total Item in Pack", "Product Size",
+        "Category Name", "Brand Name", "Product Unit", "Product Image URL"
+    };
+
+            for (int i = 0; i < headers.Length; i++)
+            {
+                var cell = worksheet.Cell(1, i + 1);
+                cell.Value = headers[i];
+                cell.Style.Font.Bold = true;
+                cell.Style.Fill.BackgroundColor = XLColor.LightGray;
+            }
+        }
+
+        private void FormatWorksheet(IXLWorksheet worksheet)
+        {
+            // Auto-fit columns
+            worksheet.Columns().AdjustToContents();
+
+            // Freeze header row
+            worksheet.SheetView.FreezeRows(1);
+
+            // Add borders to header row
+            var headerRange = worksheet.Range(1, 1, 1, 12);
+            headerRange.Style.Border.OutsideBorder = XLBorderStyleValues.Thin;
+            headerRange.Style.Border.InsideBorder = XLBorderStyleValues.Thin;
+        }
+
+        private FileResult CreateFileResult(XLWorkbook workbook)
+        {
             var stream = new MemoryStream();
-            package.SaveAs(stream);
+            workbook.SaveAs(stream);
             stream.Position = 0;
 
             return new FileStreamResult(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
             {
-                FileDownloadName = "ProductTemplate.xlsx"
+                FileDownloadName = $"ProductTemplate_{DateTime.Now:yyyy-MM-dd}.xlsx"
             };
         }
 
-
-        private void PopulateDropdownList(ExcelWorksheet worksheet, IEnumerable<string> items, string rangeName, int columnIndex)
+        private void AddDropdownValidation(IXLWorksheet worksheet, string rangeName, int columnIndex)
         {
-            var rowIndex = 2;
-            foreach (var item in items)
-            {
-                worksheet.Cells[rowIndex++, columnIndex].Value = item;
-            }
-            worksheet.Names.Add(rangeName, worksheet.Cells[2, columnIndex, items.Count() + 1, columnIndex]);
-        }
-
-        private void AddDropdownValidation(ExcelWorksheet worksheet, string rangeName, int columnIndex)
-        {
-            var validation = worksheet.DataValidations.AddListValidation(worksheet.Cells[2, columnIndex, 100, columnIndex].Address);
+            // Use a larger range to accommodate more rows (1000 instead of 100)
+            var range = worksheet.Range(2, columnIndex, 1000, columnIndex);
+            var validation = range.CreateDataValidation();
+            validation.IgnoreBlanks = true;
+            validation.InCellDropdown = true;
+            validation.AllowedValues = XLAllowedValues.List;
+            validation.List($"={rangeName}");  // Use List method
             validation.ShowErrorMessage = true;
-            validation.ErrorTitle = "Invalid selection";
-            validation.Error = "Please select a valid value from the list.";
-            validation.Formula.ExcelFormula = $"={rangeName}";
+            validation.ErrorTitle = "Invalid Selection";
+            validation.ErrorMessage = "Please select a valid value from the dropdown list.";
+            validation.ShowInputMessage = true;
+            validation.InputTitle = "Selection Required";
+            validation.InputMessage = "Please select from the available options.";
         }
 
+        private void PopulateDropdownList(IXLWorksheet worksheet, IEnumerable<string> items, string rangeName, int columnIndex)
+        {
+            var itemList = items.ToList();
+
+            // Guard against empty lists
+            if (!itemList.Any())
+            {
+                worksheet.Cell(1, columnIndex).Value = "No options available";
+                var singleRange = worksheet.Range(1, columnIndex, 1, columnIndex);
+                singleRange.AddToNamed(rangeName);
+                return;
+            }
+
+            int rowIndex = 1;
+            foreach (var item in itemList)
+            {
+                worksheet.Cell(rowIndex++, columnIndex).Value = item ?? string.Empty;
+            }
+
+            var range = worksheet.Range(1, columnIndex, itemList.Count, columnIndex);
+            range.AddToNamed(rangeName);
+        }
+
+
+        //private void PopulateDropdownList(ExcelWorksheet worksheet, IEnumerable<string> items, string rangeName, int columnIndex)
+        //{
+        //    var rowIndex = 2;
+        //    foreach (var item in items)
+        //    {
+        //        worksheet.Cells[rowIndex++, columnIndex].Value = item;
+        //    }
+        //    worksheet.Names.Add(rangeName, worksheet.Cells[2, columnIndex, items.Count() + 1, columnIndex]);
+        //}
+
+        //private void AddDropdownValidation(ExcelWorksheet worksheet, string rangeName, int columnIndex)
+        //{
+        //    var validation = worksheet.DataValidations.AddListValidation(worksheet.Cells[2, columnIndex, 100, columnIndex].Address);
+        //    validation.ShowErrorMessage = true;
+        //    validation.ErrorTitle = "Invalid selection";
+        //    validation.Error = "Please select a valid value from the list.";
+        //    validation.Formula.ExcelFormula = $"={rangeName}";
+        //}
+
+
+        //public async Task UploadProductsFromExcelAsync(Stream excelStream)
+        //{
+        //    try
+        //    {
+        //        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
+        //        using var package = new ExcelPackage(excelStream);
+        //        var worksheet = package.Workbook.Worksheets.FirstOrDefault();
+        //        if (worksheet == null)
+        //            throw new ArgumentException("The Excel file is empty.");
+
+        //        var productList = new List<CreateProductRequest>();
+
+        //        for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+        //        {
+        //            var name = worksheet.Cells[row, 1]?.Value?.ToString()?.Trim();
+        //            if (string.IsNullOrWhiteSpace(name))
+        //                break;
+        //            var description = worksheet.Cells[row, 2]?.Value?.ToString()?.Trim();
+        //            var barCode = worksheet.Cells[row, 3]?.Value?.ToString()?.Trim();
+        //            var unitPrice = decimal.TryParse(worksheet.Cells[row, 4]?.Value?.ToString(), out var unitPriceValue) ? unitPriceValue : 0;
+        //            var pricePerPack = decimal.TryParse(worksheet.Cells[row, 5]?.Value?.ToString(), out var pricePerPackValue) ? pricePerPackValue : 0;
+        //            var packPriceMarkup = decimal.TryParse(worksheet.Cells[row, 6]?.Value?.ToString(), out var packPriceMarkupValue) ? packPriceMarkupValue : 0;
+        //            var totalItemInPack = int.TryParse(worksheet.Cells[row, 7]?.Value?.ToString(), out var totalItemValue) ? totalItemValue : 0;
+        //            var productSize = double.TryParse(worksheet.Cells[row, 8]?.Value?.ToString(), out var productSizeValue) ? productSizeValue : 0;
+        //            var categoryName = worksheet.Cells[row, 9]?.Value?.ToString()?.Trim();
+        //            var brandName = worksheet.Cells[row, 10]?.Value?.ToString()?.Trim();
+        //            var unitName = worksheet.Cells[row, 11]?.Value?.ToString()?.Trim();
+        //            var productImage = worksheet.Cells[row, 12]?.Value?.ToString()?.Trim();
+
+        //            if (string.IsNullOrEmpty(categoryName) || string.IsNullOrEmpty(unitName))
+        //                continue;
+
+        //            var category = await _categoryRepository.GetCategoryByNameAsync(categoryName);
+        //            var brand = await _brandRepository.GetBrandByNameAsync(brandName);
+        //            var productUnit = await _productUnitRepository.GetProductUnitByNameAsync(unitName);
+
+        //            if (category == null || productUnit == null)
+        //                continue;
+
+        //            var productRequest = new CreateProductRequest
+        //            {
+        //                Name = name,
+        //                Description = description,
+        //                BarCode = barCode,
+        //                UnitPrice = unitPrice,
+        //                PricePerPack = pricePerPack,
+        //                PackPriceMarkup = packPriceMarkup,
+        //                TotalItemInPack = totalItemInPack,
+        //                ProductSize = productSize,
+        //                CategoryId = category.Id,
+        //                BrandId = brand?.Id,
+        //                UnitId = productUnit.Id,
+        //                ProductImageUrl = productImage
+        //            };
+
+        //            productList.Add(productRequest);
+        //        }
+
+        //        foreach (var productRequest in productList)
+        //        {
+        //            await CreateProductAsync(productRequest);
+        //        }
+        //    }
+        //    catch (ArgumentException ex)
+        //    {
+        //        throw new ApplicationException("There was an issue with the Excel file format. Please ensure it is correctly structured.", ex);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new ApplicationException("An error occurred while processing the Excel file. Please try again later.", ex);
+        //    }
+        //}
 
         public async Task UploadProductsFromExcelAsync(Stream excelStream)
         {
             try
             {
-                ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+                using var workbook = new XLWorkbook(excelStream);
+                var worksheet = workbook.Worksheets.FirstOrDefault();
 
-                using var package = new ExcelPackage(excelStream);
-                var worksheet = package.Workbook.Worksheets.FirstOrDefault();
                 if (worksheet == null)
                     throw new ArgumentException("The Excel file is empty.");
 
                 var productList = new List<CreateProductRequest>();
 
-                for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                foreach (var row in worksheet.RowsUsed().Skip(1))
                 {
-                    var name = worksheet.Cells[row, 1]?.Value?.ToString()?.Trim();
+                    var name = row.Cell(1).GetString().Trim();
                     if (string.IsNullOrWhiteSpace(name))
                         break;
-                    var description = worksheet.Cells[row, 2]?.Value?.ToString()?.Trim();
-                    var barCode = worksheet.Cells[row, 3]?.Value?.ToString()?.Trim();
-                    var unitPrice = decimal.TryParse(worksheet.Cells[row, 4]?.Value?.ToString(), out var unitPriceValue) ? unitPriceValue : 0;
-                    var pricePerPack = decimal.TryParse(worksheet.Cells[row, 5]?.Value?.ToString(), out var pricePerPackValue) ? pricePerPackValue : 0;
-                    var packPriceMarkup = decimal.TryParse(worksheet.Cells[row, 6]?.Value?.ToString(), out var packPriceMarkupValue) ? packPriceMarkupValue : 0;
-                    var totalItemInPack = int.TryParse(worksheet.Cells[row, 7]?.Value?.ToString(), out var totalItemValue) ? totalItemValue : 0;
-                    var productSize = double.TryParse(worksheet.Cells[row, 8]?.Value?.ToString(), out var productSizeValue) ? productSizeValue : 0;
-                    var categoryName = worksheet.Cells[row, 9]?.Value?.ToString()?.Trim();
-                    var brandName = worksheet.Cells[row, 10]?.Value?.ToString()?.Trim();
-                    var unitName = worksheet.Cells[row, 11]?.Value?.ToString()?.Trim();
-                    var productImage = worksheet.Cells[row, 12]?.Value?.ToString()?.Trim();
+
+                    var description = row.Cell(2).GetString().Trim();
+                    var barCode = row.Cell(3).GetString().Trim();
+
+                    var unitPrice = decimal.TryParse(row.Cell(4).GetString(), out var unitPriceValue) ? unitPriceValue : 0;
+                    var pricePerPack = decimal.TryParse(row.Cell(5).GetString(), out var pricePerPackValue) ? pricePerPackValue : 0;
+                    var packPriceMarkup = decimal.TryParse(row.Cell(6).GetString(), out var packPriceMarkupValue) ? packPriceMarkupValue : 0;
+                    var totalItemInPack = int.TryParse(row.Cell(7).GetString(), out var totalItemValue) ? totalItemValue : 0;
+                    var productSize = double.TryParse(row.Cell(8).GetString(), out var productSizeValue) ? productSizeValue : 0;
+
+                    var categoryName = row.Cell(9).GetString().Trim();
+                    var brandName = row.Cell(10).GetString().Trim();
+                    var unitName = row.Cell(11).GetString().Trim();
+                    var productImage = row.Cell(12).GetString().Trim();
 
                     if (string.IsNullOrEmpty(categoryName) || string.IsNullOrEmpty(unitName))
                         continue;
@@ -623,7 +823,5 @@ namespace AnurStore.Application.Services
                 throw new ApplicationException("An error occurred while processing the Excel file. Please try again later.", ex);
             }
         }
-
-
     }
 }
