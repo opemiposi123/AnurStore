@@ -5,6 +5,9 @@ using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnurStore.Application.Services
 {
@@ -13,6 +16,8 @@ namespace AnurStore.Application.Services
         private readonly IProductSaleRepository _productSaleRepository;
         private readonly IProductRepository _productRepository;
         private readonly IInventoryRepository _inventoryRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IReceiptService _receiptService;
         private readonly IProductService _productService;
         private readonly IUnitOfWork _unitOfWork;
@@ -22,7 +27,10 @@ namespace AnurStore.Application.Services
             IReceiptService receiptService,
             IProductService productService,
             IUnitOfWork unitOfWork,
-            IInventoryRepository inventoryRepository)
+            IInventoryRepository inventoryRepository,
+            UserManager<User> userManager,
+             IHttpContextAccessor httpContextAccessor
+           )
         {
             _productSaleRepository = productSaleRepository;
             _productRepository = productRepository;
@@ -30,6 +38,8 @@ namespace AnurStore.Application.Services
             _productService = productService;
             _unitOfWork = unitOfWork;
             _inventoryRepository = inventoryRepository;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponse<byte[]>> AddProductSale(CreateProductSaleRequest request)
@@ -113,7 +123,7 @@ namespace AnurStore.Application.Services
 
                     inventory.TotalPiecesAvailable -= totalUnitsToDeduct;
 
-                    await _inventoryRepository.UpdateAsync(inventory); 
+                    await _inventoryRepository.UpdateAsync(inventory);
 
                     saleItems.Add(new ProductSaleItem
                     {
@@ -284,19 +294,40 @@ namespace AnurStore.Application.Services
             }
         }
 
-
-
         public async Task<PagedResponse<List<ProductSaleDto>>> GetAllProductSalesPagedAsync(int pageNumber, int pageSize)
         {
-            var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize);
-            var totalRecords = await _productSaleRepository.GetTotalProductSalesCountAsync();
+            var userPrincipal = _httpContextAccessor.HttpContext?.User;
+            if (userPrincipal == null)
+            {
+                return new PagedResponse<List<ProductSaleDto>>
+                {
+                    Status = false,
+                    Message = "User context not found."
+                };
+            }
+
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            if (user == null)
+            {
+                return new PagedResponse<List<ProductSaleDto>>
+                {
+                    Status = false,
+                    Message = "User not found."
+                };
+            }
+
+            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+            var username = userPrincipal?.Identity?.Name;
+            var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize, username);
+            var totalRecords = await _productSaleRepository.GetTotalProductSalesCountAsync(username);
 
             if (!productSales.Any())
             {
                 return new PagedResponse<List<ProductSaleDto>>
                 {
                     Status = false,
-                    Message = "No product sales found.",
+                    Message = "No product sales found."
                 };
             }
 
@@ -333,7 +364,6 @@ namespace AnurStore.Application.Services
                 TotalRecords = totalRecords
             };
         }
-
 
 
         public async Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter)
@@ -409,7 +439,7 @@ namespace AnurStore.Application.Services
 
             sale.IsDeleted = true;
             sale.DeletedOn = DateTime.Now;
-           await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
 
             var result = _productSaleRepository.UpdateAsync(sale);
 

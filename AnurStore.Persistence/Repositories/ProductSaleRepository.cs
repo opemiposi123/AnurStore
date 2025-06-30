@@ -63,21 +63,35 @@ namespace AnurStore.Persistence.Repositories
             await _context.SaveChangesAsync(); 
         }
 
-        public async Task<int> GetTotalProductSalesCountAsync()
+     
+        public async Task<List<ProductSale>> GetProductSalesPagedAsync(int pageNumber, int pageSize, string username = null)
         {
-            return await _context.ProductSales.CountAsync();
-        }
-
-
-        public async Task<List<ProductSale>> GetProductSalesPagedAsync(int pageNumber, int pageSize)
-        {
-            return await _context.ProductSales
+            IQueryable<ProductSale> query = _context.ProductSales
                 .Include(s => s.ProductSaleItems)
-                .ThenInclude(item => item.Product)
-                .OrderByDescending(s => s.SaleDate)
+                .ThenInclude(item => item.Product);
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(sale => sale.CreatedBy == username);
+            }
+
+            return await query
+                .OrderByDescending(sale => sale.SaleDate)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+        }
+
+        public async Task<int> GetTotalProductSalesCountAsync(string username = null)
+        {
+            IQueryable<ProductSale> query = _context.ProductSales;
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(sale => sale.CreatedBy == username);
+            }
+
+            return await query.CountAsync();
         }
 
 

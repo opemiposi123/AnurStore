@@ -22,14 +22,20 @@ namespace AnurStore.Persistence.Repositories
             return productPurchase;
         }
 
-        public async Task<IList<ProductPurchase>> GetAllAsync()
+        public async Task<List<ProductPurchase>> GetAllAsync( string username = null)
         {
-            return await _context.ProductPurchases
+            IQueryable<ProductPurchase> query = _context.ProductPurchases
                 .Include(p => p.Supplier)
-                .Include(p => p.PurchaseItems) 
-                  .ThenInclude(p => p.Product)
-                .OrderByDescending(p => p.PurchaseDate)
-                .ToListAsync();
+                .Include(p => p.PurchaseItems)
+                    .ThenInclude(p => p.Product);
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(p => p.CreatedBy == username);
+            }
+
+            return await query.ToListAsync();
+
         }
 
         public async Task<ProductPurchase?> GetByIdAsync(string id)
