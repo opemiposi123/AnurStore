@@ -3,6 +3,7 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AspNetCoreHero.ToastNotification.Abstractions;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
  
 namespace AnurStore.WebUI.Controllers
@@ -35,9 +36,11 @@ namespace AnurStore.WebUI.Controllers
                        : View(category.Data);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult CreateCategory() =>
           View();
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> CreateCategory(CreateCategoryRequest model, [FromServices] IValidator<CreateCategoryRequest> validator)
         {

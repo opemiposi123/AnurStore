@@ -40,7 +40,7 @@ namespace AnurStore.WebUI.Controllers
         public IActionResult CreateBrand() =>
           View();
 
-        [HttpPost]
+       [HttpPost]
        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBrand(CreateBrandRequest model, [FromServices] IValidator<CreateBrandRequest> validator)
         {

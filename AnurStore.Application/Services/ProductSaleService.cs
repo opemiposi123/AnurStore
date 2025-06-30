@@ -89,7 +89,6 @@ namespace AnurStore.Application.Services
                         _ => 0
                     };
 
-                    // Calculate total pieces to deduct based on unit type
                     int totalUnitsToDeduct = item.ProductUnitType switch
                     {
                         ProductUnitType.Pack => item.Quantity * product.TotalItemInPack,
@@ -100,6 +99,23 @@ namespace AnurStore.Application.Services
                     };
 
                     var inventory = product.Inventory;
+                    inventory.TotalPiecesAvailable -= totalUnitsToDeduct;
+
+                    if (inventory.TotalPiecesAvailable == 0)
+                    {
+                        inventory.StockStatus = StockStatus.OutOfStock;
+                    }
+                    else if (inventory.TotalPiecesAvailable < product.TotalItemInPack * 10)
+                    {
+                        inventory.StockStatus = StockStatus.LowStock;
+                    }
+                    else
+                    {
+                        inventory.StockStatus = StockStatus.InStock;
+                    }
+
+                    await _inventoryRepository.UpdateAsync(inventory);
+
 
                     if (inventory.TotalPiecesAvailable < totalUnitsToDeduct)
                     {
@@ -284,8 +300,6 @@ namespace AnurStore.Application.Services
             }
         }
 
-
-
         public async Task<PagedResponse<List<ProductSaleDto>>> GetAllProductSalesPagedAsync(int pageNumber, int pageSize)
         {
             var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize);
@@ -333,8 +347,6 @@ namespace AnurStore.Application.Services
                 TotalRecords = totalRecords
             };
         }
-
-
 
         public async Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter)
         {
@@ -389,8 +401,6 @@ namespace AnurStore.Application.Services
                 TotalRecords = totalRecords
             };
         }
-
-
 
         public async Task<BaseResponse<bool>> CancelProductSaleAsync(string saleId)
         {

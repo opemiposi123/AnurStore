@@ -160,7 +160,6 @@ namespace AnurStore.Application.Services
                 foreach (var p in productToUpdate)
                     await _productRepo.UpdateProduct(p);
 
-                // ✅ Mark purchase as processed
                 purchase.IsAddedToInventory = true;
                 await _productpurchaseRepo.UpdateAsync(purchase);
 
@@ -185,7 +184,6 @@ namespace AnurStore.Application.Services
                 };
             }
         }
-
 
         public async Task<BaseResponse<bool>> DeletePurchaseAsync(string purchaseId)
         {
@@ -245,7 +243,7 @@ namespace AnurStore.Application.Services
 
                 var productPurchaseDtos = response
                     .Where(x => !x.IsDeleted)
-                    .OrderByDescending(x => x.CreatedOn) 
+                    .OrderByDescending(x => x.PurchaseDate) 
                     .Select(r => new ProductPurchaseDto
                     {
                         Id = r.Id,
