@@ -8,6 +8,7 @@ using AnurStore.Application.Wrapper;
 using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using OfficeOpenXml;
 
@@ -20,8 +21,9 @@ namespace AnurStore.Application.Services
         private readonly IProductPurchaseRepository _productpurchaseRepo;
         private readonly IProductService _productService;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<ProductPurchaseService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserManager<User> _userManager;
+        private readonly ILogger<ProductPurchaseService> _logger;
 
         public ProductPurchaseService(IInventoryRepository inventoryRepo,
             IProductRepository productRepo,
@@ -29,13 +31,16 @@ namespace AnurStore.Application.Services
             IProductService productService,
             ILogger<ProductPurchaseService> logger,
             IUnitOfWork unitOfWork,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+             UserManager<User> userManager)
         {
             _inventoryRepo = inventoryRepo;
             _productRepo = productRepo;
             _productpurchaseRepo = productPurchaseRepo;
             _productService = productService;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
+            _userManager = userManager;
             _logger = logger;
         }
         public async Task<BaseResponse<string>> PurchaseProductsAsync(CreateProductPurchaseRequest request, string userName)
@@ -241,29 +246,46 @@ namespace AnurStore.Application.Services
             _logger.LogInformation("Starting GetAllProductPurchase method.");
             try
             {
-                var response = await _productpurchaseRepo.GetAllAsync();
-
-                var productPurchaseDtos = response
-                    .Where(x => !x.IsDeleted)
-                    .OrderByDescending(x => x.CreatedOn) 
-                    .Select(r => new ProductPurchaseDto
+                var userPrincipal = _httpContextAccessor.HttpContext?.User;
+                if (userPrincipal == null)
+                {
+                    return new BaseResponse<IEnumerable<ProductPurchaseDto>>
                     {
-                        Id = r.Id,
-                        SupplierName = r.Supplier.Name,
-                        Total = r.Total,
-                        Discount = r.Discount,
-                        PurchaseDate = r.PurchaseDate,
-                        Batch = r.Batch,
-                        CreatedBy = r.CreatedBy
-                    })
-                    .ToList();
+                        Status = false,
+                        Message = "User context not found."
+                    };
+                }
+
+                var user = await _userManager.GetUserAsync(userPrincipal);
+                if (user == null)
+                {
+                    return new BaseResponse<IEnumerable<ProductPurchaseDto>>
+                    {
+                        Status = false,
+                        Message = "User not found."
+                    };
+                }
+
+                bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+                var username = userPrincipal?.Identity?.Name;
+                var response = await _productpurchaseRepo.GetAllAsync(username);
+                var productPurchaseeDtos = response.Where(x => !x.IsDeleted).Select(r => new ProductPurchaseDto
+                {
+                    Id = r.Id,
+                    SupplierName = r.Supplier.Name,
+                    Total = r.Total,
+                    Discount = r.Discount,
+                    PurchaseDate = r.PurchaseDate,
+                    Batch = r.Batch,
+                    CreatedBy = r.CreatedBy
+                }).ToList();
 
                 _logger.LogInformation("Successfully retrieved product purchases.");
                 return new BaseResponse<IEnumerable<ProductPurchaseDto>>
                 {
                     Message = "Record Found Successfully",
                     Status = true,
-                    Data = productPurchaseDtos,
+                    Data = productPurchaseeDtos,
                 };
             }
             catch (Exception ex)
