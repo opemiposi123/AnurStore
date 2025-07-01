@@ -21,9 +21,9 @@ namespace AnurStore.Application.Services
         private readonly IProductPurchaseRepository _productpurchaseRepo;
         private readonly IProductService _productService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
         private readonly ILogger<ProductPurchaseService> _logger;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ProductPurchaseService(IInventoryRepository inventoryRepo,
             IProductRepository productRepo,
@@ -39,6 +39,7 @@ namespace AnurStore.Application.Services
             _productpurchaseRepo = productPurchaseRepo;
             _productService = productService;
             _unitOfWork = unitOfWork;
+            _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _logger = logger;
         }
@@ -284,7 +285,7 @@ namespace AnurStore.Application.Services
                 {
                     Message = "Record Found Successfully",
                     Status = true,
-                    Data = productPurchaseDtos,
+                    Data = productPurchaseeDtos,
                 };
             }
             catch (Exception ex)
