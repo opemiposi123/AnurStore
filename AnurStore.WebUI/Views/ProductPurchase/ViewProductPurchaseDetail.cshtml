@@ -95,6 +95,13 @@
                             </div>
                         </div>
 
+                        <form asp-action="ProcessInventory" asp-controller="ProductPurchase" method="post">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-info rounded-pill px-4" @(Model.IsAddedToInventory ? "disabled" : "")>
+                                <i class="las la-cogs me-1"></i> Process Inventory
+                            </button>
+                        </form>
+
                         <div class="row mt-2">
                             <div class="col-sm-12">
                                 <b class="text-danger">Note:</b>

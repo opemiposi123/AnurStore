@@ -94,9 +94,9 @@ public class ReceiptService : IReceiptService
                         {
                             headerColumn.Item().AlignCenter().Text("ANUR STORE").Bold().FontSize(16).FontColor(Colors.Blue.Darken2);
                             headerColumn.Item().AlignCenter().Text("Premium Quality Products").FontSize(9).Italic().FontColor(Colors.Grey.Darken1);
-                            headerColumn.Item().PaddingTop(3).AlignCenter().Text("📍 6 Unity Road, Ayoafolabi, Lagos").FontSize(8);
-                            headerColumn.Item().AlignCenter().Text("📞 09068041575").FontSize(8);
-                            headerColumn.Item().AlignCenter().Text("📧 oseniahoseniahmadkorede@gmail.com").FontSize(8);
+                            headerColumn.Item().PaddingTop(3).AlignCenter().Text("📍 44 Idowu Buhari Str, Robiyan, Ogun").FontSize(8);
+                            headerColumn.Item().AlignCenter().Text("📞 08051550404").FontSize(8);
+                            headerColumn.Item().AlignCenter().Text("📧 anurstore@gmail.com").FontSize(8);
                         });
 
                         column.Item().PaddingVertical(4);

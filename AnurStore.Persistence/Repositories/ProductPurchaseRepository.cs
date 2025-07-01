@@ -15,6 +15,12 @@ namespace AnurStore.Persistence.Repositories
         {
             _context = context;
         }
+        public async Task<ProductPurchase?> GetByIdWithItemsAsync(string purchaseId)
+        {
+            return await _context.ProductPurchases
+                .Include(p => p.PurchaseItems)
+                .FirstOrDefaultAsync(p => p.Id == purchaseId);
+        }
 
         public async Task<ProductPurchase> PurchaseProductAsync(ProductPurchase productPurchase)
         {
