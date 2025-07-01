@@ -3,7 +3,9 @@ using AnurStore.Application.DTOs;
 using AnurStore.Application.Pagination;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
+using AnurStore.Persistence;
 using AspNetCoreHero.ToastNotification.Abstractions;
+using Azure;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,20 +16,38 @@ namespace AnurStore.WebUI.Controllers
         private readonly INotyfService _notyf;
         private readonly IProductPurchaseService _productPurchaseService;
         private readonly ISupplierService _supplierService;
-        public ProductPurchaseController(INotyfService notyf, IProductPurchaseService productPurchaseService, ISupplierService supplierService)
+        private readonly BatchHelper _batchHelper;
+        public ProductPurchaseController(INotyfService notyf,
+            IProductPurchaseService productPurchaseService,
+            ISupplierService supplierService,
+            BatchHelper batchHelper)
         {
             _notyf = notyf;
             _productPurchaseService = productPurchaseService;
             _supplierService = supplierService;
+            _batchHelper = batchHelper;
         }
+
+        public async Task<IActionResult> Index()
+        {
+            var response = await _productPurchaseService.GetAllPurchasesAsync();
+            if (response.Status)
+            {
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
+                return View(response.Data);
+            }
+            return View(Enumerable.Empty<ProductPurchaseDto>());
+        }
+
 
         public async Task<IActionResult> CreateProductPurchase()
         {
+            var batchNumber = await _batchHelper.GenerateBatchNumberAsync();
             var model = new CreateProductPurchaseRequest
             {
-                PurchaseDate = DateTime.Now
+                PurchaseDate = DateTime.Now,
+                Batch = batchNumber
             };
-
             ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
 
             return View(model);
@@ -42,7 +62,7 @@ namespace AnurStore.WebUI.Controllers
                 foreach (var error in validationResult.Errors)
                 {
                     ModelState.AddModelError(error.PropertyName, error.ErrorMessage);
-                    _notyf.Error(error.ErrorMessage); 
+                    _notyf.Error(error.ErrorMessage);
                 }
 
                 ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
@@ -50,20 +70,34 @@ namespace AnurStore.WebUI.Controllers
             }
             var userName = User?.Identity?.Name ?? "System";
 
-            await _productPurchaseService.PurchaseProductsAsync(model,userName);
+            var request = await _productPurchaseService.PurchaseProductsAsync(model, userName);
+            if (!request.Status)
+            {
+                _notyf.Error(request.Message);
+                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
+                return View(model);
+            }
             _notyf.Success("Product purchased successfully");
             return RedirectToAction("Index", "ProductPurchase");
         }
 
-        public async Task<IActionResult> Index()
+        [HttpPost]
+        public async Task<IActionResult> ProcessInventory(string id)
         {
-            var response = await _productPurchaseService.GetAllPurchasesAsync();
-            if (response.Status)
+            if (string.IsNullOrEmpty(id))
             {
-                ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
-                return View(response.Data);
+                _notyf.Success("Invalid purchase ID.");
+                return RedirectToAction("Index");
             }
-            return View(Enumerable.Empty<ProductPurchaseDto>());
+            var userName = User.Identity?.Name ?? "System";
+            var result = await _productPurchaseService.ProcessInventoryAndProductUpdateAsync(id, userName);
+
+            if (!result.Status)
+            {
+                _notyf.Error(result.Message);
+            }
+            _notyf.Success("Product purchased proccesed successfully");
+            return RedirectToAction("Index", "ProductPurchase");
         }
 
         public async Task<IActionResult> ViewPurchasesBySupplier(string supplierId)
@@ -83,7 +117,7 @@ namespace AnurStore.WebUI.Controllers
             if (response.Status)
             {
                 ViewBag.Suppliers = await _supplierService.GetSupplierSelectList();
-                return View("Index", response.Data); 
+                return View("Index", response.Data);
             }
             return View("Index", Enumerable.Empty<ProductPurchaseDto>());
         }
@@ -97,7 +131,8 @@ namespace AnurStore.WebUI.Controllers
             }
             return View(Enumerable.Empty<ProductPurchaseDto>());
         }
-        public async Task<IActionResult> ViewProductPurchaseDetail([FromRoute]string id) 
+
+        public async Task<IActionResult> ViewProductPurchaseDetail([FromRoute] string id)
         {
             var productPurchase = await _productPurchaseService.GetPurchaseDetailsAsync(id);
 
@@ -115,7 +150,7 @@ namespace AnurStore.WebUI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewAllPurchases(PurchaseFilterRequest filter) 
+        public async Task<IActionResult> ViewAllPurchases(PurchaseFilterRequest filter)
         {
             var response = await _productPurchaseService.GetPurchasesPagedAsync(filter);
 

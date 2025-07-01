@@ -1,5 +1,6 @@
 using AnurStore.Application.Abstractions.Repositories; 
 using AnurStore.Application.Abstractions.Services;
+using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;
@@ -10,12 +11,14 @@ using AnurStore.Application.Validators.ProductUnit;
 using AnurStore.Application.Validators.Supplier;
 using AnurStore.Application.Validators.User;
 using AnurStore.Domain.Entities;
+using AnurStore.Persistence;
 using AnurStore.Persistence.Context;
 using AnurStore.Persistence.Context.Seeder;
 using AnurStore.Persistence.Repositories;
 using AspNetCoreHero.ToastNotification;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +29,7 @@ builder.Services.AddControllersWithViews();
 //Database
 var connectionString = 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer       (builder.Configuration.GetConnectionString("AnurStore")));
-
+builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("SMTPConfig"));
 //Repositories
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -40,6 +43,7 @@ builder.Services.AddScoped<IInventoryRepository, InventoryRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IReceiptRepository, ReceiptRepository>();
 builder.Services.AddScoped<IProductSaleRepository, ProductSaleRepository>();
+builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
 
 //Services
 builder.Services.AddScoped<IUserAuthService,UserAuthService>();
@@ -53,6 +57,10 @@ builder.Services.AddScoped<IProductPurchaseService, ProductPurchaseService>();
 builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddScoped<IReceiptService, ReceiptService>();
 builder.Services.AddScoped<IProductSaleService, ProductSaleService>();
+builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<BatchHelper>();
+
 
 //Validators
 builder.Services.AddScoped<IValidator<CreateCategoryRequest>, CreateCategoryValidator>();
@@ -72,6 +80,18 @@ builder.Services.AddScoped<IValidator<UpdateProductUnitRequest>, UpdateProductUn
 builder.Services.AddScoped<IValidator<UpdateProductRequest>, UpdateProductValidator>();
 builder.Services.AddScoped<IValidator<UpdateUserRequest>, UpdateUserValidator>();
 
+
+// Increase the maximum request body size if needed
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = 52428800; // 50MB
+});
+
+// Configure Kestrel for larger files
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = 52428800; // 50MB
+});
 //Identity
 builder.Services.AddIdentity<User, IdentityRole>(opt =>
 {
@@ -93,6 +113,10 @@ builder.Services.AddNotyf(config =>
     config.Position = NotyfPosition.TopRight;
 }
 );
+builder.Services.ConfigureApplicationCookie(config =>
+{
+    config.LoginPath = "/UserAuth/Login";
+});
 QuestPDF.Settings.License = QuestPDF.Infrastructure.LicenseType.Community;
 builder.Services.AddHttpContextAccessor();
 

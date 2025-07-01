@@ -15,25 +15,36 @@ namespace AnurStore.Persistence.Repositories
         {
             _context = context;
         }
+        public async Task<ProductPurchase?> GetByIdWithItemsAsync(string purchaseId)
+        {
+            return await _context.ProductPurchases
+                .Include(p => p.PurchaseItems)
+                .FirstOrDefaultAsync(p => p.Id == purchaseId);
+        }
 
         public async Task<ProductPurchase> PurchaseProductAsync(ProductPurchase productPurchase)
         {
             await _context.ProductPurchases.AddAsync(productPurchase);
-            await _context.SaveChangesAsync();
             return productPurchase;
         }
 
-        public async Task<IList<ProductPurchase>> GetAllAsync()
+        public async Task<List<ProductPurchase>> GetAllAsync( string username = null)
         {
-            return await _context.ProductPurchases
+            IQueryable<ProductPurchase> query = _context.ProductPurchases
                 .Include(p => p.Supplier)
-                .Include(p => p.PurchaseItems) 
-                  .ThenInclude(p => p.Product)
-                .OrderByDescending(p => p.PurchaseDate)
-                .ToListAsync();
+                .Include(p => p.PurchaseItems)
+                    .ThenInclude(p => p.Product);
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                query = query.Where(p => p.CreatedBy == username);
+            }
+
+            return await query.ToListAsync();
+
         }
 
-        public async Task<ProductPurchase> GetByIdAsync(string id)
+        public async Task<ProductPurchase?> GetByIdAsync(string id)
         {
             return await _context.ProductPurchases
                 .Include(p => p.Supplier)
@@ -115,7 +126,6 @@ namespace AnurStore.Persistence.Repositories
                 return false;
 
             _context.Entry(existing).CurrentValues.SetValues(productPurchase);
-            await _context.SaveChangesAsync();
             return true;
         }
     }

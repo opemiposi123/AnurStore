@@ -3,6 +3,7 @@ using AnurStore.Application.DTOs;
 using AnurStore.Domain.Entities;
 using AnurStore.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace AnurStore.Persistence.Repositories
@@ -43,6 +44,7 @@ namespace AnurStore.Persistence.Repositories
 
         public async Task<bool> Exist(string productName)
         {
+           // await using var context = _contextFactory.CreateDbContext();
             var product = await _context.Products.AnyAsync(r => r.Name == productName);
             return product;
         }
@@ -77,12 +79,13 @@ namespace AnurStore.Persistence.Repositories
 
         public async Task<bool> UpdateProduct(Product product)
         {
-            var result = _context.Products.Update(product);
+            _context.Products.Update(product);
             return await _context.SaveChangesAsync() > 0;
         }
-
+       
         public async Task<string> CreateProductWithSizeAsync(Product product, ProductSize productSize)
         {
+            //await using var context = _contextFactory.CreateDbContext();
             using var transaction = await _context.Database.BeginTransactionAsync();
 
             try
@@ -111,9 +114,23 @@ namespace AnurStore.Persistence.Repositories
 
         public async Task<ProductSize?> GetProductSizeByProductIdAsync(string productId, bool noTracking = false)
         {
+          //  await using var context = _contextFactory.CreateDbContext();
             var query = _context.ProductSizes.Where(p => p.ProductId == productId);
             return noTracking ? await query.AsNoTracking().FirstOrDefaultAsync()
                               : await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Product>> GetProductsByIdsAsync(List<string> productIds)
+        {
+            return await _context.Products
+                .Where(p => productIds.Contains(p.Id))
+                .ToListAsync(); 
+        }
+
+        public async Task UpdateRangeAsync(List<Product> products)
+        {
+            _context.Products.UpdateRange(products);
+            await _context.SaveChangesAsync(); 
         }
 
     }

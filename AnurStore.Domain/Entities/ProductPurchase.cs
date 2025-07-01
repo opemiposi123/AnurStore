@@ -6,7 +6,7 @@ namespace AnurStore.Domain.Entities;
 
 public class ProductPurchase : BaseEntity
 {
-    public string Batch { get; set; } 
+    public string Batch { get; set; } = default!;
 
     [Column(TypeName = "money")]
     public decimal Total { get; set; } 
@@ -24,4 +24,3 @@ public class ProductPurchase : BaseEntity
 
     public bool IsAddedToInventory { get; set; }    
 }
-

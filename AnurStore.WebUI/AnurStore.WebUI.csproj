@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Receipt\**" />
+    <Content Remove="Views\Receipt\**" />
+    <EmbeddedResource Remove="Views\Receipt\**" />
+    <None Remove="Views\Receipt\**" />
+  </ItemGroup>
+
+  <ItemGroup>
 	  <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">

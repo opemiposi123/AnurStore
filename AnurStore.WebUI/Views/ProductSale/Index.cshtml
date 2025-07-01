@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody class="ligth-body">
-                            @if (Model != null)
+                            @if (Model?.Items != null && Model.Items.Any())
                             {
                                 foreach (var sale in Model.Items)
                                 {
@@ -57,16 +57,9 @@
                                                 <a asp-action="ViewProductSaleDetail" asp-route-id="@sale.Id" class="badge badge-info mr-2" title="View">
                                                     <i class="ri-eye-line"></i>
                                                 </a>
-                                                <a asp-action="EditProductSale" asp-route-id="@sale.Id" class="badge bg-success mr-2" title="Edit">
-                                                    <i class="ri-pencil-line"></i>
-                                                </a>
-                                                <form asp-action="CancelProductSaleAsync" asp-route-id="@sale.Id" method="post" class="d-inline">
-                                                    <button type="submit" class="badge bg-warning border-0" title="Cancel" onclick="return confirm('Are you sure you want to cancel this sale?');">
-                                                        <i class="ri-close-line"></i>
-                                                    </button>
-                                                </form>
                                             </div>
                                         </td>
+
                                     </tr>
                                 }
                             }
@@ -76,8 +69,8 @@
                                     <td colspan="7" class="text-center text-muted">No sales found.</td>
                                 </tr>
                             }
-
                         </tbody>
+
                     </table>
                 </div>
                 <nav aria-label="Page navigation" class="mt-4">

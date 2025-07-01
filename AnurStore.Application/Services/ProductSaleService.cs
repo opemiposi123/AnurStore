@@ -3,10 +3,11 @@ using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.DTOs;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Wrapper;
-using AnurStore.Domain.Common.Contracts;
 using AnurStore.Domain.Entities;
 using AnurStore.Domain.Enums;
-using System.Text.Json;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace AnurStore.Application.Services
 {
@@ -14,21 +15,39 @@ namespace AnurStore.Application.Services
     {
         private readonly IProductSaleRepository _productSaleRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IInventoryRepository _inventoryRepository;
+        private readonly UserManager<User> _userManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IReceiptService _receiptService;
         private readonly IProductService _productService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ProductSaleService(IProductSaleRepository productSaleRepository, IProductRepository productRepository, IReceiptService receiptService, IProductService productService)
+        public ProductSaleService(IProductSaleRepository productSaleRepository,
+            IProductRepository productRepository,
+            IReceiptService receiptService,
+            IProductService productService,
+            IUnitOfWork unitOfWork,
+            IInventoryRepository inventoryRepository,
+            UserManager<User> userManager,
+             IHttpContextAccessor httpContextAccessor
+           )
         {
             _productSaleRepository = productSaleRepository;
             _productRepository = productRepository;
             _receiptService = receiptService;
             _productService = productService;
+            _unitOfWork = unitOfWork;
+            _inventoryRepository = inventoryRepository;
+            _userManager = userManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<BaseResponse<byte[]>> AddProductSale(CreateProductSaleRequest request)
         {
             try
             {
+                await _unitOfWork.BeginTransactionAsync();
+
                 decimal totalAmount = 0;
                 var saleItems = new List<ProductSaleItem>();
                 var productNames = new Dictionary<string, string>();
@@ -39,6 +58,7 @@ namespace AnurStore.Application.Services
 
                     if (product == null)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -46,37 +66,19 @@ namespace AnurStore.Application.Services
                         };
                     }
 
-                    if (item.ProductUnitType == ProductUnitType.SingleUnit && product.UnitPrice == null)
-                    {
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Product {product.Name} does not support unit pricing"
-                        };
-                    }
-
-                    if ((item.ProductUnitType == ProductUnitType.Pack ||
-                        item.ProductUnitType == ProductUnitType.HalfPack ||
-                        item.ProductUnitType == ProductUnitType.QuarterPack) && product.PricePerPack == null)
-                    {
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Product {product.Name} does not support pack-based pricing"
-                        };
-                    }
-
                     if (product.Inventory == null)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
-                            Message = $"Inventory not found for product: {product.Name}"
+                            Message = $"{product.Name} has not been stocked yet. Please check back later or contact inventory management."
                         };
                     }
 
                     if (product.TotalItemInPack <= 0)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
@@ -97,31 +99,31 @@ namespace AnurStore.Application.Services
                         _ => 0
                     };
 
+                    // Calculate total pieces to deduct based on unit type
                     int totalUnitsToDeduct = item.ProductUnitType switch
                     {
                         ProductUnitType.Pack => item.Quantity * product.TotalItemInPack,
-                        ProductUnitType.HalfPack => (int)(0.5 * product.TotalItemInPack * item.Quantity),
-                        ProductUnitType.QuarterPack => (int)(0.25 * product.TotalItemInPack * item.Quantity),
+                        ProductUnitType.HalfPack => (int)(0.5m * product.TotalItemInPack * item.Quantity),
+                        ProductUnitType.QuarterPack => (int)(0.25m * product.TotalItemInPack * item.Quantity),
                         ProductUnitType.SingleUnit => item.Quantity,
                         _ => 0
                     };
 
                     var inventory = product.Inventory;
-                    int totalAvailableUnits = inventory.QuantityAvailable * product.TotalItemInPack;
 
-                    if (totalAvailableUnits < totalUnitsToDeduct)
+                    if (inventory.TotalPiecesAvailable < totalUnitsToDeduct)
                     {
+                        await _unitOfWork.RollbackAsync();
                         return new BaseResponse<byte[]>
                         {
                             Status = false,
-                            Message = $"Insufficient stock for {product.Name}. Only {totalAvailableUnits} units available."
+                            Message = $"Insufficient stock for {product.Name}. Only {inventory.TotalPiecesAvailable} pieces available."
                         };
                     }
 
-                    totalAvailableUnits -= totalUnitsToDeduct;
-                    inventory.QuantityAvailable = totalAvailableUnits / product.TotalItemInPack;
+                    inventory.TotalPiecesAvailable -= totalUnitsToDeduct;
 
-                    await _productRepository.UpdateProduct(product);
+                    await _inventoryRepository.UpdateAsync(inventory);
 
                     saleItems.Add(new ProductSaleItem
                     {
@@ -141,7 +143,7 @@ namespace AnurStore.Application.Services
 
                 var productSale = new ProductSale
                 {
-                    CustomerName = request.CustomerName,
+                    CustomerName = string.IsNullOrWhiteSpace(request.CustomerName) ? "Guest Customer" : request.CustomerName,
                     PaymentMethod = request.PaymentMethod,
                     Discount = discount,
                     TotalAmount = totalAmount,
@@ -151,6 +153,7 @@ namespace AnurStore.Application.Services
                 };
 
                 await _productSaleRepository.AddProductSaleAsync(productSale);
+                await _unitOfWork.SaveChangesAsync();
 
                 var saleDto = new ProductSaleDto
                 {
@@ -170,6 +173,9 @@ namespace AnurStore.Application.Services
 
                 var (receiptDto, pdfBytes) = await _receiptService.GenerateFromProductSaleAsync(saleDto);
 
+                productSale.ReceiptId = receiptDto.Id;
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitAsync();
 
                 return new BaseResponse<byte[]>
                 {
@@ -180,48 +186,15 @@ namespace AnurStore.Application.Services
             }
             catch (Exception ex)
             {
+                await _unitOfWork.RollbackAsync();
                 return new BaseResponse<byte[]>
                 {
                     Status = false,
-                    Message = $"Failed to record product sale: {ex.Message}"
+                    Message = $"Failed to record product sale. Please try again later.{ex.Message}"
                 };
             }
         }
 
-
-
-
-        //public async Task<BaseResponse<CreateProductSaleRequest>> PrepareSaleRequestAsync(CreateProductSaleViewModel viewModel)
-        //{
-        //    if (string.IsNullOrWhiteSpace(viewModel.SaleRequest.ProductSaleItemsJson))
-        //    {
-        //        return new BaseResponse<CreateProductSaleRequest>
-        //        {
-        //            Status = false,
-        //            Message = "No product items found in request."
-        //        };
-        //    }
-
-        //    try
-        //    {
-        //        viewModel.SaleRequest.ProductSaleItems = JsonSerializer.Deserialize<List<CreateProductSaleItemRequest>>(viewModel.SaleRequest.ProductSaleItemsJson) ?? new();
-
-        //        return new BaseResponse<CreateProductSaleRequest>
-        //        {
-        //            Status = true,
-        //            Message = "Request prepared successfully.",
-        //            Data = viewModel.SaleRequest
-        //        };
-        //    }
-        //    catch
-        //    {
-        //        return new BaseResponse<CreateProductSaleRequest>
-        //        {
-        //            Status = false,
-        //            Message = "Invalid format for product sale items."
-        //        };
-        //    }
-        //}
 
 
 
@@ -321,19 +294,40 @@ namespace AnurStore.Application.Services
             }
         }
 
-
-
         public async Task<PagedResponse<List<ProductSaleDto>>> GetAllProductSalesPagedAsync(int pageNumber, int pageSize)
         {
-            var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize);
-            var totalRecords = await _productSaleRepository.GetTotalProductSalesCountAsync();
+            var userPrincipal = _httpContextAccessor.HttpContext?.User;
+            if (userPrincipal == null)
+            {
+                return new PagedResponse<List<ProductSaleDto>>
+                {
+                    Status = false,
+                    Message = "User context not found."
+                };
+            }
+
+            var user = await _userManager.GetUserAsync(userPrincipal);
+            if (user == null)
+            {
+                return new PagedResponse<List<ProductSaleDto>>
+                {
+                    Status = false,
+                    Message = "User not found."
+                };
+            }
+
+            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
+
+            var username = userPrincipal?.Identity?.Name;
+            var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize, username);
+            var totalRecords = await _productSaleRepository.GetTotalProductSalesCountAsync(username);
 
             if (!productSales.Any())
             {
                 return new PagedResponse<List<ProductSaleDto>>
                 {
                     Status = false,
-                    Message = "No product sales found.",
+                    Message = "No product sales found."
                 };
             }
 
@@ -370,7 +364,6 @@ namespace AnurStore.Application.Services
                 TotalRecords = totalRecords
             };
         }
-
 
 
         public async Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter)
@@ -441,11 +434,12 @@ namespace AnurStore.Application.Services
 
             foreach (var item in sale.ProductSaleItems)
             {
-                item.Product.Inventory.QuantityAvailable += item.Quantity;
+                item.Product.Inventory.TotalPiecesAvailable += item.Quantity;
             }
 
             sale.IsDeleted = true;
             sale.DeletedOn = DateTime.Now;
+            await _unitOfWork.SaveChangesAsync();
 
             var result = _productSaleRepository.UpdateAsync(sale);
 
@@ -479,9 +473,9 @@ namespace AnurStore.Application.Services
                         _ => 0
                     };
 
-                    int currentUnits = product.Inventory.QuantityAvailable * product.TotalItemInPack;
+                    int currentUnits = product.Inventory.TotalPiecesAvailable * product.TotalItemInPack;
                     int updatedUnits = currentUnits + unitsToAddBack;
-                    product.Inventory.QuantityAvailable = updatedUnits / product.TotalItemInPack;
+                    product.Inventory.TotalPiecesAvailable = updatedUnits / product.TotalItemInPack;
 
                     await _productRepository.UpdateProduct(product);
                 }
@@ -535,7 +529,7 @@ namespace AnurStore.Application.Services
                         _ => 0
                     };
 
-                    int availableUnits = product.Inventory.QuantityAvailable * product.TotalItemInPack;
+                    int availableUnits = product.Inventory.TotalPiecesAvailable * product.TotalItemInPack;
 
                     if (availableUnits < unitsToDeduct)
                     {
@@ -548,7 +542,7 @@ namespace AnurStore.Application.Services
 
                     // Deduct from inventory
                     availableUnits -= unitsToDeduct;
-                    product.Inventory.QuantityAvailable = availableUnits / product.TotalItemInPack;
+                    product.Inventory.TotalPiecesAvailable = availableUnits / product.TotalItemInPack;
 
                     await _productRepository.UpdateProduct(product);
 

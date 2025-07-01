@@ -20,13 +20,13 @@
                                             <div class="col-lg-12">
                                                 <div class="floating-label form-group">
                                                     <input class="floating-input form-control" type="text" name="Username" placeholder="Username">
-                                                   @*  <label>Username</label> *@
+                                                    @*  <label>Username</label> *@
                                                 </div>
                                             </div>
                                             <div class="col-lg-12">
                                                 <div class="floating-label form-group">
                                                     <input class="floating-input form-control" type="password" name="Password" placeholder="Password">
-                                                   @*  <label>Password</label> *@
+                                                    @*  <label>Password</label> *@
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
@@ -36,12 +36,12 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-6">
-                                                <a href="auth-recoverpw.html" class="text-primary float-right">Forgot Password?</a>
+                                                <a href="@Url.Action("RequestPasswordReset", "PasswordReset")"  class="text-primary float-right">Forgot Password?</a>
                                             </div>
                                         </div>
                                         <button type="submit" class="btn btn-primary">Sign In</button>
                                         <p class="mt-3">
-                                            Create an Account <a href="auth-sign-up.html" class="text-primary">Sign Up</a>
+                                            Create an Account <a href="@Url.Action("UserRegistration", "UserAuth")" class="text-primary">Sign Up</a>
                                         </p>
                                     </form>
                                 </div>

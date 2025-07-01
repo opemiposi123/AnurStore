@@ -3,47 +3,52 @@
     ViewData["Title"] = "Product Details";
     Layout = "_DashboardLayout";
 }
-
-<div class="container mt-5">
-    <div class="custom-card shadow">
-        <div class="row no-gutters">
-            <!-- Product Image -->
-            <div class="col-md-5">
-                <img src="@Model.ProductImageUrl" class="img-fluid rounded-start custom-img" alt="@Model.Name">
-            </div>
-            <!-- Product Details -->
-            <div class="col-md-7">
-                <div class="custom-card-body p-4">
-                    <h3 class="custom-title">@Model.Name</h3>
-                    <p class="custom-text text-muted">@Model.Description</p>
-                    <hr>
-                    <div>
-                        <strong>Category:</strong> <span class="text-primary">@Model.CategoryName</span>
-                    </div>
-                    <div>
-                        <strong>Brand:</strong> <span class="text-success">@Model.BrandName</span>
-                    </div>
-                    <div>
-                        <strong>Unit Price:</strong> <span class="text-danger">₦@Model.UnitPrice</span>
-                    </div>
-                    <div>
-                        <strong>Price Per Pack:</strong> <span class="text-warning">₦@Model.PricePerPack</span>
-                    </div>
-                    <div>
-                        <strong>Size:</strong> <span class="text-info">@Model.SizeWithUnit</span>
-                    </div>
-                    <div>
-                        <strong>Total Items in Pack:</strong> <span>@Model.TotalItemInPack</span>
-                    </div>
-                    <hr>
-                    <!-- Action Buttons -->
-                    <div class="d-flex">
-                        <a href="@Url.Action("EditProduct", new { id = Model.Id })" class="custom-btn btn-success mr-2">
-                            <i class="ri-pencil-line"></i> Edit
-                        </a>
-                        <a href="@Url.Action("DeleteProduct", new { id = Model.Id })" class="custom-btn btn-danger">
-                            <i class="ri-delete-bin-line"></i> Delete
-                        </a>
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="container mt-5">
+                    <div class="custom-card shadow">
+                        <div class="row no-gutters">
+                            <div class="col-md-5">
+                                <img src="@Model.ProductImageUrl" class="img-fluid rounded-start custom-img" alt="@Model.Name">
+                            </div>
+                            <div class="col-md-7">
+                                <div class="custom-card-body p-4">
+                                    <h3 class="custom-title">@Model.Name</h3>
+                                    <p class="custom-text text-muted">@Model.Description</p>
+                                    <hr>
+                                    <div>
+                                        <strong>Category:</strong> <span class="text-primary">@Model.CategoryName</span>
+                                    </div>
+                                    <div>
+                                        <strong>Brand:</strong> <span class="text-success">@Model.BrandName</span>
+                                    </div>
+                                    <div>
+                                        <strong>Unit Price:</strong> <span class="text-danger">₦@Model.UnitPrice</span>
+                                    </div>
+                                    <div>
+                                        <strong>Price Per Pack:</strong> <span class="text-warning">₦@Model.PricePerPack</span>
+                                    </div>
+                                    <div>
+                                        <strong>Size:</strong> <span class="text-info">@Model.SizeWithUnit</span>
+                                    </div>
+                                    <div>
+                                        <strong>Total Items in Pack:</strong> <span>@Model.TotalItemInPack</span>
+                                    </div>
+                                    <hr>
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex">
+                                        <a href="@Url.Action("EditProduct", new { id = Model.Id })" class="custom-btn btn-success mr-2">
+                                            <i class="ri-pencil-line"></i> Edit
+                                        </a>
+                                        <a href="@Url.Action("DeleteProduct", new { id = Model.Id })" class="custom-btn btn-danger">
+                                            <i class="ri-delete-bin-line"></i> Delete
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

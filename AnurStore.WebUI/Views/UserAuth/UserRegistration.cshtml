@@ -1,0 +1,109 @@
+﻿@model AnurStore.Application.RequestModel.CreateUserRequest
+
+@{
+    ViewData["Title"] = "User";
+    Layout = "_RegistrationLayout";
+}
+
+<div class="content-page">
+    <div class="container-fluid add-form-list">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card shadow">
+
+                    <!-- Card Header -->
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="card-title mb-0">User Registration</h4>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <form asp-controller="UserAuth" asp-action="UserRegistration" method="post">
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <div class="row">
+
+                                <!-- Username -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Username" class="form-label">User Name *</label>
+                                    <input asp-for="Username" class="form-control" placeholder="Enter User Name" required />
+                                    <span asp-validation-for="Username" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Email -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Email" class="form-label">Email</label>
+                                    <input asp-for="Email" class="form-control" placeholder="Enter Email" type="email" />
+                                    <span asp-validation-for="Email" class="text-danger small"></span>
+                                </div>
+
+                                <!-- First Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="FirstName" class="form-label">First Name *</label>
+                                    <input asp-for="FirstName" class="form-control" placeholder="Enter First Name" required />
+                                    <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Last Name -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="LastName" class="form-label">Last Name</label>
+                                    <input asp-for="LastName" class="form-control" placeholder="Enter Last Name" />
+                                    <span asp-validation-for="LastName" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Address -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Address" class="form-label">Address</label>
+                                    <input asp-for="Address" class="form-control" placeholder="Enter Address" />
+                                    <span asp-validation-for="Address" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Phone Number -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                    <input asp-for="PhoneNumber" class="form-control" placeholder="Enter Phone Number" type="tel" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Gender -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Gender" class="form-label">Gender</label>
+                                    <select asp-for="Gender" class="form-select">
+                                        <option value="">-- Select Gender --</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="PreferNotToSay">Prefer Not To Say</option>
+                                    </select>
+                                    <span asp-validation-for="Gender" class="text-danger small"></span>
+                                </div>
+
+
+                                <!-- Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="Password" class="form-label">Password *</label>
+                                    <input asp-for="Password" class="form-control" placeholder="Enter Password" type="password" required />
+                                    <span asp-validation-for="Password" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Confirm Password -->
+                                <div class="col-md-6 mb-3">
+                                    <label asp-for="ConfirmPassword" class="form-label">Confirm Password *</label>
+                                    <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm Password" type="password" required />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="text-end mt-3">
+                                <button type="submit" class="btn btn-primary">Sign Up</button>
+                            </div>
+
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

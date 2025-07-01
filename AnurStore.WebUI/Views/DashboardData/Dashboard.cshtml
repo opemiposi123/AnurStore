@@ -1,0 +1,182 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_DashboardLayout";
+}
+<div class="content-page">
+    <div class="container-fluid add-form-list">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="container-fluid mt-4">
+                    <!-- Top Boxes: 4 per line -->
+                    <div class="row g-4">
+                        <div class="col-md-3">
+                            <div class="card text-white bg-success shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Today Sales</div>
+                                    <div>₦3,100.00</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card text-white bg-danger shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Expired</div>
+                                    <div>0</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card text-white bg-warning shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Today Invoice</div>
+                                    <div>1</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card text-white bg-info shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">New Products</div>
+                                    <div>5</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-success bg-opacity-75 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Daily Profit</div>
+                                    <div>Coming Soon</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-success bg-opacity-75 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Weekly Profit</div>
+                                    <div>Coming Soon</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-success bg-opacity-75 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Current Month Profit</div>
+                                    <div>Coming Soon</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card bg-success bg-opacity-75 shadow-sm h-100">
+                                <div class="card-body text-center">
+                                    <div class="fw-bold">Current Year Profit</div>
+                                    <div>Coming Soon</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="row mt-5 g-4">
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Suppliers</div>
+                                <h5>1</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Invoices</div>
+                                <h5>1</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Current Month Sales</div>
+                                <h5>₦3,100.00</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Last 3 Month Record Sales</div>
+                                <h5>₦3,100.00</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Last 6 Month Record Sales</div>
+                                <h5>₦3,100.00</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Available Products</div>
+                                <h5>5</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Users</div>
+                                <h5>3</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Current Year Revenue</div>
+                                <h5>₦3,100.00</h5>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="card shadow-sm text-center p-3 h-100">
+                                <div>Stores</div>
+                                <h5>2</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Transactions Table -->
+                    <div class="mt-5">
+                        <h5 class="mb-3 text-primary fw-bold">Today's (Friday 2nd June, 2023) Transactions</h5>
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ORDER ID</th>
+                                    <th>CUSTOMER</th>
+                                    <th>PAYMENT</th>
+                                    <th>AMOUNT</th>
+                                    <th>ATTENDANT</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>INV-00001</td>
+                                    <td>POS</td>
+                                    <td>POS</td>
+                                    <td>₦3,100.00</td>
+                                    <td>Oluwatosin</td>
+                                    <td><span class="badge bg-success">Paid</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

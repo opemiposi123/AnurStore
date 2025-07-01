@@ -8,10 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCoreHero.ToastNotification" Version="1.1.0" />
+    <PackageReference Include="ClosedXML" Version="0.104.1" />
     <PackageReference Include="EPPlus" Version="8.0.5" />
     <PackageReference Include="FluentValidation" Version="11.11.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
+    <PackageReference Include="MailKit" Version="4.13.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
+    <PackageReference Include="NPOI" Version="2.7.4" />
     <PackageReference Include="Oscore.QrCodes.SkiaSharp" Version="1.1.1" />
 	<PackageReference Include="QRCoder" Version="1.6.0" />
 	<PackageReference Include="QuestPDF" Version="2025.5.1" />

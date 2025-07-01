@@ -3,12 +3,14 @@ using AnurStore.Application.Abstractions.Repositories;
 using AnurStore.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using AnurStore.Domain.Enums;
+using System.Linq;
 
 namespace AnurStore.Persistence.Repositories
 {
     public class InventoryRepository : IInventoryRepository
     {
         private readonly ApplicationContext _context;
+
 
         public InventoryRepository(ApplicationContext context)
         {
@@ -21,21 +23,23 @@ namespace AnurStore.Persistence.Repositories
                 .Where(i => i.StockStatus == status)
                 .ToListAsync();
         }
-
-        public async Task<Inventory?> GetByProductAndBatchAsync(string productId, string batchNumber)
+       
+        public async Task UpdateAsync(Inventory inventory)
         {
-            return await _context.Inventories
-                .FirstOrDefaultAsync(i => i.ProductId == productId && i.BatchNumber == batchNumber);
+            var tracked = _context.Inventories.Local.FirstOrDefault(e => e.Id == inventory.Id);
+            if (tracked != null)
+            {
+                _context.Entry(tracked).CurrentValues.SetValues(inventory);
+            }
+            else
+            {
+                _context.Inventories.Update(inventory);
+            }
         }
 
         public async Task AddAsync(Inventory inventory)
         {
             await _context.Inventories.AddAsync(inventory);
-        }
-
-        public async Task UpdateAsync(Inventory inventory)
-        {
-            _context.Inventories.Update(inventory);
         }
 
         public async Task<IList<Inventory>> GetAllInventories()
@@ -50,9 +54,32 @@ namespace AnurStore.Persistence.Repositories
                      .ThenInclude(r => r.Brand)
                   .ToListAsync();
             return inventory;
+        } 
+
+        public async Task<Inventory?> GetByProductAsync(string productId)
+        {
+            return await _context.Inventories
+                .FirstOrDefaultAsync(i => i.ProductId == productId);
         }
 
-     
+        public async Task<List<Inventory>> GetByProductsAndBatchAsync(List<string> productIds, string batch)
+        {
+            return await _context.Inventories
+                .Where(i => productIds.Contains(i.ProductId) && i.BatchNumber == batch)
+                .ToListAsync();
+        }
+
+        public async Task AddRangeAsync(List<Inventory> inventories)
+        {
+            await _context.Inventories.AddRangeAsync(inventories);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateRangeAsync(List<Inventory> inventories)
+        {
+            _context.Inventories.UpdateRange(inventories);
+            await _context.SaveChangesAsync();
+        }
     }
 
 }

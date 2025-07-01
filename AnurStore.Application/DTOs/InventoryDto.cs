@@ -14,7 +14,8 @@ namespace AnurStore.Application.DTOs
         public decimal? PackPrice { get; set; }   
         public decimal? UnitPrice { get; set; }  
         public string? ProductSize { get; set; } 
-        public int QuantityAvailable { get; set; }
+        public int TotalPiecesAvailable { get; set; }
+        public string FormattedQuantity { get; set; } = default!;
         public StockStatus StockStatus { get; set; } 
         public string CreatedBy { get; set; } = default!;
         public DateTime CreatedOn { get; set; }

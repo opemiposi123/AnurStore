@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using ZXing;
 using ZXing.Common;
-using ZXing.QrCode;
 
 public class ReceiptService : IReceiptService
 {
@@ -22,9 +21,9 @@ public class ReceiptService : IReceiptService
     public async Task<(ReceiptDto Receipt, byte[] PdfBytes)> GenerateFromProductSaleAsync(ProductSaleDto sale)
     {
         if (sale == null || sale.ProductSaleItems == null || !sale.ProductSaleItems.Any())
-            throw new Exception("Sale or Sale Items are empty. Cannot generate receipt.");
+            throw new ArgumentException("Sale or Sale Items are empty. Cannot generate receipt.");
 
-        var receiptNumber = $"INV-{DateTime.UtcNow.Ticks.ToString()[^6..]}";
+        var receiptNumber = $"ASR-{DateTime.UtcNow:yyyyMMdd}-{DateTime.UtcNow.Ticks.ToString()[^6..]}";
 
         var receiptEntity = new Reciept
         {
@@ -32,12 +31,12 @@ public class ReceiptService : IReceiptService
             CustomerName = sale.CustomerName,
             Discount = sale.Discount ?? 0,
             TotalAmount = sale.TotalAmount,
-            NetAmount = sale.TotalAmount,
+            NetAmount = sale.TotalAmount - (sale.Discount ?? 0),
             PaymentMethod = sale.PaymentMethod,
             CreatedOn = DateTime.Now,
             RecieptItems = sale.ProductSaleItems.Select(item => new RecieptItem
             {
-                ProductName = item.ProductName ?? "Unknown",
+                ProductName = item.ProductName ?? "Unknown Product",
                 Quantity = item.Quantity,
                 UnitPrice = item.Quantity > 0 ? item.SubTotal / item.Quantity : 0,
                 TotalPrice = item.SubTotal,
@@ -48,103 +47,7 @@ public class ReceiptService : IReceiptService
         await _receiptRepository.GenerateReceiptAsync(receiptEntity);
 
         byte[] qrImageData = GenerateQrCodeImage(receiptNumber);
-        byte[] pdfBytes;
-
-        try
-        {
-            var pdf = Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Size(PageSizes.A6);
-                    page.Margin(5);
-                    page.DefaultTextStyle(x => x.FontSize(8).FontFamily("Arial"));
-
-                    page.Content().Column(column =>
-                    {
-                        // Header
-                        column.Item().AlignCenter().Text("AnurStore").Bold().FontSize(11);
-                        column.Item().AlignCenter().Text("6 Unity Road, Ayoafolabi, Lagos").FontSize(6);
-                        column.Item().AlignCenter().Text("Tel: 09068041575").FontSize(6);
-                        column.Item().AlignCenter().Text(text =>
-                        {
-                            text.Span("Email: ").Bold().FontSize(6);
-                            text.Span("oseniahoseniahmadkorede@gmail.com").FontSize(6);
-                        });
-                        column.Item().PaddingVertical(1).LineHorizontal(1);
-                        column.Item().AlignCenter().Text("SALES INVOICE").Bold().FontSize(8);
-
-                        // Detail section
-                        void AddDetail(string label, string value)
-                        {
-                            column.Item().Row(row =>
-                            {
-                                row.ConstantItem(60).Text(label).Bold().FontSize(7);
-                                row.ConstantItem(5).Text(":");
-                                row.RelativeItem().AlignRight().Text(value).FontSize(7);
-                            });
-                        }
-
-                        AddDetail("INVOICE NO", receiptNumber);
-                        AddDetail("CUSTOMER", sale.CustomerName ?? "Guest");
-                        AddDetail("DATE", DateTime.Now.ToString("MMM dd, yyyy"));
-                        AddDetail("TIME", DateTime.Now.ToString("hh:mm tt"));
-
-                        column.Item().PaddingVertical(1).LineHorizontal(1);
-
-                        // Table
-                        column.Item().Table(table =>
-                        {
-                            table.ColumnsDefinition(columns =>
-                            {
-                                columns.RelativeColumn(5);
-                                columns.RelativeColumn(2);
-                                columns.RelativeColumn(3);
-                            });
-
-                            table.Header(header =>
-                            {
-                                header.Cell().Text("ITEM").Bold().FontSize(7);
-                                header.Cell().AlignCenter().Text("QTY").Bold().FontSize(7);
-                                header.Cell().AlignRight().Text("₦ AMOUNT").Bold().FontSize(7);
-                            });
-
-                            foreach (var item in receiptEntity.RecieptItems)
-                            {
-                                table.Cell().Element(CellStyle).Text(item.ProductName).FontSize(6.5f);
-                                table.Cell().Element(CellStyle).AlignCenter().Text(item.Quantity.ToString()).FontSize(6.5f);
-                                table.Cell().Element(CellStyle).AlignRight().Text($"{item.TotalPrice:N2}").FontSize(6.5f);
-                            }
-
-                            IContainer CellStyle(IContainer container) => container.PaddingVertical(1);
-                        });
-
-                        column.Item().PaddingVertical(1).LineHorizontal(1);
-
-                        AddDetail("TOTAL", $"₦{receiptEntity.TotalAmount:N2}");
-                        AddDetail("DISCOUNT", $"₦{receiptEntity.Discount:N2}");
-                        AddDetail("NET AMOUNT", $"₦{receiptEntity.NetAmount:N2}");
-                        AddDetail("PAID VIA", sale.PaymentMethod.ToString());
-
-                        column.Item().PaddingVertical(1).LineHorizontal(1);
-
-                        if (qrImageData != null && qrImageData.Length > 0)
-                        {
-                            column.Item().AlignCenter().Height(35).Image(qrImageData, ImageScaling.FitHeight);
-                        }
-
-                        column.Item().AlignCenter().Text("Thank you for your purchase!").Italic().FontSize(6.5f);
-                        column.Item().AlignCenter().Text("© 2025 AnurStore").FontSize(6);
-                    });
-                });
-            });
-
-            pdfBytes = pdf.GeneratePdf();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("PDF layout failed. Ensure all values and images are valid.", ex);
-        }
+        byte[] pdfBytes = GeneratePdfReceipt(receiptEntity, sale, qrImageData);
 
         var receiptDto = new ReceiptDto
         {
@@ -167,29 +70,207 @@ public class ReceiptService : IReceiptService
         return (receiptDto, pdfBytes);
     }
 
+    private byte[] GeneratePdfReceipt(Reciept receipt, ProductSaleDto sale, byte[] qrImageData)
+    {
+        try
+        {
+            var pdf = Document.Create(container =>
+            {
+                container.Page(page =>
+                {
+                    const float mmToPt = 2.83465f; 
+                    float width = 120f * mmToPt;
+                    float height = 200f * mmToPt;
+
+                    page.Size(width, height);
+                    page.PageColor(Colors.White);
+                    page.Margin(8f * mmToPt);
+                    page.DefaultTextStyle(x => x.FontSize(9).FontFamily("Arial"));
+
+                    page.Content().Column(column =>
+                    {
+                        // Header Section - Compact but wider
+                        column.Item().Background(Colors.Grey.Lighten4).Padding(6).Column(headerColumn =>
+                        {
+                            headerColumn.Item().AlignCenter().Text("ANUR STORE").Bold().FontSize(16).FontColor(Colors.Blue.Darken2);
+                            headerColumn.Item().AlignCenter().Text("Premium Quality Products").FontSize(9).Italic().FontColor(Colors.Grey.Darken1);
+                            headerColumn.Item().PaddingTop(3).AlignCenter().Text("📍 44 Idowu Buhari Str, Robiyan, Ogun").FontSize(8);
+                            headerColumn.Item().AlignCenter().Text("📞 08051550404").FontSize(8);
+                            headerColumn.Item().AlignCenter().Text("📧 anurstore@gmail.com").FontSize(8);
+                        });
+
+                        column.Item().PaddingVertical(4);
+
+                        // Receipt Header
+                        column.Item().Background(Colors.Blue.Lighten4).Padding(4).AlignCenter().Text("SALES RECEIPT").Bold().FontSize(13).FontColor(Colors.Blue.Darken2);
+
+                        column.Item().PaddingVertical(4);
+
+                        // Customer and Transaction Details in a more compact row format
+                        column.Item().Column(detailsColumn =>
+                        {
+                            // First row: Customer and Payment Method
+                            detailsColumn.Item().Row(row =>
+                            {
+                                row.RelativeItem().Text($"Customer: {receipt.CustomerName ?? "Walk-in Customer"}").FontSize(9).Bold();
+                                row.RelativeItem().AlignRight().Text($"Payment: {sale.PaymentMethod}").FontSize(9);
+                            });
+
+                            // Second row: Date and Receipt Number
+                            detailsColumn.Item().PaddingTop(2).Row(row =>
+                            {
+                                row.RelativeItem().Text($"Date: {DateTime.Now:MMM dd, yyyy HH:mm}").FontSize(9);
+                            });
+                        });
+
+                        column.Item().PaddingVertical(4).LineHorizontal(1).LineColor(Colors.Grey.Medium);
+
+                        // Items Section - Condensed format for many items
+                        column.Item().Column(itemsColumn =>
+                        {
+                            // Header
+                            itemsColumn.Item().Background(Colors.Blue.Lighten3).Padding(3).Row(headerRow =>
+                            {
+                                headerRow.ConstantItem(25).Text("#").Bold().FontSize(9);
+                                headerRow.RelativeItem(4).Text("ITEM").Bold().FontSize(9);
+                                headerRow.ConstantItem(35).AlignCenter().Text("QTY").Bold().FontSize(9);
+                                headerRow.ConstantItem(45).AlignRight().Text("UNIT").Bold().FontSize(9);
+                                headerRow.ConstantItem(55).AlignRight().Text("TOTAL").Bold().FontSize(9);
+                            });
+
+                            // Items - Compact single-line format for each item
+                            int serialNumber = 1;
+                            foreach (var item in receipt.RecieptItems)
+                            {
+                                // Alternate row colors for better readability
+                                var backgroundColor = serialNumber % 2 == 0 ? Colors.Grey.Lighten5 : Colors.White;
+
+                                itemsColumn.Item().Background(backgroundColor).Padding(2).Row(itemRow =>
+                                {
+                                    itemRow.ConstantItem(25).Text($"{serialNumber}").FontSize(9);
+                                    itemRow.RelativeItem(4).Text(TruncateText(item.ProductName, 25)).FontSize(9);
+                                    itemRow.ConstantItem(35).AlignCenter().Text($"{item.Quantity:N0}").FontSize(9);
+                                    itemRow.ConstantItem(45).AlignRight().Text($"₦{item.UnitPrice:N2}").FontSize(9);
+                                    itemRow.ConstantItem(55).AlignRight().Text($"₦{item.TotalPrice:N2}").FontSize(9).Bold();
+                                });
+
+                                serialNumber++;
+                            }
+                        });
+
+                        column.Item().PaddingVertical(4).LineHorizontal(1).LineColor(Colors.Grey.Medium);
+
+                        // Totals Section - More compact
+                        column.Item().Column(totalsColumn =>
+                        {
+                            var subtotal = receipt.TotalAmount + receipt.Discount;
+
+                            // Show subtotal if there's a discount
+                            if (receipt.Discount > 0)
+                            {
+                                totalsColumn.Item().Row(row =>
+                                {
+                                    row.RelativeItem().Text("Subtotal:").FontSize(10);
+                                    row.ConstantItem(80).AlignRight().Text($"₦{subtotal:N2}").FontSize(10);
+                                });
+
+                                totalsColumn.Item().Row(row =>
+                                {
+                                    row.RelativeItem().Text("Discount:").FontSize(10);
+                                    row.ConstantItem(80).AlignRight().Text($"-₦{receipt.Discount:N2}").FontSize(10).FontColor(Colors.Red.Medium);
+                                });
+                            }
+
+                            // Final Total with emphasis
+                            totalsColumn.Item().PaddingTop(3).Background(Colors.Blue.Lighten4).Padding(4).Row(totalRow =>
+                            {
+                                totalRow.RelativeItem().Text("TOTAL AMOUNT:").Bold().FontSize(12);
+                                totalRow.ConstantItem(90).AlignRight().Text($"₦{receipt.NetAmount:N2}").Bold().FontSize(14).FontColor(Colors.Green.Darken1);
+                            });
+                        });
+
+                        column.Item().PaddingVertical(6);
+
+                        // QR Code Section - Smaller to save space
+                        if (qrImageData != null && qrImageData.Length > 0)
+                        {
+                            column.Item().AlignCenter().Column(qrColumn =>
+                            {
+                                qrColumn.Item().Text("Scan for Verification").FontSize(8).FontColor(Colors.Grey.Darken1).AlignCenter();
+                                qrColumn.Item().PaddingTop(3).Height(35).AlignCenter().Image(qrImageData, ImageScaling.FitHeight);
+                            });
+                        }
+
+                        column.Item().PaddingVertical(4);
+
+                        // Footer - Condensed
+                        column.Item().Background(Colors.Grey.Lighten4).Padding(4).Column(footerColumn =>
+                        {
+                            footerColumn.Item().AlignCenter().Text("Thank you for choosing AnurStore!").Bold().FontSize(10).FontColor(Colors.Blue.Darken2);
+                            footerColumn.Item().AlignCenter().Text("Your satisfaction is our priority").FontSize(8).Italic().FontColor(Colors.Grey.Darken1);
+                            footerColumn.Item().PaddingTop(2).AlignCenter().Text($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm}").FontSize(7).FontColor(Colors.Grey.Medium);
+                        });
+                    });
+                });
+            });
+
+            return pdf.GeneratePdf();
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException("Failed to generate PDF receipt. Please ensure all data is valid.", ex);
+        }
+    }
+
+    // Helper method to truncate long product names
+    private string TruncateText(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+            return text;
+
+        return text.Substring(0, maxLength - 3) + "...";
+    }
+
     private byte[] GenerateQrCodeImage(string text)
     {
-        var qrWriter = new BarcodeWriterPixelData
+        try
         {
-            Format = BarcodeFormat.QR_CODE,
-            Options = new EncodingOptions { Height = 150, Width = 150, Margin = 1 }
-        };
+            var encodingOptions = new EncodingOptions
+            {
+                Height = 120, // Smaller QR code
+                Width = 120,
+                Margin = 1
+            };
 
-        var pixelData = qrWriter.Write(text);
+            encodingOptions.Hints.Add(EncodeHintType.ERROR_CORRECTION, ZXing.QrCode.Internal.ErrorCorrectionLevel.M);
+            encodingOptions.Hints.Add(EncodeHintType.CHARACTER_SET, "UTF-8");
 
-        using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppRgb);
-        var bitmapData = bitmap.LockBits(
-            new Rectangle(0, 0, pixelData.Width, pixelData.Height),
-            ImageLockMode.WriteOnly,
-            PixelFormat.Format32bppRgb
-        );
+            var qrWriter = new BarcodeWriterPixelData
+            {
+                Format = BarcodeFormat.QR_CODE,
+                Options = encodingOptions
+            };
 
-        System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
-        bitmap.UnlockBits(bitmapData);
+            var pixelData = qrWriter.Write(text);
 
-        using var stream = new MemoryStream();
-        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-        return stream.ToArray();
+            using var bitmap = new Bitmap(pixelData.Width, pixelData.Height, PixelFormat.Format32bppRgb);
+            var bitmapData = bitmap.LockBits(
+                new Rectangle(0, 0, pixelData.Width, pixelData.Height),
+                ImageLockMode.WriteOnly,
+                PixelFormat.Format32bppRgb
+            );
+
+            System.Runtime.InteropServices.Marshal.Copy(pixelData.Pixels, 0, bitmapData.Scan0, pixelData.Pixels.Length);
+            bitmap.UnlockBits(bitmapData);
+
+            using var stream = new MemoryStream();
+            bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+            return stream.ToArray();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"QR Code generation failed: {ex.Message}");
+            return new byte[0];
+        }
     }
 }
-

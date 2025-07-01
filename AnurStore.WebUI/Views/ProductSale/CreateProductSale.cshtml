@@ -24,14 +24,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Payment Method</label>
-                                    <select name="PaymentMethod" class="form-select">
+                                    <select name="PaymentMethod" class="form-select rounded-pill shadow-sm px-3" required>
                                         <option value="">-- Select Payment Method --</option>
                                         @foreach (var method in Enum.GetValues(typeof(PaymentMethod)))
                                         {
                                             <option value="@((int)method)">@method</option>
                                         }
                                     </select>
+                                    <div class="invalid-feedback">
+                                        Please select a payment method.
+                                    </div>
                                 </div>
+
                             </div>
 
                             <table class="table table-bordered text-center align-middle" id="cartTable">
@@ -119,11 +123,11 @@
                 const qty = item.Quantity;
 
                 switch (item.ProductUnitType) {
-            case 1: subtotal = (item.PricePerPack || 0) * qty; break;               // Pack
-            case 2: subtotal = (item.UnitPrice || 0) * qty; break;                  // Single
-            case 3: subtotal = ((item.PricePerPack || 0) / 2) * qty; break;         // Half
-            case 4: subtotal = ((item.PricePerPack || 0) / 4) * qty; break;         // Quarter
-        }
+                    case 1: subtotal = (item.PricePerPack || 0) * qty; break;
+                    case 2: subtotal = (item.UnitPrice || 0) * qty; break;
+                    case 3: subtotal = ((item.PricePerPack || 0) / 2) * qty; break;
+                    case 4: subtotal = ((item.PricePerPack || 0) / 4) * qty; break;
+                }
 
                 item.SubTotal = subtotal;
                 total += subtotal;
@@ -134,13 +138,12 @@
                 row.innerHTML = `
                     <td>${productName}</td>
                     <td>
-               <select class="form-select form-select-sm unit-type-select" data-index="${index}">
-            <option value="1" ${item.ProductUnitType === 1 ? "selected" : ""}>Pack</option>
-            <option value="2" ${item.ProductUnitType === 2 ? "selected" : ""}>Single</option>
-            <option value="3" ${item.ProductUnitType === 3 ? "selected" : ""}>Half</option>
-            <option value="4" ${item.ProductUnitType === 4 ? "selected" : ""}>Quarter</option>
-             </select>
-
+                        <select class="form-select form-select-sm unit-type-select" data-index="${index}">
+                            <option value="1" ${item.ProductUnitType === 1 ? "selected" : ""}>Pack</option>
+                            <option value="2" ${item.ProductUnitType === 2 ? "selected" : ""}>Single</option>
+                            <option value="3" ${item.ProductUnitType === 3 ? "selected" : ""}>Half</option>
+                            <option value="4" ${item.ProductUnitType === 4 ? "selected" : ""}>Quarter</option>
+                        </select>
                     </td>
                     <td><input type="number" min="1" value="${qty}" class="form-control form-control-sm quantity-input" data-index="${index}" /></td>
                     <td>₦${subtotal.toFixed(2)}</td>
@@ -188,19 +191,39 @@
             renderCart();
         });
 
+        // ✅ Quantity input uses "input" to update in real-time
         document.addEventListener("input", function (e) {
             if (e.target.classList.contains("quantity-input")) {
                 const index = parseInt(e.target.dataset.index);
-                cartItems[index].Quantity = parseInt(e.target.value);
-                renderCart();
+                const newQty = parseInt(e.target.value) || 0;
+                cartItems[index].Quantity = newQty;
+
+                const item = cartItems[index];
+                let subtotal = 0;
+
+                switch (item.ProductUnitType) {
+                    case 1: subtotal = (item.PricePerPack || 0) * newQty; break;
+                    case 2: subtotal = (item.UnitPrice || 0) * newQty; break;
+                    case 3: subtotal = ((item.PricePerPack || 0) / 2) * newQty; break;
+                    case 4: subtotal = ((item.PricePerPack || 0) / 4) * newQty; break;
+                }
+
+                item.SubTotal = subtotal;
+
+                const row = e.target.closest("tr");
+                row.querySelector("td:nth-child(4)").textContent = `₦${subtotal.toFixed(2)}`;
+
+                const total = cartItems.reduce((sum, p) => sum + p.SubTotal, 0);
+                document.getElementById("totalPayable").textContent = total.toFixed(2);
             }
         });
 
+        // ✅ Unit type still handled with "change"
         document.addEventListener("change", function (e) {
             if (e.target.classList.contains("unit-type-select")) {
                 const index = parseInt(e.target.dataset.index);
                 cartItems[index].ProductUnitType = parseInt(e.target.value);
-                renderCart();
+                renderCart(); // Full re-render OK for unit change
             }
         });
 
@@ -233,7 +256,7 @@
             products.forEach(product => {
                 $.get(`/ProductSale/get-product-by-id?id=${product.id || product.Id}`, function (productDetails) {
                     const displayName = `${productDetails.name || productDetails.Name} - ${productDetails.size || productDetails.Size || ""}
-                    ${productDetails.unitName || productDetails.UnitName || ""} (${productDetails.brandName || productDetails.BrandName || ""})`;
+                        ${productDetails.unitName || productDetails.UnitName || ""} (${productDetails.brandName || productDetails.BrandName || ""})`;
 
                     let html = `
                         <div class="col-md-4 mb-3">
@@ -264,4 +287,5 @@
             document.getElementById("SaleRequestJson").value = JSON.stringify(saleRequest);
         });
     </script>
+}
 }

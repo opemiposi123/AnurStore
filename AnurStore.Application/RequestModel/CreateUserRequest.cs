@@ -13,6 +13,6 @@ namespace AnurStore.Application.RequestModel
         public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
         public Gender Gender { get; set; }
-        public Role Role { get; set; }
+        public Role? Role { get; set; }
     }
 }

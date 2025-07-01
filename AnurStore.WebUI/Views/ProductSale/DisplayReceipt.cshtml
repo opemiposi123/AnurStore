@@ -1,0 +1,150 @@
+﻿@{
+    ViewData["Title"] = "Receipt Generated";
+    Layout = "_DashboardLayout";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-md-10">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <h4 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Sale Completed Successfully!
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="alert alert-success border-0 shadow-sm">
+                            <i class="fas fa-receipt fa-2x mb-2 text-success"></i>
+                            <h5 class="mb-1">Receipt Generated</h5>
+                            <p class="mb-0 text-muted">Your receipt has been successfully created and is ready for download.</p>
+                        </div>
+                    </div>
+
+                    <!-- PDF Preview Container -->
+                    <div class="pdf-preview-container mb-4">
+                        <div class="border rounded shadow-sm bg-light p-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-file-pdf text-danger me-1"></i>
+                                    Receipt Preview
+                                </h6>
+                                <small class="text-muted">@ViewBag.ReceiptFileName</small>
+                            </div>
+
+                            <!-- PDF Embed -->
+                            <div class="pdf-embed-container">
+                                <embed src="data:application/pdf;base64,@ViewBag.ReceiptData" 
+                                       type="application/pdf" 
+                                       width="100%" 
+                                       height="600px"
+                                       class="border rounded">
+
+                                <!-- Fallback for browsers that don't support PDF embedding -->
+                                <div class="pdf-fallback text-center py-5" style="display: none;">
+                                    <i class="fas fa-file-pdf fa-3x text-danger mb-3"></i>
+                                    <h6>PDF Preview Not Available</h6>
+                                    <p class="text-muted">Your browser doesn't support PDF preview. Please download the receipt to view it.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="@Url.Action("DownloadReceipt")" 
+                               class="btn btn-primary btn-lg w-100 shadow-sm">
+                                <i class="fas fa-download me-2"></i>
+                                Download Receipt
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <form asp-action="ContinueToSales" method="post" class="w-100">
+                                <button type="submit" class="btn btn-success btn-lg w-100 shadow-sm">
+                                    <i class="fas fa-arrow-right me-2"></i>
+                                    Continue to Product Sales
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Create New Sale -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-12">
+                            <a href="@Url.Action("CreateProductSale")" 
+                               class="btn btn-outline-primary btn-lg w-100 shadow-sm">
+                                <i class="fas fa-plus me-2"></i>
+                                Create New Product Sale
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-light text-center py-3">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Receipt generated on @DateTime.Now.ToString("MMM dd, yyyy 'at' hh:mm tt")
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .pdf-preview-container {
+        max-height: 650px;
+        overflow: hidden;
+    }
+
+    .pdf-embed-container {
+        position: relative;
+        min-height: 400px;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+    }
+
+    .alert {
+        border-radius: 10px;
+    }
+
+    @@media (max-width: 768px) {
+        .pdf-embed-container embed {
+            height: 400px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const embed = document.querySelector('embed');
+        const fallback = document.querySelector('.pdf-fallback');
+
+        const hasPlugins = navigator.plugins && navigator.plugins.length > 0;
+        const hasPdfPlugin = hasPlugins && Array.from(navigator.plugins).some(plugin =>
+            plugin.name.toLowerCase().includes('pdf') ||
+            plugin.name.toLowerCase().includes('adobe')
+        );
+
+        if (!hasPdfPlugin && !window.chrome) {
+            embed.style.display = 'none';
+            fallback.style.display = 'block';
+        }
+    });
+</script>

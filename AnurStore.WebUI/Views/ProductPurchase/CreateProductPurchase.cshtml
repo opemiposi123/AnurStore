@@ -26,17 +26,17 @@
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label asp-for="SupplierId">Supplier</label>
-                                    <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.Suppliers">
-                                        <option value="">Select Supplier</option> 
-                                    </select> 
-                                    <span asp-validation-for="SupplierId" class="text-danger"></span>
+                                    <label asp-for="Batch">Batch</label>
+                                    <input asp-for="Batch" class="form-control" placeholder="Enter Batch" readonly />
+                                    <span asp-validation-for="Batch" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4">
-                                    <label asp-for="Batch">Batch</label>
-                                    <input asp-for="Batch" class="form-control" placeholder="Enter Batch" required />
-                                    <span asp-validation-for="Batch" class="text-danger"></span>
+                                    <label asp-for="SupplierId">Supplier</label>
+                                    <select asp-for="SupplierId" class="form-control" asp-items="ViewBag.Suppliers">
+                                        <option value="">Select Supplier</option>
+                                    </select>
+                                    <span asp-validation-for="SupplierId" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -71,7 +71,7 @@
                                 </div>
                             </div>
 
-                            <input asp-for="IsAddedToInventory" type="hidden" value="true" />
+                            <input asp-for="IsAddedToInventory" type="hidden" value="false" />
                             <button type="submit" class="btn btn-primary mt-3">Submit Purchase</button>
                         </form>
                     </div>
@@ -88,6 +88,7 @@
 
     <script>
         let productIndex = 0;
+        let selectedProductIds = new Set();
 
         $(document).ready(function () {
             $("#product-search").autocomplete({
@@ -96,7 +97,8 @@
                         url: '/api/product/search',
                         data: { query: request.term },
                         success: function (data) {
-                            response(data.map(p => ({
+                            const filtered = data.filter(p => !selectedProductIds.has(p.id));
+                            response(filtered.map(p => ({
                                 label: p.display,
                                 value: p.id
                             })));
@@ -108,7 +110,13 @@
                 },
                 minLength: 1,
                 select: function (event, ui) {
+                    if (selectedProductIds.has(ui.item.value)) {
+                        _notyf.warning("Product already added!");
+                        return false;
+                    }
+
                     addProductRow(ui.item.label, ui.item.value);
+                    selectedProductIds.add(ui.item.value);
                     $("#product-search").val('');
                     return false;
                 }
@@ -143,17 +151,18 @@
         });
 
         $(document).on('click', '.remove-row', function () {
-            $(this).closest('tr').remove();
+            const row = $(this).closest('tr');
+            const productId = row.find('input[name*="ProductId"]').val();
+
+            selectedProductIds.delete(productId); // remove from set
+            row.remove();
             reindexPurchaseItems();
             recalculateTotals();
         });
 
         function reindexPurchaseItems() {
             $('#purchase-items-body tr').each(function (index) {
-                // Update the row number
                 $(this).find('td:first').text(index + 1);
-
-                // Update all input/select name attributes to match new index
                 $(this).find('input, select').each(function () {
                     const nameAttr = $(this).attr('name');
                     if (nameAttr) {
@@ -163,7 +172,6 @@
                 });
             });
 
-            // Reset productIndex to current number of rows
             productIndex = $('#purchase-items-body tr').length;
         }
 
@@ -180,10 +188,8 @@
                 grandTotal += subtotal;
             });
 
-            // Show grand total with comma format
             $('#grand-total').text(grandTotal.toLocaleString('en-NG', { minimumFractionDigits: 2 }));
             $('#total-hidden').val(grandTotal.toFixed(2));
         }
     </script>
 }
-

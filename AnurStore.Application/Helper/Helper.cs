@@ -1,7 +1,15 @@
-﻿namespace AnurStore.Application.Helper
+﻿using AnurStore.Application.Abstractions.Repositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace AnurStore.Application.Helper
 {
     public class Helper
     {
+        private readonly IUnitOfWork _unitOfWork;
+        public Helper(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
         public static string GetGreetingMessage()
         {
             var currentHour = DateTime.Now.Hour;
@@ -46,5 +54,15 @@
         {
             return Math.Round(number / 100, MidpointRounding.AwayFromZero) * 100;
         }
+
+        public static string GetFormattedQuantity(int totalPieces, int itemsPerPack)
+        {
+            int packs = totalPieces / itemsPerPack;
+            int pieces = totalPieces % itemsPerPack;
+            return $"{packs} pack(s), {pieces} piece(s)";
+        }
+
+
+
     }
 }
