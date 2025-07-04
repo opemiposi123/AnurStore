@@ -72,11 +72,25 @@
                             <option value="Cheque" selected="@(paymentType == "Cheque")">Cheque</option>
                         </select>
                     </div>
-                    <div class="col-md-3 d-grid">
-                        <button type="submit" class="btn btn-dark">
-                            <i class="fas fa-search me-1"></i> Search Record
-                        </button>
+                    <div class="col-md-3">
+                        <div class="row">
+                            <div class="col-6 d-grid">
+                                <button type="submit" class="btn btn-dark">
+                                    <i class="fas fa-search me-1"></i> Search
+                                </button>
+                            </div>
+                            <div class="col-6 d-grid">
+                                <a class="btn btn-outline-primary"
+                                   asp-action="ExportToPdf"
+                                   asp-route-fromDate="@fromDate"
+                                   asp-route-toDate="@toDate"
+                                   asp-route-paymentType="@paymentType">
+                                    <i class="fas fa-file-pdf me-1"></i> Export
+                                </a>
+                            </div>
+                        </div>
                     </div>
+
                 </form>
             </div>
         </div>

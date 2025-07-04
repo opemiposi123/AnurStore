@@ -16,6 +16,8 @@ using AnurStore.Persistence.Context;
 using AnurStore.Persistence.Context.Seeder;
 using AnurStore.Persistence.Repositories;
 using AspNetCoreHero.ToastNotification;
+using DinkToPdf.Contracts;
+using DinkToPdf;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -30,6 +32,8 @@ builder.Services.AddControllersWithViews();
 var connectionString = 
 builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer       (builder.Configuration.GetConnectionString("AnurStore")));
 builder.Services.Configure<EmailConfiguration>(builder.Configuration.GetSection("SMTPConfig"));
+builder.Services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
+
 //Repositories
 builder.Services.AddTransient<IBrandRepository, BrandRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();

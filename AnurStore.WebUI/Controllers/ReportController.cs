@@ -18,5 +18,14 @@ namespace AnurStore.WebUI.Controllers
             var report = await _reportService.GetSalesReportAsync(fromDate, toDate, paymentType);
             return View(report);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportToPdf([FromQuery] DateTime? fromDate, [FromQuery] DateTime? toDate, [FromQuery] string? paymentType)
+        {
+            var report = await _reportService.GetSalesReportAsync(fromDate, toDate, paymentType);
+
+            var pdfBytes = await _reportService.ExportSalesReportToPdfAsync(report);
+            return File(pdfBytes, "application/pdf", $"Sales_Report_{DateTime.Now:yyyyMMdd}.pdf");
+        }
     }
 }

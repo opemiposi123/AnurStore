@@ -125,6 +125,7 @@ namespace AnurStore.Application.Services
                     {
                         inventory.TotalPiecesAvailable += totalPieces;
                         inventory.StockDate = DateTime.Now;
+                        inventory.StockStatus = StockStatus.InStock; 
                         await _inventoryRepo.UpdateAsync(inventory);
                     }
                     else
