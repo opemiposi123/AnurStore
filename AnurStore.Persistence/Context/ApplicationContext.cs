@@ -51,33 +51,26 @@ public class ApplicationContext(DbContextOptions<ApplicationContext> options, IH
 
     private void ApplyAuditInfo()
     {
-        string fullName = "System";
+        string userName = "System";
 
         var httpContext = _httpContextAccessor?.HttpContext;
         if (httpContext != null && httpContext.User?.Identity?.IsAuthenticated == true)
         {
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!string.IsNullOrEmpty(userId))
-            {
-                var currentUser = Users.FirstOrDefault(u => u.Id == userId);
-
-                fullName = currentUser != null ? $"{currentUser.FirstName} {currentUser.LastName}" : "System";
-            }
+            userName = httpContext.User.Identity.Name ?? "System";
         }
 
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Entity.CreatedOn = DateTime.UtcNow;
-                entry.Entity.CreatedBy = fullName;
+                entry.Entity.CreatedOn = DateTime.Now;
+                entry.Entity.CreatedBy = userName;
             }
 
             if (entry.State == EntityState.Modified)
             {
-                entry.Entity.LastModifiedOn = DateTime.UtcNow;
-                entry.Entity.LastModifiedBy = fullName;
+                entry.Entity.LastModifiedOn = DateTime.Now;
+                entry.Entity.LastModifiedBy = userName;
             }
 
             if (entry.State == EntityState.Deleted && entry.Entity is ISoftDelete deletable)
