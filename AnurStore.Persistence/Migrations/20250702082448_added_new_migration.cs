@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AnurStore.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class addednewmigration : Migration
+    public partial class added_new_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -122,6 +122,30 @@ namespace AnurStore.Persistence.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PasswordResets",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ResetCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RequestedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    UsedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastModifiedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedOn = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordResets", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -480,7 +504,7 @@ namespace AnurStore.Persistence.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Batch = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Total = table.Column<decimal>(type: "money", nullable: false),
+                    Total = table.Column<decimal>(type: "money", precision: 16, scale: 2, nullable: false),
                     Discount = table.Column<decimal>(type: "money", nullable: true),
                     SupplierId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -544,7 +568,7 @@ namespace AnurStore.Persistence.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProductId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    QuantityAvailable = table.Column<int>(type: "int", nullable: false),
+                    TotalPiecesAvailable = table.Column<int>(type: "int", nullable: false),
                     StockDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime", nullable: true),
                     BatchNumber = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -841,6 +865,9 @@ namespace AnurStore.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Inventories");
+
+            migrationBuilder.DropTable(
+                name: "PasswordResets");
 
             migrationBuilder.DropTable(
                 name: "Payments");
