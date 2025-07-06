@@ -1,0 +1,175 @@
+﻿@using System.Security.Claims
+@using AnurStore.Application.Helper
+@model AnurStore.Application.DTOs.DashboardCountDto
+
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "_DashboardLayout";
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var username = User.Identity?.Name;
+    var greeting = Helper.GetGreetingMessage();
+}
+
+<div class="content-page">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Welcome -->
+            <div class="col-lg-4">
+                <div class="card card-transparent card-block card-stretch card-height border-none">
+                    <div class="card-body p-0 mt-lg-2 mt-0">
+                        <h3 class="mb-3">Hi @username, @greeting</h3>
+                        <p class="mb-0 mr-4">
+                            Your dashboard gives you views of key performance or business process.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metrics -->
+            <div class="col-lg-8">
+                <div class="row">
+                    <div class="col-lg-4 col-md-4">
+                        <div class="card card-block card-stretch card-height">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-4 card-total-sale">
+                                    <div class="icon iq-icon-box-2 bg-info-light">
+                                        <img src="../assets/images/product/1.png" class="img-fluid" alt="image" />
+                                    </div>
+                                    <div>
+                                        <p class="mb-2">Total Sales</p>
+                                        <h4>@Model.TotalSales</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="card card-block card-stretch card-height">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-4 card-total-sale">
+                                    <div class="icon iq-icon-box-2 bg-danger-light">
+                                        <img src="../assets/images/product/2.png" class="img-fluid" alt="image" />
+                                    </div>
+                                    <div>
+                                        <p class="mb-2">Total Purchases</p>
+                                        <h4>@Model.TotalPurchases</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4">
+                        <div class="card card-block card-stretch card-height">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-4 card-total-sale">
+                                    <div class="icon iq-icon-box-2 bg-success-light">
+                                        <img src="../assets/images/product/3.png" class="img-fluid" alt="image" />
+                                    </div>
+                                    <div>
+                                        <p class="mb-2">Total Revenue</p>
+                                        <h4>₦@Model.TotalRevenue.ToString("N2")</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="col-lg-6">
+                <div class="card card-block card-stretch card-height">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Overview</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="layout1-chart1"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card card-block card-stretch card-height">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Revenue Vs Cost</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="layout1-chart-2" style="min-height: 360px"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Products -->
+            <div class="col-lg-8">
+                <div class="card card-block card-stretch card-height">
+                    <div class="card-header d-flex justify-content-between">
+                        <div class="header-title">
+                            <h4 class="card-title">Top Products</h4>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled row top-product mb-0">
+                            @foreach (var product in Model.TopProducts)
+                            {
+                                <li class="col-lg-3">
+                                    <div class="card card-block card-stretch card-height mb-0">
+                                        <div class="card-body">
+                                            <div class="bg-warning-light rounded">
+                                                <img src="@product.ImageUrl" class="style-img img-fluid m-auto p-3" alt="image" />
+                                            </div>
+                                            <div class="style-text text-left mt-3">
+                                                <h5 class="mb-1">@product.ProductName</h5>
+                                                <p class="mb-0">@product.QuantityInStock Item(s)</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Best Selling Products -->
+            <div class="col-lg-4">
+                <div class="card card-transparent card-block card-stretch mb-4">
+                    <div class="card-header d-flex align-items-center justify-content-between p-0">
+                        <div class="header-title">
+                            <h4 class="card-title mb-0">Best Item All Time</h4>
+                        </div>
+                        <div class="card-header-toolbar d-flex align-items-center">
+                            <div>
+                                <a href="#" class="btn btn-primary view-btn font-size-14">View All</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @foreach (var product in Model.BestSellingProducts)
+                {
+                    <div class="card card-block card-stretch card-height-helf">
+                        <div class="card-body card-item-right">
+                            <div class="d-flex align-items-top">
+                                <div class="bg-success-light rounded">
+                                    <img src="@product.ImageUrl" class="style-img img-fluid m-auto" alt="image" />
+                                </div>
+                                <div class="style-text text-left">
+                                    <h5 class="mb-2">@product.ProductName</h5>
+                                    <p class="mb-2">Total Sell : @product.TotalSold</p>
+                                    <p class="mb-0">Total Earned : ₦@product.TotalEarned.ToString("N2")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var revenueCostData = @Html.Raw(Json.Serialize(Model.RevenueCostData));
+    var dailySalesData = @Html.Raw(Json.Serialize(Model.DailySalesData));
+</script>

@@ -4,9 +4,6 @@ using AnurStore.Application.Services;
 using AnurStore.Persistence.Context;
 using AnurStore.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
-
-using AnurStore.Application.Abstractions.Repositories;
-using AnurStore.Application.Abstractions.Services;
 using AnurStore.Application.RequestModel;
 using AnurStore.Application.Services;
 using AnurStore.Application.Validators.Brand;

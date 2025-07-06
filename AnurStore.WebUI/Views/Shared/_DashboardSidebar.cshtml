@@ -2,7 +2,7 @@
 <div class="iq-sidebar sidebar-default">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <div class="iq-sidebar-logo d-flex align-items-center justify-content-between">
-        <a href="@Url.Action("Dashboard", "DashboardData")" class="header-logo">
+        <a href="@Url.Action("Index", "Homw")" class="header-logo">
             <img src="~/assets/images/logo.png"
                  class="img-fluid rounded-normal light-logo" 
                  alt="logo" />
@@ -16,7 +16,7 @@
         <nav class="iq-sidebar-menu">
             <ul id="iq-sidebar-toggle" class="iq-menu">
                 <li class="active">
-                    <a href="@Url.Action("Index","Home")" class="svg-icon">
+                    <a href="@Url.Action("Index","Dashboard")" class="svg-icon">
                         <svg class="svg-icon"
                              id="p-dash1"
                              width="20"
@@ -434,7 +434,7 @@
                     </ul>
                 </li>
                 <li class=" ">
-                    <a href="~/backend/page-report.html" class="">
+                    <a href="@Url.Action("Index","Report")">
                         <svg class="svg-icon"
                              id="p-dash7"
                              width="20"

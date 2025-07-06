@@ -12,6 +12,7 @@ namespace AnurStore.Application.Abstractions.Repositories
         Task<int> GetTotalProductSalesCountAsync(string username = null);
         Task<List<ProductSale>> GetProductSalesPagedAsync(int pageNumber, int pageSize, string username = null);
         Task<List<string>> GetTopSoldProductsRawAsync(DateTime startDate, DateTime endDate, int limit = 9);
+        Task<List<ProductSale>> GetSalesWithFiltersAsync(DateTime? fromDate, DateTime? toDate, string? paymentType);
     }
 
 }

@@ -33,9 +33,12 @@
                             <div class="col-sm-6 text-end">
                                 <h6>Purchased By</h6>
                                 <p><strong>@Model.CreatedBy</strong></p>
-                                <p>Status: <span class="badge bg-success">
-                                    @(Model.IsAddedToInventory ? "Added to Inventory" : "Pending")
-                                </span></p>
+                                <p>
+                                    Status:
+                                    <span class="badge @(Model.IsAddedToInventory ? "bg-success" : "bg-warning")">
+                                        @(Model.IsAddedToInventory ? "Added to Inventory" : "Pending")
+                                    </span>
+                                </p>
                             </div>
                         </div>
 

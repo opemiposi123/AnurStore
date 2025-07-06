@@ -1,7 +1,6 @@
 ﻿using AnurStore.Application.DTOs;
 using AnurStore.Application.Abstractions.Services;
 using Microsoft.AspNetCore.Mvc;
-using AnurStore.Application.Abstractions.Repositories;
 
 namespace AnurStore.API.Controllers
 {

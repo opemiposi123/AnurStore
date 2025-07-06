@@ -99,7 +99,6 @@ namespace AnurStore.Application.Services
                         _ => 0
                     };
 
-                    // Calculate total pieces to deduct based on unit type
                     int totalUnitsToDeduct = item.ProductUnitType switch
                     {
                         ProductUnitType.Pack => item.Quantity * product.TotalItemInPack,
@@ -111,6 +110,7 @@ namespace AnurStore.Application.Services
 
                     var inventory = product.Inventory;
 
+                    // ❗ Check before deducting
                     if (inventory.TotalPiecesAvailable < totalUnitsToDeduct)
                     {
                         await _unitOfWork.RollbackAsync();
@@ -121,7 +121,22 @@ namespace AnurStore.Application.Services
                         };
                     }
 
+                    // ✅ Deduct once
                     inventory.TotalPiecesAvailable -= totalUnitsToDeduct;
+
+                    // ✅ Update StockStatus
+                    if (inventory.TotalPiecesAvailable == 0)
+                    {
+                        inventory.StockStatus = StockStatus.OutOfStock;
+                    }
+                    else if (inventory.TotalPiecesAvailable < product.TotalItemInPack * 10)
+                    {
+                        inventory.StockStatus = StockStatus.LowStock;
+                    }
+                    else
+                    {
+                        inventory.StockStatus = StockStatus.InStock;
+                    }
 
                     await _inventoryRepository.UpdateAsync(inventory);
 
@@ -190,13 +205,10 @@ namespace AnurStore.Application.Services
                 return new BaseResponse<byte[]>
                 {
                     Status = false,
-                    Message = $"Failed to record product sale. Please try again later.{ex.Message}"
+                    Message = $"Failed to record product sale. Please try again later. {ex.Message}"
                 };
             }
         }
-
-
-
 
         public async Task<BaseResponse<ProductSaleDto>> GetProductSaleById(string productSaleId)
         {
@@ -241,7 +253,6 @@ namespace AnurStore.Application.Services
                 Data = productSaleDto
             };
         }
-
 
         public async Task<BaseResponse<List<ProductDto>>> GetTopFrequentlySoldProductsAsync(int days = 7)
         {
@@ -306,17 +317,6 @@ namespace AnurStore.Application.Services
                 };
             }
 
-            var user = await _userManager.GetUserAsync(userPrincipal);
-            if (user == null)
-            {
-                return new PagedResponse<List<ProductSaleDto>>
-                {
-                    Status = false,
-                    Message = "User not found."
-                };
-            }
-
-            bool isAdmin = await _userManager.IsInRoleAsync(user, "Admin");
 
             var username = userPrincipal?.Identity?.Name;
             var productSales = await _productSaleRepository.GetProductSalesPagedAsync(pageNumber, pageSize, username);
@@ -364,7 +364,6 @@ namespace AnurStore.Application.Services
                 TotalRecords = totalRecords
             };
         }
-
 
         public async Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter)
         {
@@ -420,8 +419,6 @@ namespace AnurStore.Application.Services
             };
         }
 
-
-
         public async Task<BaseResponse<bool>> CancelProductSaleAsync(string saleId)
         {
             var sale = await _productSaleRepository.GetProductSaleByIdAsync(saleId);
@@ -445,7 +442,6 @@ namespace AnurStore.Application.Services
 
             return new BaseResponse<bool> { Status = true, Message = "Sale canceled successfully.", Data = true };
         }
-
 
         public async Task<BaseResponse<bool>> UpdateProductSaleAsync(string productSaleId, UpdateProductSaleRequest request)
         {
@@ -593,8 +589,5 @@ namespace AnurStore.Application.Services
                 };
             }
         }
-
-
-
     }
 }
