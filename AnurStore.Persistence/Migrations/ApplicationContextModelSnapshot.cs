@@ -476,6 +476,7 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Total")
+                        .HasPrecision(16, 2)
                         .HasColumnType("money");
 
                     b.HasKey("Id");

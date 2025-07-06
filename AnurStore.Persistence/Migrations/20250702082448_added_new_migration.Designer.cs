@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnurStore.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    [Migration("20250626133120_Change Quantty name")]
-    partial class ChangeQuanttyname
+    [Migration("20250702082448_added_new_migration")]
+    partial class added_new_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -265,6 +265,58 @@ namespace AnurStore.Persistence.Migrations
                     b.ToTable("Inventories");
                 });
 
+            modelBuilder.Entity("AnurStore.Domain.Entities.PasswordReset", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("LastModifiedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("RequestedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ResetCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PasswordResets");
+                });
+
             modelBuilder.Entity("AnurStore.Domain.Entities.Payment", b =>
                 {
                     b.Property<string>("Id")
@@ -427,6 +479,7 @@ namespace AnurStore.Persistence.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Total")
+                        .HasPrecision(16, 2)
                         .HasColumnType("money");
 
                     b.HasKey("Id");
