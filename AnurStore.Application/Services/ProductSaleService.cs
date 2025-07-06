@@ -52,14 +52,14 @@ namespace AnurStore.Application.Services
                 var saleItems = new List<ProductSaleItem>();
                 var productNames = new Dictionary<string, string>();
 
-                foreach (var item in request.ProductSaleItems) 
+                foreach (var item in request.ProductSaleItems)
                 {
                     var product = await _productRepository.GetProductById(item.ProductId);
 
                     if (product == null)
                     {
                         await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]> 
+                        return new BaseResponse<byte[]>
                         {
                             Status = false,
                             Message = $"Product with ID {item.ProductId} not found"
@@ -109,8 +109,22 @@ namespace AnurStore.Application.Services
                     };
 
                     var inventory = product.Inventory;
+
+                    // ❗ Check before deducting
+                    if (inventory.TotalPiecesAvailable < totalUnitsToDeduct)
+                    {
+                        await _unitOfWork.RollbackAsync();
+                        return new BaseResponse<byte[]>
+                        {
+                            Status = false,
+                            Message = $"Insufficient stock for {product.Name}. Only {inventory.TotalPiecesAvailable} pieces available."
+                        };
+                    }
+
+                    // ✅ Deduct once
                     inventory.TotalPiecesAvailable -= totalUnitsToDeduct;
 
+                    // ✅ Update StockStatus
                     if (inventory.TotalPiecesAvailable == 0)
                     {
                         inventory.StockStatus = StockStatus.OutOfStock;
@@ -123,21 +137,6 @@ namespace AnurStore.Application.Services
                     {
                         inventory.StockStatus = StockStatus.InStock;
                     }
-
-                    await _inventoryRepository.UpdateAsync(inventory);
-
-
-                    if (inventory.TotalPiecesAvailable < totalUnitsToDeduct)
-                    {
-                        await _unitOfWork.RollbackAsync();
-                        return new BaseResponse<byte[]>
-                        {
-                            Status = false,
-                            Message = $"Insufficient stock for {product.Name}. Only {inventory.TotalPiecesAvailable} pieces available."
-                        };
-                    }
-
-                    inventory.TotalPiecesAvailable -= totalUnitsToDeduct;
 
                     await _inventoryRepository.UpdateAsync(inventory);
 
@@ -206,13 +205,10 @@ namespace AnurStore.Application.Services
                 return new BaseResponse<byte[]>
                 {
                     Status = false,
-                    Message = $"Failed to record product sale. Please try again later.{ex.Message}"
+                    Message = $"Failed to record product sale. Please try again later. {ex.Message}"
                 };
             }
         }
-
-
-
 
         public async Task<BaseResponse<ProductSaleDto>> GetProductSaleById(string productSaleId)
         {
@@ -257,7 +253,6 @@ namespace AnurStore.Application.Services
                 Data = productSaleDto
             };
         }
-
 
         public async Task<BaseResponse<List<ProductDto>>> GetTopFrequentlySoldProductsAsync(int days = 7)
         {
@@ -370,8 +365,6 @@ namespace AnurStore.Application.Services
             };
         }
 
-
-
         public async Task<PagedResponse<List<ProductSaleDto>>> GetFilteredProductSalesPagedAsync(ProductSaleFilterRequest filter)
         {
             var query = await _productSaleRepository.GetAllProductSalesAsync();
@@ -449,7 +442,6 @@ namespace AnurStore.Application.Services
 
             return new BaseResponse<bool> { Status = true, Message = "Sale canceled successfully.", Data = true };
         }
-
 
         public async Task<BaseResponse<bool>> UpdateProductSaleAsync(string productSaleId, UpdateProductSaleRequest request)
         {
@@ -597,8 +589,5 @@ namespace AnurStore.Application.Services
                 };
             }
         }
-
-
-
     }
 }
