@@ -48,7 +48,7 @@ namespace AnurStore.Application.Services
             _brandRepository = brandRepository;
             _logger = logger;
             _productUnitRepository = productUnitRepository;
-        }
+        } 
 
         public async Task<BaseResponse<string>> CreateProductAsync(CreateProductRequest request)
         {
@@ -63,7 +63,7 @@ namespace AnurStore.Application.Services
                     Message = "Request cannot be null",
                     Status = false,
                 };
-            }
+            } 
 
             try
             {
@@ -71,7 +71,7 @@ namespace AnurStore.Application.Services
 
 
                 string productImageUrl = null;
-                if (request.ProductImage != null && request.ProductImage.Length > 0)
+                if (request.ProductImage != null && request.ProductImage.Length > 0) 
                 {
                     productImageUrl = await SaveFileAsync(request.ProductImage);
                 }
@@ -439,9 +439,8 @@ namespace AnurStore.Application.Services
                     CategoryName = product.Category?.Name ?? "N/A",
                     BrandName = product.Brand?.Name ?? "N/A",
                     Size = product.ProductSize?.Size ?? 0,
+                    SizeWithUnit = $"{product.ProductSize?.Size} {product.ProductSize?.ProductUnit?.Name}",
                     UnitName = product.ProductSize?.ProductUnit?.Name ?? "N/A",
-
-
                 };
 
                 _logger.LogInformation("Successfully retrieved Product with Id {ProductId}.", productId);

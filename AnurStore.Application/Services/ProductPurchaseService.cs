@@ -42,7 +42,8 @@ namespace AnurStore.Application.Services
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
             _logger = logger;
-        }
+        } 
+
         public async Task<BaseResponse<string>> PurchaseProductsAsync(CreateProductPurchaseRequest request, string userName)
         {
             _logger.LogInformation("Creating product purchase. SupplierId: {SupplierId}, Batch: {Batch}", request.SupplierId, request.Batch);
@@ -536,8 +537,5 @@ namespace AnurStore.Application.Services
                 }
             };
         }
-
-      
     }
-
 }

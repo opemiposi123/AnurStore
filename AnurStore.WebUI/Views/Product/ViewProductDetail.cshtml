@@ -1,56 +1,295 @@
 ﻿@model AnurStore.Application.DTOs.ProductDto
+
 @{
     ViewData["Title"] = "Product Details";
     Layout = "_DashboardLayout";
 }
+
+<style>
+    .product-details-card {
+        border: none;
+        border-radius: 20px;
+        overflow: hidden;
+        background: #fff;
+    }
+
+    .product-image-container {
+        background: linear-gradient(135deg, #f8f9fa, #eef2f7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%;
+        padding: 30px;
+    }
+
+    .product-image {
+        width: 100%;
+        max-height: 420px;
+        object-fit: contain;
+        border-radius: 15px;
+    }
+
+    .product-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #222;
+    }
+
+    .product-desc {
+        font-size: 15px;
+        line-height: 1.8;
+    }
+
+    .info-card {
+        background: #f8f9fc;
+        border-radius: 14px;
+        padding: 18px;
+        transition: .3s ease;
+        height: 100%;
+    }
+
+        .info-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+    .info-label {
+        font-size: 13px;
+        color: #6c757d;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+    }
+
+    .info-value {
+        font-size: 18px;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #444;
+        margin-bottom: 15px;
+    }
+
+    .custom-btn {
+        border: none;
+        border-radius: 10px;
+        padding: 10px 22px;
+        font-weight: 600;
+        transition: .3s ease;
+    }
+
+        .custom-btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .meta-box {
+        background: #fff;
+        border: 1px solid #edf0f5;
+        border-radius: 12px;
+        padding: 15px;
+    }
+
+    .barcode-box {
+        background: #f4f6fa;
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-family: monospace;
+        font-size: 14px;
+    }
+</style>
+
 <div class="content-page">
     <div class="container-fluid">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="container mt-5">
-                    <div class="custom-card shadow">
-                        <div class="row no-gutters">
-                            <div class="col-md-5">
-                                <img src="@Model.ProductImageUrl" class="img-fluid rounded-start custom-img" alt="@Model.Name">
-                            </div>
-                            <div class="col-md-7">
-                                <div class="custom-card-body p-4">
-                                    <h3 class="custom-title">@Model.Name</h3>
-                                    <p class="custom-text text-muted">@Model.Description</p>
-                                    <hr>
-                                    <div>
-                                        <strong>Category:</strong> <span class="text-primary">@Model.CategoryName</span>
-                                    </div>
-                                    <div>
-                                        <strong>Brand:</strong> <span class="text-success">@Model.BrandName</span>
-                                    </div>
-                                    <div>
-                                        <strong>Unit Price:</strong> <span class="text-danger">₦@Model.UnitPrice</span>
-                                    </div>
-                                    <div>
-                                        <strong>Price Per Pack:</strong> <span class="text-warning">₦@Model.PricePerPack</span>
-                                    </div>
-                                    <div>
-                                        <strong>Size:</strong> <span class="text-info">@Model.SizeWithUnit</span>
-                                    </div>
-                                    <div>
-                                        <strong>Total Items in Pack:</strong> <span>@Model.TotalItemInPack</span>
-                                    </div>
-                                    <hr>
-                                    <!-- Action Buttons -->
-                                    <div class="d-flex">
-                                        <a href="@Url.Action("EditProduct", new { id = Model.Id })" class="custom-btn btn-success mr-2">
-                                            <i class="ri-pencil-line"></i> Edit
-                                        </a>
-                                        <a href="@Url.Action("DeleteProduct", new { id = Model.Id })" class="custom-btn btn-danger">
-                                            <i class="ri-delete-bin-line"></i> Delete
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1 font-weight-bold">Product Details</h2>
+                <p class="text-muted mb-0">
+                    View complete information about this product
+                </p>
+            </div>
+
+            <div>
+                <a href="@Url.Action("EditProduct", new { id = Model.Id })"
+                   class="btn btn-success custom-btn mr-2">
+                    <i class="ri-pencil-line"></i> Edit Product
+                </a>
+
+                <a href="@Url.Action("DeleteProduct", new { id = Model.Id })"
+                   class="btn btn-danger custom-btn">
+                    <i class="ri-delete-bin-line"></i> Delete
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-lg product-details-card">
+            <div class="row no-gutters">
+
+                <!-- Product Image -->
+                <div class="col-lg-4">
+                    <div class="product-image-container h-100">
+                        <img src="@Model.ProductImageUrl"
+                             alt="@Model.Name"
+                             class="product-image" />
                     </div>
                 </div>
+
+                <!-- Product Details -->
+                <div class="col-lg-8">
+                    <div class="p-4 p-lg-5">
+
+                        <div class="mb-4">
+                            <h1 class="product-title">@Model.Name</h1>
+
+                            <p class="product-desc text-muted mt-3">
+                                @(string.IsNullOrWhiteSpace(Model.Description)
+                                    ? "No product description available."
+                                    : Model.Description)
+                            </p>
+                        </div>
+
+                        <!-- Basic Info -->
+                        <div class="mb-4">
+                            <h5 class="section-title">Basic Information</h5>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Category</div>
+                                        <div class="info-value text-primary">
+                                            @Model.CategoryName
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Brand</div>
+                                        <div class="info-value text-success">
+                                            @Model.BrandName
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Size With Unit</div>
+                                        <div class="info-value text-info">
+                                            @Model.SizeWithUnit
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Items Per Pack</div>
+                                        <div class="info-value">
+                                            @Model.TotalItemInPack
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Pricing -->
+                        <div class="mb-4">
+                            <h5 class="section-title">Pricing Information</h5>
+
+                            <div class="row">
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Unit Price</div>
+                                        <div class="info-value text-danger">
+                                            ₦@Model.UnitPrice?.ToString("N2")
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Pack Price</div>
+                                        <div class="info-value text-warning">
+                                            ₦@Model.PricePerPack?.ToString("N2")
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="info-card">
+                                        <div class="info-label">Pack Markup</div>
+                                        <div class="info-value text-success">
+                                            @Model.PackPriceMarkup%
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Product Metadata -->
+                        <div>
+                            <h5 class="section-title">Product Metadata</h5>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-box">
+                                        <div class="info-label">Barcode</div>
+
+                                        <div class="barcode-box">
+                                            @(string.IsNullOrWhiteSpace(Model.BarCode)
+                                                ? "N/A"
+                                                : Model.BarCode)
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-box">
+                                        <div class="info-label">Created By</div>
+
+                                        <div class="info-value">
+                                            @Model.CreatedBy
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <div class="meta-box">
+                                        <div class="info-label">Created On</div>
+
+                                        <div class="info-value">
+                                            @Model.CreatedOn.ToString("dddd, dd MMM yyyy")
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @if (Model.LastModifiedOn.HasValue)
+                                {
+                                    <div class="col-md-6 mb-3">
+                                        <div class="meta-box">
+                                            <div class="info-label">Last Modified</div>
+
+                                            <div class="info-value">
+                                                @Model.LastModifiedOn.Value.ToString("dddd, dd MMM yyyy")
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
